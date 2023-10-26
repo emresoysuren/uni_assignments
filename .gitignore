@@ -1,0 +1,5 @@
+# VSCode Related
+.vscode/
+
+# Binary
+*.exe
