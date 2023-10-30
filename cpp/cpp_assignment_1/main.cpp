@@ -12,8 +12,8 @@
 
 #include <iostream>
 #include <string>
-#include <cstring>
-#include <math.h>
+#include <iomanip>
+#include <cmath>
 #include <map>
 using namespace std;
 
@@ -59,6 +59,8 @@ int rastgeleNot();
 int main()
 {
 
+    cout << left;
+
     // Random fonksiyonunun seedini belirler.
     srand((unsigned int)time(NULL));
 
@@ -90,10 +92,9 @@ int main()
     NotBilgisi *notlar = new NotBilgisi[ogrenciSayisi];
     map<string, int> notuAlanlar;
 
-    string baslik = "Ogrenciler ve Yil Sonu Notlari";
-
-    printf("\n| %*s%s%*s |\n", (43 - strlen(baslik.c_str())) / 2, "", baslik.c_str(), (43 - strlen(baslik.c_str())) / 2, "");
-    printf("| %-20s | %-20s |\n", "Adi Soyadi", "Harf Not (Sayisal)");
+    cout << endl
+         << setw(40) << "Ogrenciler ve Yil Sonu Notlari" << endl;
+    cout << setw(20) << "Adi Soyadi" << setw(20) << "Harf Not (Sayisal)" << endl;
 
     // Verilen sayida rastgele ad ve soyadlar ile
     // rastgele not değerlerinde ogrenciler oluştur.
@@ -133,23 +134,22 @@ int main()
 
     sinif.standartSapma = sqrt(sinif.standartSapma / (ogrenciSayisi - 1));
 
-    baslik = "Sinif Bilgileri";
+    cout << endl
+         << setw(100) << "Sinif Bilgileri" << endl;
+    cout << setw(20) << "Ogrenci Sayisi" << setw(20) << "En Dusuk Not" << setw(20) << "En Yuksek Not" << setw(20) << "Ortalama" << setw(20) << "Standart Sapma" << endl;
+    cout << setw(20) << ogrenciSayisi << setw(20) << setprecision(5) << sinif.enDusukNot << setw(20) << setprecision(5) << sinif.enYuksekNot << setw(20) << setprecision(5) << sinif.ortalama << setw(20) << setprecision(5) << sinif.standartSapma << endl;
 
-    printf("\n| %*s%s%*s |\n", (112 - strlen(baslik.c_str())) / 2, "", baslik.c_str(), (112 - strlen(baslik.c_str())) / 2, "");
-    printf("| %-20s | %-20s | %-20s | %-20s | %-20s |\n", "Ogrenci Sayisi", "En Dusuk Not", "En Yuksek Not", "Ortalama", "Standart Sapma");
-    printf("| %-20d | %-20.2f | %-20.2f | %-20.2f | %-20.2f |\n", ogrenciSayisi, sinif.enDusukNot, sinif.enYuksekNot, sinif.ortalama, sinif.standartSapma);
-
-    baslik = "Notlarin Sayisal Dagilimi";
-
-    printf("\n| %*s%s%*s |\n", (43 - strlen(baslik.c_str())) / 2, "", baslik.c_str(), (43 - strlen(baslik.c_str())) / 2, "");
-    printf("| %-20s | %-20s |\n", "Harf Not", "Alan Kisi Sayisi");
+    cout << endl
+         << setw(40) << "Notlarin Sayisal Dagilimi" << endl;
+    cout << setw(20) << "Harf Not" << setw(20) << "Alan Kisi Sayisi" << endl;
 
     for (auto [k, v] : notuAlanlar)
     {
-        printf("| %-20s | %-20d |\n", k.c_str(), v);
+        cout << setw(20) << k << setw(20) << v << endl;
     }
 
-    cout << "\nProgramin Sonuna Ulasildi";
+    cout << endl
+         << "Programin Sonuna Ulasildi";
 
     return 0;
 }
@@ -162,7 +162,7 @@ void ogrenciYilsonuNotuYazdir(Ogrenci ogr, AgirlikKatsayileri agirliklar)
     NotBilgisi yilSonuNotu = yilSonuNotuHesapla(ogr, agirliklar);
 
     // Ad Soyad ve Yil Sonu notunu yazdir Yazdir
-    printf("| %-20s | %-20s |\n", (ogr.isim + " " + ogr.soyisim).c_str(), (yilSonuNotu.harf + " (" + to_string(yilSonuNotu.sayisalNot) + ")").c_str());
+    cout << setw(20) << ogr.isim + " " + ogr.soyisim << setw(20) << yilSonuNotu.harf + " (" + to_string(yilSonuNotu.sayisalNot) + ")" << endl;
 }
 
 NotBilgisi yilSonuNotuHesapla(Ogrenci ogr, AgirlikKatsayileri agirliklar)
