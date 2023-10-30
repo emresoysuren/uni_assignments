@@ -54,6 +54,7 @@ Ogrenci rastgeleOgrenciOlustur();
 void ogrenciYilsonuNotuYazdir(Ogrenci, AgirlikKatsayileri);
 NotBilgisi notuBul(float);
 NotBilgisi yilSonuNotuHesapla(Ogrenci, AgirlikKatsayileri);
+int rastgeleNot();
 
 int main()
 {
@@ -91,8 +92,8 @@ int main()
 
     string baslik = "Ogrenciler ve Yil Sonu Notlari";
 
-    printf("\n|%*s%s%*s|\n", (41 - strlen(baslik.c_str())) / 2, "", baslik.c_str(), (41 - strlen(baslik.c_str())) / 2, "");
-    printf("|%-20s|%-20s|\n", "Adi Soyadi", "Harf Not (Sayisal)");
+    printf("\n| %*s%s%*s |\n", (43 - strlen(baslik.c_str())) / 2, "", baslik.c_str(), (43 - strlen(baslik.c_str())) / 2, "");
+    printf("| %-20s | %-20s |\n", "Adi Soyadi", "Harf Not (Sayisal)");
 
     // Verilen sayida rastgele ad ve soyadlar ile
     // rastgele not değerlerinde ogrenciler oluştur.
@@ -134,18 +135,18 @@ int main()
 
     baslik = "Sinif Bilgileri";
 
-    printf("\n|%*s%s%*s|\n", (83 - strlen(baslik.c_str())) / 2, "", baslik.c_str(), (83 - strlen(baslik.c_str())) / 2, "");
-    printf("|%-20s|%-20s|%-20s|%-20s|\n", "En Dusuk Not", "En Yuksek Not", "Ortalama", "Standart Sapma");
-    printf("|%-20.2f|%-20.2f|%-20.2f|%-20.2f|\n", sinif.enDusukNot, sinif.enYuksekNot, sinif.ortalama, sinif.standartSapma);
+    printf("\n| %*s%s%*s |\n", (112 - strlen(baslik.c_str())) / 2, "", baslik.c_str(), (112 - strlen(baslik.c_str())) / 2, "");
+    printf("| %-20s | %-20s | %-20s | %-20s | %-20s |\n", "Ogrenci Sayisi", "En Dusuk Not", "En Yuksek Not", "Ortalama", "Standart Sapma");
+    printf("| %-20d | %-20.2f | %-20.2f | %-20.2f | %-20.2f |\n", ogrenciSayisi, sinif.enDusukNot, sinif.enYuksekNot, sinif.ortalama, sinif.standartSapma);
 
     baslik = "Notlarin Sayisal Dagilimi";
 
-    printf("\n|%*s%s%*s|\n", (41 - strlen(baslik.c_str())) / 2, "", baslik.c_str(), (41 - strlen(baslik.c_str())) / 2, "");
-    printf("|%-20s|%-20s|\n", "Harf Not", "Alan Kisi Sayisi");
+    printf("\n| %*s%s%*s |\n", (43 - strlen(baslik.c_str())) / 2, "", baslik.c_str(), (43 - strlen(baslik.c_str())) / 2, "");
+    printf("| %-20s | %-20s |\n", "Harf Not", "Alan Kisi Sayisi");
 
     for (auto [k, v] : notuAlanlar)
     {
-        printf("|%-20s|%-20d|\n", k.c_str(), v);
+        printf("| %-20s | %-20d |\n", k.c_str(), v);
     }
 
     cout << "\nProgramin Sonuna Ulasildi";
@@ -161,12 +162,14 @@ void ogrenciYilsonuNotuYazdir(Ogrenci ogr, AgirlikKatsayileri agirliklar)
     NotBilgisi yilSonuNotu = yilSonuNotuHesapla(ogr, agirliklar);
 
     // Ad Soyad ve Yil Sonu notunu yazdir Yazdir
-    printf("|%-20s|%-20s|\n", (ogr.isim + " " + ogr.soyisim).c_str(), (yilSonuNotu.harf + " (" + to_string(yilSonuNotu.sayisalNot) + ")").c_str());
+    printf("| %-20s | %-20s |\n", (ogr.isim + " " + ogr.soyisim).c_str(), (yilSonuNotu.harf + " (" + to_string(yilSonuNotu.sayisalNot) + ")").c_str());
 }
 
 NotBilgisi yilSonuNotuHesapla(Ogrenci ogr, AgirlikKatsayileri agirliklar)
 {
-    float yilSonuNotu = (ogr.odev[0] + ogr.odev[1]) * (agirliklar.odev / 100) + (ogr.kisa_sinav[0] + ogr.kisa_sinav[1]) * (agirliklar.kisaSinav / 100) + ogr.vize * (agirliklar.vize / 100);
+    float agirlikPaydasi = agirliklar.kisaSinav * 2 + agirliklar.odev * 2 + agirliklar.vize;
+
+    float yilSonuNotu = (ogr.odev[0] + ogr.odev[1]) * (agirliklar.odev / agirlikPaydasi) + (ogr.kisa_sinav[0] + ogr.kisa_sinav[1]) * (agirliklar.kisaSinav / agirlikPaydasi) + ogr.vize * (agirliklar.vize / agirlikPaydasi);
 
     NotBilgisi notBilgisi = notuBul(yilSonuNotu);
 
@@ -206,35 +209,20 @@ Ogrenci rastgeleOgrenciOlustur()
         "Aydin",
     };
 
-    // Rastgele bir şekilde %20'si 80 ile 100 arasi, %50'si 80 ile 50 arasi, %30'u 50 ile 0 arasi
-    // ogrencinin notlarina atanabilicek notlar oluşturur.
-    const int atanabilicekNotlar[10] = {
-        rastgeleSayi(81, 100),
-        rastgeleSayi(81, 100),
-        rastgeleSayi(51, 80),
-        rastgeleSayi(51, 80),
-        rastgeleSayi(51, 80),
-        rastgeleSayi(51, 80),
-        rastgeleSayi(51, 80),
-        rastgeleSayi(0, 50),
-        rastgeleSayi(0, 50),
-        rastgeleSayi(0, 50),
-    };
-
     // Ogrencinin bilgilerini rastgele oluşturup bunu döner.
     return Ogrenci{
         isim[rastgeleSayi(0, 9)],
         soyisim[rastgeleSayi(0, 9)],
-        (float)atanabilicekNotlar[rastgeleSayi(0, 9)],
+        (float)rastgeleNot(),
         {
 
-            (float)atanabilicekNotlar[rastgeleSayi(0, 9)],
-            (float)atanabilicekNotlar[rastgeleSayi(0, 9)],
+            (float)rastgeleNot(),
+            (float)rastgeleNot(),
         },
         {
 
-            (float)atanabilicekNotlar[rastgeleSayi(0, 9)],
-            (float)atanabilicekNotlar[rastgeleSayi(0, 9)],
+            (float)rastgeleNot(),
+            (float)rastgeleNot(),
         },
     };
 }
@@ -247,6 +235,29 @@ Ogrenci rastgeleOgrenciOlustur()
 int rastgeleSayi(int min, int max)
 {
     return rand() % (max - min + 1) + min;
+}
+
+// Rastgele bir şekilde %20'si 80 ile 100 arasi, %50'si 80 ile 50 arasi, %30'u 50 ile 0 arasi
+// ogrencinin notlarina atanabilicek notlar oluşturur.
+int rastgeleNot()
+{
+    // 0 - 1 => 81, 100
+    // 2 - 6 => 51, 80
+    // 7 - 9 => 0, 50
+    switch (rastgeleSayi(0, 9))
+    {
+    case 0:
+    case 1:
+        return rastgeleSayi(81, 100);
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+        return rastgeleSayi(51, 81);
+    default:
+        return rastgeleSayi(0, 50);
+    }
 }
 
 /* Fonksiyonel | Bitis */
