@@ -58,6 +58,7 @@ NotBilgisi notuBul(float);
 NotBilgisi netNotuHesapla(Ogrenci, AgirlikKatsayileri);
 int rastgeleNot();
 NotBilgisi yilIciNotuHesapla(Ogrenci, AgirlikKatsayileri);
+string yuvarlanmisString(float);
 
 int main()
 {
@@ -154,12 +155,14 @@ int main()
 
     cout << endl
          << setw(40) << "Notlarin Sayisal Dagilimi (Net Nota Gore)" << endl;
-    cout << setw(20) << "Harf Not" << setw(20) << "Alan Kisi Sayisi" << endl
-         << string(40, '-') << endl;
+    cout << setw(20) << "Harf Not" << setw(20) << "Alan Kisi Sayisi" << setw(20) << "Alan Kisi Yuzdesi" << endl
+         << string(60, '-') << endl;
 
     for (auto [k, v] : notuAlanlar)
     {
-        cout << setw(20) << k << setw(20) << v << endl;
+        float yuzde = (float)v / ogrenciSayisi * 100;
+
+        cout << setw(20) << k << setw(20) << v << setw(20) << yuvarlanmisString(yuzde) + "%" << endl;
     }
 
     cout << endl
@@ -180,8 +183,8 @@ void ogrenciYilsonuNotuYazdir(Ogrenci ogr, AgirlikKatsayileri agirliklar)
 
     // Ad Soyad ve Yil Sonu notunu yazdir Yazdir
     cout << setw(20) << ogr.isim + " " + ogr.soyisim;
-    cout << setw(20) << yilIciNot.harf + " (" + to_string(yilIciNot.sayisalNot) + ")";
-    cout << setw(20) << netNot.harf + " (" + to_string(netNot.sayisalNot) + ")" << endl;
+    cout << setw(20) << yilIciNot.harf + " (" + yuvarlanmisString(yilIciNot.sayisalNot) + ")";
+    cout << setw(20) << netNot.harf + " (" + yuvarlanmisString(netNot.sayisalNot) + ")" << endl;
 }
 
 NotBilgisi netNotuHesapla(Ogrenci ogr, AgirlikKatsayileri agirliklar)
@@ -292,6 +295,12 @@ int rastgeleNot()
     default:
         return rastgeleSayi(0, 50);
     }
+}
+
+string yuvarlanmisString(float sayi)
+{
+    string yazi = to_string(sayi);
+    return yazi.substr(0, yazi.find(".") + 3);
 }
 
 /* Fonksiyonel | Bitis */
