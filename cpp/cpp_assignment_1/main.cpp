@@ -27,6 +27,7 @@ struct SinavKatsayilari
 
 struct Ogrenci
 {
+    int no;
     string ad;
     string soyad;
     float vize;
@@ -51,12 +52,19 @@ struct SinifBilgisi
     float standartSapma = 0;
 };
 
+struct RastgeleOgrenciBilgileri
+{
+    int sira;
+    int ogrenciSayisi;
+    int calistirmaKaristirici;
+};
+
 int rastgeleSayi(int, int);
-Ogrenci rastgeleOgrenci();
+Ogrenci rastgeleOgrenci(RastgeleOgrenciBilgileri);
 void ogrenciyiYazdir(Ogrenci, SinavKatsayilari);
 NotBilgisi harfNotBul(float);
 NotBilgisi netNot(Ogrenci, SinavKatsayilari);
-int rastgeleNot();
+int rastgeleNot(int, RastgeleOgrenciBilgileri);
 NotBilgisi yilIciNot(Ogrenci, SinavKatsayilari);
 string yuvarlanmisString(float);
 
@@ -96,6 +104,8 @@ int main()
     cout << "Ogrenci Sayisini belirleyiniz: ";
     cin >> ogrenciSayisi;
 
+    int rastgeleOgrenciBilgiSayisi = rastgeleSayi(0, 1199);
+
     SinifBilgisi sinifBilgisi;
 
     // Standart Sapma ve Notların Dagilimini bulmak icin liste olusturulur.
@@ -112,7 +122,14 @@ int main()
     // rastgele not değerlerinde ogrenciler oluştur.
     for (int i = 0; i < ogrenciSayisi; i++)
     {
-        Ogrenci ogr = rastgeleOgrenci();
+
+        RastgeleOgrenciBilgileri rastgeleBilgiler = {
+            i,
+            ogrenciSayisi,
+            rastgeleOgrenciBilgiSayisi,
+        };
+
+        Ogrenci ogr = rastgeleOgrenci(rastgeleBilgiler);
 
         // Sinif bilgilerini net notuyla gunceller
         NotBilgisi netNotBilgisi = netNot(ogr, katsayilar);
@@ -133,8 +150,6 @@ int main()
 
         *(notBilgileri + i) = netNotBilgisi;
 
-        cout << setw(10) << i + 1;
-
         ogrenciyiYazdir(ogr, katsayilar);
     }
 
@@ -151,9 +166,9 @@ int main()
 
     cout << endl
          << setw(100) << "Sinif Bilgileri" << endl;
-    cout << setw(20) << "Ogrenci Sayisi" << setw(20) << "En Dusuk Not" << setw(20) << "En Yuksek Not" << setw(20) << "Ortalama" << setw(20) << "Standart Sapma" << endl
-         << string(100, '-') << endl;
-    cout << setw(20) << ogrenciSayisi << setw(20) << setprecision(5) << sinifBilgisi.enDusukNot << setw(20) << setprecision(5) << sinifBilgisi.enYuksekNot << setw(20) << setprecision(5) << sinifBilgisi.ortalama << setw(20) << setprecision(5) << sinifBilgisi.standartSapma << endl;
+    cout << setw(20) << "Ogrenci Sayisi" << setw(20) << "Yil Ici Etkisi" << setw(20) << "En Dusuk Not" << setw(20) << "En Yuksek Not" << setw(20) << "Ortalama" << setw(20) << "Standart Sapma" << endl
+         << string(120, '-') << endl;
+    cout << setw(20) << ogrenciSayisi << setw(20) << yuvarlanmisString(katsayilar.yilIciEtki * 100) + "%" << setw(20) << setprecision(5) << sinifBilgisi.enDusukNot << setw(20) << setprecision(5) << sinifBilgisi.enYuksekNot << setw(20) << setprecision(5) << sinifBilgisi.ortalama << setw(20) << setprecision(5) << sinifBilgisi.standartSapma << endl;
 
     cout << endl
          << setw(40) << "Notlarin Sayisal Dagilimi (Net Nota Gore)" << endl;
@@ -184,6 +199,7 @@ void ogrenciyiYazdir(Ogrenci ogr, SinavKatsayilari katsayilar)
     NotBilgisi yilIciNotBilgisi = yilIciNot(ogr, katsayilar);
 
     // Ad Soyad ve Yil Sonu notunu yazdir Yazdir
+    cout << setw(10) << ogr.no + 1;
     cout << setw(20) << ogr.ad + " " + ogr.soyad;
     cout << setw(20) << yilIciNotBilgisi.harf + " (" + yuvarlanmisString(yilIciNotBilgisi.sayisal) + ")";
     cout << setw(20) << netNotBilgisi.harf + " (" + yuvarlanmisString(netNotBilgisi.sayisal) + ")" << endl;
@@ -213,7 +229,7 @@ NotBilgisi yilIciNot(Ogrenci ogr, SinavKatsayilari katsayilar)
     return notBilgisi;
 }
 
-Ogrenci rastgeleOgrenci()
+Ogrenci rastgeleOgrenci(RastgeleOgrenciBilgileri bilgi)
 {
 
     // Rastgele isim secimi yapilirken kulanilicak isimlerin bulundugi liste.
@@ -286,20 +302,19 @@ Ogrenci rastgeleOgrenci()
 
     // Ogrencinin bilgilerini rastgele oluşturup bunu döner.
     return Ogrenci{
+        bilgi.sira,
         ad[rastgeleSayi(0, 29)],
         soyad[rastgeleSayi(0, 29)],
-        (float)rastgeleNot(),
+        (float)rastgeleNot(0, bilgi),
         {
-
-            (float)rastgeleNot(),
-            (float)rastgeleNot(),
+            (float)rastgeleNot(1, bilgi),
+            (float)rastgeleNot(2, bilgi),
         },
         {
-
-            (float)rastgeleNot(),
-            (float)rastgeleNot(),
+            (float)rastgeleNot(3, bilgi),
+            (float)rastgeleNot(4, bilgi),
         },
-        (float)rastgeleNot(),
+        (float)rastgeleNot(5, bilgi),
     };
 }
 
@@ -315,12 +330,23 @@ int rastgeleSayi(int min, int max)
 
 // Rastgele bir şekilde %20'si 80 ile 100 arasi, %50'si 80 ile 50 arasi, %30'u 50 ile 0 arasi
 // ogrencinin notlarina atanabilicek notlar oluşturur.
-int rastgeleNot()
+int rastgeleNot(int notNo, RastgeleOgrenciBilgileri bilgi)
 {
+
+    // Bu sekilde calistirmaKaristirici ya programin basinda rastgele atanan sayi sayesinde
+    // program her calismasinda farkli bir sekilde sinav atamalarini yapıcaktir.
+
+    int yuzdelik = bilgi.sira + bilgi.calistirmaKaristirici;
+
+    if ((notNo + bilgi.calistirmaKaristirici) % (bilgi.calistirmaKaristirici % 6) == 0)
+    {
+        yuzdelik = bilgi.ogrenciSayisi - bilgi.sira + bilgi.calistirmaKaristirici;
+    }
+
     // 0 - 1 => 81, 100
     // 2 - 6 => 51, 80
     // 7 - 9 => 0, 50
-    switch (rastgeleSayi(0, 9))
+    switch (yuzdelik % 10)
     {
     case 0:
     case 1:
