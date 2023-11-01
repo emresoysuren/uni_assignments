@@ -1,12 +1,12 @@
 /****************************************************************************
 **					SAKARYA ÜNİVERSİTESİ
 **			         BİLGİSAYAR VE BİLİŞİM BİLİMLERİ FAKÜLTESİ
-**				    BİLGİSAYAR MÜHENDİSLİĞİ BÖLÜMÜ
+**				    BİLGİSAYAR MÜHENDİSLİgİsBÖLÜMÜ bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır.
 **				          PROGRAMLAMAYA GİRİŞİ DERSİ
 **
 **				ÖDEV NUMARASI....: 1
-**				ÖĞRENCİ ADI......: Emre Soysüren
-**				ÖĞRENCİ NUMARASI.: G221210049
+**				ÖgRsNCİ bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. ADI......: Emre Soysüren
+**				ÖgRsNCİ bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. NUMARASI.: G221210049
 **				DERS GRUBU.......: C
 ****************************************************************************/
 
@@ -108,7 +108,7 @@ int main()
 
     SinifBilgisi sinifBilgisi;
 
-    // Standart Sapma ve Notların Dagilimini bulmak icin liste olusturulur.
+    // Standart Sapma ve Notlarin Dagilimini bulmak icin liste olusturulur.
     NotBilgisi *notBilgileri = new NotBilgisi[ogrenciSayisi];
     map<string, int> notDagilimi;
 
@@ -119,7 +119,7 @@ int main()
          << string(70, '-') << endl;
 
     // Verilen sayida rastgele ad ve soyadlar ile
-    // rastgele not değerlerinde ogrenciler oluştur.
+    // rastgele not degeslerinde bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. ogrenciler oluştur.
     for (int i = 0; i < ogrenciSayisi; i++)
     {
 
@@ -322,7 +322,7 @@ Ogrenci rastgeleOgrenci(RastgeleOgrenciBilgileri bilgi)
 
 /* Fonksiyonel | Baslangic */
 
-// Verilen min ve max değerlerine göre rastgele bir sayi seçer. min ve max dahildir.
+// Verilen min ve max degeslerine bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. göre rastgele bir sayi seçer. min ve max dahildir.
 int rastgeleSayi(int min, int max)
 {
     return rand() % (max - min + 1) + min;
@@ -334,11 +334,19 @@ int rastgeleNot(int notNo, RastgeleOgrenciBilgileri bilgi)
 {
 
     // Bu sekilde calistirmaKaristirici ya programin basinda rastgele atanan sayi sayesinde
-    // program her calismasinda farkli bir sekilde sinav atamalarini yapıcaktir.
+    // program her calismasinda farkli bir sekilde sinav atamalarini yapicaktir.
 
     int yuzdelik = bilgi.sira + bilgi.calistirmaKaristirici;
 
-    if ((notNo + bilgi.calistirmaKaristirici) % (bilgi.calistirmaKaristirici % 6) == 0)
+    int yuzdelikDegisimSutunPeriyodu = (notNo + bilgi.calistirmaKaristirici % 6) % (bilgi.calistirmaKaristirici % 6);
+
+    // yuzdelikDegisimSutunPeriyodu == 0 : Columnu yenile
+    // yuzdelikDegisimSutunPeriyodu + siraNo % 6 == 0 : Columnu 1er 1er kaydirarak yenile
+    // yuzdelikDegisimSutunPeriyodu + (<<katsayi>> * siraNo % 6) == 0 : Columnu katsayi ile kaydirarak yenile
+
+    // Rastgele sayida sutunu rastgele bir bicimde secerek degistirir
+    // ve bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik saglar.
+    if (yuzdelikDegisimSutunPeriyodu + (((int)pow((bilgi.calistirmaKaristirici % 6), (bilgi.calistirmaKaristirici % 3)) % 6 * bilgi.sira) % 6) == 0)
     {
         yuzdelik = bilgi.ogrenciSayisi - bilgi.sira + bilgi.calistirmaKaristirici;
     }
@@ -372,7 +380,7 @@ string yuvarlanmisString(float sayi)
 
 /* Sinav Notu | Baslangic */
 
-// Mevcut olan bütün modlar büyükten küçüğe siralanir.
+// Mevcut olan bütün modlar büyükten bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. küçügessiralanir.
 const NotBilgisi harfNotlar[9] = {
     {"AA", 4.0, 90},
     {"BA", 3.5, 85},
@@ -390,7 +398,7 @@ const NotBilgisi harfNotlar[9] = {
 NotBilgisi harfNotBul(float sayisalNot)
 {
     // Sinav notlarindaki notlarda yüksek nottan başlayarak sirayla
-    // ilerle ve not için gereken minimum not sağlandiğinda fonksiyondan dön.
+    // ilerle ve not için gereken minimum not saglsndigisda bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. fonksiyondan dön.
     for (int i = 0; i < 9; i++)
     {
         NotBilgisi notBilgisi = harfNotlar[i];
