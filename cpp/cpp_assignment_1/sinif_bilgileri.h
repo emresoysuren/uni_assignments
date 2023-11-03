@@ -13,10 +13,6 @@ using namespace std;
 struct SinifBilgisi
 {
 public:
-    float enDusukNot = -1;
-    float enYuksekNot = -1;
-    float ortalama = 0;
-    float standartSapma = 0;
     Ogrenci *ogrenciler;
     int ogrenciSayisi;
     SinavKatsayilari katsayilar;
@@ -55,6 +51,13 @@ public:
 
     void ogrencileriYazdir()
     {
+
+        cout << endl
+             << setw(70) << "Ogrenciler ve Notlari" << endl;
+
+        cout << setw(10) << "Sira" << setw(20) << "Adi Soyadi" << setw(20) << "Yil Ici Not" << setw(20) << "Net Not" << endl
+             << string(70, '-') << endl;
+
         for (unsigned int i = 0; i < ogrenciSayisi; i++)
         {
 
@@ -76,6 +79,36 @@ public:
 
     void bilgileriYazdir()
     {
+        float enDusukNot = -1;
+        float enYuksekNot = -1;
+        float ortalama = 0;
+        float standartSapma = 0;
+
+        for (int i = 0; i < ogrenciSayisi; i++)
+        {
+            NotBilgisi notBilgisi = (ogrenciler + i)->netNot(katsayilar);
+
+            // Ortalamayi hesapla
+
+            ortalama += notBilgisi.sayisal / ogrenciSayisi;
+
+            // "En" degerlerini belirle
+
+            if (enDusukNot == -1 || notBilgisi.sayisal < enDusukNot)
+            {
+                enDusukNot = notBilgisi.sayisal;
+            }
+
+            if (notBilgisi.sayisal > enYuksekNot)
+            {
+                enYuksekNot = notBilgisi.sayisal;
+            }
+
+            standartSapma += pow(notBilgisi.sayisal - ortalama, 2);
+        }
+
+        standartSapma = sqrt(standartSapma / (ogrenciSayisi - 1));
+
         cout << endl
              << setw(100) << "Sinif Bilgileri" << endl;
         cout << setw(20) << "Ogrenci Sayisi" << setw(20) << "Yil Ici Etkisi" << setw(20) << "En Dusuk Not" << setw(20) << "En Yuksek Not" << setw(20) << "Ortalama" << setw(20) << "Standart Sapma" << endl
