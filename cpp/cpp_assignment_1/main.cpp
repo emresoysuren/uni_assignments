@@ -15,61 +15,21 @@
 #include <iomanip>
 #include <cmath>
 #include <map>
+#include "sinif_bilgileri.h"
+#include "structlar.h"
 using namespace std;
 
-struct SinavKatsayilari
-{
-    float odev;
-    float kisa_sinav;
-    float vize;
-    float yilIciEtki = -1.0;
-};
-
-struct Ogrenci
-{
-    int no;
-    string ad;
-    string soyad;
-    float vize;
-    float odev[2];
-    float kisa_sinav[2];
-    float final_sinavi;
-};
-
-// Belirlenmiş not seviyeleri hakkindaki bilgileri içerir.
-struct NotBilgisi
-{
-    string harf;
-    float katsayi;
-    float sayisal;
-};
-
-struct SinifBilgisi
-{
-    float enDusukNot = -1;
-    float enYuksekNot = -1;
-    float ortalama = 0;
-    float standartSapma = 0;
-};
-
-struct RastgeleOgrenciBilgileri
-{
-    int sira;
-    int ogrenciSayisi;
-    int calistirmaKaristirici;
-};
-
 int rastgeleSayi(int, int);
-Ogrenci rastgeleOgrenci(RastgeleOgrenciBilgileri);
-void ogrenciyiYazdir(Ogrenci, SinavKatsayilari);
-NotBilgisi harfNotBul(float);
-NotBilgisi netNot(Ogrenci, SinavKatsayilari);
 int rastgeleNot(int, RastgeleOgrenciBilgileri);
-NotBilgisi yilIciNot(Ogrenci, SinavKatsayilari);
 string yuvarlanmisString(float);
+NotBilgisi yilIciNot(Ogrenci, SinavKatsayilari);
+NotBilgisi harfNotBul(float);
+Ogrenci rastgeleOgrenci(RastgeleOgrenciBilgileri);
+NotBilgisi netNot(Ogrenci, SinavKatsayilari);
 
 int main()
 {
+    SinifBilgisi sinifBilgisi;
 
     cout << left;
 
@@ -77,40 +37,34 @@ int main()
     srand((unsigned int)time(NULL));
 
     // Sinav ve odev agirlik bilgilerini kullanicidan al.
-    SinavKatsayilari katsayilar;
 
     // Odev agirligini kullanicidan al.
     cout << "Odevlerin (2) agirligini belirleyiniz: ";
-    cin >> katsayilar.odev;
+    cin >> sinifBilgisi.katsayilar.odev;
 
     // Sinav agirligini kullanicidan al.
     cout << "Sinavlarin (2) agirligini belirleyiniz: ";
-    cin >> katsayilar.kisa_sinav;
+    cin >> sinifBilgisi.katsayilar.kisa_sinav;
 
     // Vize agirligini kullanicidan al.
     cout << "Vize agirligini belirleyiniz: ";
-    cin >> katsayilar.vize;
+    cin >> sinifBilgisi.katsayilar.vize;
 
     // Yil ici puaninin gecme notuna etkisini kullanicidan al.
-    while (katsayilar.yilIciEtki < 0 || 1 < katsayilar.yilIciEtki)
+    while (sinifBilgisi.katsayilar.yilIciEtki < 0 || 1 < sinifBilgisi.katsayilar.yilIciEtki)
     {
         cout << "Yil ici puaninin gecme notuna etkisini belirleyiniz (Deger 0 ile 1 arasinda olmalidir.): ";
-        cin >> katsayilar.yilIciEtki;
+        cin >> sinifBilgisi.katsayilar.yilIciEtki;
     }
 
-    // Ogrenci sayisi bilgisini al.
-    int ogrenciSayisi;
-
     cout << "Ogrenci Sayisini belirleyiniz: ";
-    cin >> ogrenciSayisi;
+    cin >> sinifBilgisi.ogrenciSayisi;
 
     int rastgeleOgrenciBilgiSayisi = rastgeleSayi(0, 1199);
 
-    SinifBilgisi sinifBilgisi;
-
     // Standart Sapma ve Notlarin Dagilimini bulmak icin liste olusturulur.
-    NotBilgisi *notBilgileri = new NotBilgisi[ogrenciSayisi];
-    map<string, int> notDagilimi;
+    // NotBilgisi *notBilgileri = new NotBilgisi[ogrenciSayisi];
+    sinifBilgisi.ogrenciler = new Ogrenci[sinifBilgisi.ogrenciSayisi];
 
     cout << endl
          << setw(70) << "Ogrenciler ve Notlari" << endl;
@@ -120,23 +74,21 @@ int main()
 
     // Verilen sayida rastgele ad ve soyadlar ile
     // rastgele not degeslerinde bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. ogrenciler oluştur.
-    for (int i = 0; i < ogrenciSayisi; i++)
+    for (int i = 0; i < sinifBilgisi.ogrenciSayisi; i++)
     {
 
         RastgeleOgrenciBilgileri rastgeleBilgiler = {
             i,
-            ogrenciSayisi,
+            sinifBilgisi.ogrenciSayisi,
             rastgeleOgrenciBilgiSayisi,
         };
 
         Ogrenci ogr = rastgeleOgrenci(rastgeleBilgiler);
 
         // Sinif bilgilerini net notuyla gunceller
-        NotBilgisi netNotBilgisi = netNot(ogr, katsayilar);
+        NotBilgisi netNotBilgisi = netNot(ogr, sinifBilgisi.katsayilar);
 
-        sinifBilgisi.ortalama += netNotBilgisi.sayisal / ogrenciSayisi;
-
-        notDagilimi[netNotBilgisi.harf]++;
+        sinifBilgisi.ortalama += netNotBilgisi.sayisal / sinifBilgisi.ogrenciSayisi;
 
         if (sinifBilgisi.enDusukNot == -1 || netNotBilgisi.sayisal < sinifBilgisi.enDusukNot)
         {
@@ -148,61 +100,34 @@ int main()
             sinifBilgisi.enYuksekNot = netNotBilgisi.sayisal;
         }
 
-        *(notBilgileri + i) = netNotBilgisi;
-
-        ogrenciyiYazdir(ogr, katsayilar);
+        *(sinifBilgisi.ogrenciler + i) = ogr;
     }
 
-    for (int i = 0; i < ogrenciSayisi; i++)
+    for (int i = 0; i < sinifBilgisi.ogrenciSayisi; i++)
     {
-        NotBilgisi notBilgisi = *(notBilgileri + i);
+        NotBilgisi notBilgisi = netNot(*(sinifBilgisi.ogrenciler + i), sinifBilgisi.katsayilar);
 
         sinifBilgisi.standartSapma += pow(notBilgisi.sayisal - sinifBilgisi.ortalama, 2);
     }
 
-    delete[] notBilgileri;
+    sinifBilgisi.ogrencileriYazdir();
 
-    sinifBilgisi.standartSapma = sqrt(sinifBilgisi.standartSapma / (ogrenciSayisi - 1));
+    sinifBilgisi.notDagilimi(true);
+
+    delete[] sinifBilgisi.ogrenciler;
+
+    sinifBilgisi.standartSapma = sqrt(sinifBilgisi.standartSapma / (sinifBilgisi.ogrenciSayisi - 1));
 
     cout << endl
          << setw(100) << "Sinif Bilgileri" << endl;
     cout << setw(20) << "Ogrenci Sayisi" << setw(20) << "Yil Ici Etkisi" << setw(20) << "En Dusuk Not" << setw(20) << "En Yuksek Not" << setw(20) << "Ortalama" << setw(20) << "Standart Sapma" << endl
          << string(120, '-') << endl;
-    cout << setw(20) << ogrenciSayisi << setw(20) << yuvarlanmisString(katsayilar.yilIciEtki * 100) + "%" << setw(20) << setprecision(5) << sinifBilgisi.enDusukNot << setw(20) << setprecision(5) << sinifBilgisi.enYuksekNot << setw(20) << setprecision(5) << sinifBilgisi.ortalama << setw(20) << setprecision(5) << sinifBilgisi.standartSapma << endl;
-
-    cout << endl
-         << setw(40) << "Notlarin Sayisal Dagilimi (Net Nota Gore)" << endl;
-    cout << setw(20) << "Harf Not" << setw(20) << "Alan Kisi Sayisi" << setw(20) << "Alan Kisi Yuzdesi" << endl
-         << string(60, '-') << endl;
-
-    for (auto [k, v] : notDagilimi)
-    {
-        float notYuzdesi = (float)v / ogrenciSayisi * 100;
-
-        cout << setw(20) << k << setw(20) << v << setw(20) << yuvarlanmisString(notYuzdesi) + "%" << endl;
-    }
+    cout << setw(20) << sinifBilgisi.ogrenciSayisi << setw(20) << yuvarlanmisString(sinifBilgisi.katsayilar.yilIciEtki * 100) + "%" << setw(20) << setprecision(5) << sinifBilgisi.enDusukNot << setw(20) << setprecision(5) << sinifBilgisi.enYuksekNot << setw(20) << setprecision(5) << sinifBilgisi.ortalama << setw(20) << setprecision(5) << sinifBilgisi.standartSapma << endl;
 
     cout << endl
          << "Programin Sonunu";
 
     return 0;
-}
-
-/* Ogrenci | Baslangic */
-
-void ogrenciyiYazdir(Ogrenci ogr, SinavKatsayilari katsayilar)
-{
-    // Net notunu hesapla
-    NotBilgisi netNotBilgisi = netNot(ogr, katsayilar);
-
-    // Yil ici notunu hesapla
-    NotBilgisi yilIciNotBilgisi = yilIciNot(ogr, katsayilar);
-
-    // Ad Soyad ve Yil Sonu notunu yazdir Yazdir
-    cout << setw(10) << ogr.no + 1;
-    cout << setw(20) << ogr.ad + " " + ogr.soyad;
-    cout << setw(20) << yilIciNotBilgisi.harf + " (" + yuvarlanmisString(yilIciNotBilgisi.sayisal) + ")";
-    cout << setw(20) << netNotBilgisi.harf + " (" + yuvarlanmisString(netNotBilgisi.sayisal) + ")" << endl;
 }
 
 NotBilgisi netNot(Ogrenci ogr, SinavKatsayilari katsayilar)
