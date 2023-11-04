@@ -12,13 +12,6 @@ struct NotBilgisi
     float sayisal;
 };
 
-struct RastgeleOgrenciBilgileri
-{
-    int sira;
-    int ogrenciSayisi;
-    int calistirmaKaristirici;
-};
-
 struct SinavKatsayilari
 {
     float odev;

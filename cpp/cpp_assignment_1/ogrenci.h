@@ -5,6 +5,7 @@
 using namespace std;
 
 #include "structlar.h"
+#include "Sinif.h"
 
 class Ogrenci
 {
@@ -19,11 +20,11 @@ public:
 
     NotBilgisi netNot(SinavKatsayilari katsayilar)
     {
-        float netNot = yilIciNot(katsayilar).sayisal * katsayilar.yilIciEtki + (1 - katsayilar.yilIciEtki) * final_sinavi;
+        float sayisalNot = yilIciNot(katsayilar).sayisal * katsayilar.yilIciEtki + (1 - katsayilar.yilIciEtki) * final_sinavi;
 
-        NotBilgisi notBilgisi = harfNotBul(netNot);
+        NotBilgisi notBilgisi = harfNotBul(sayisalNot);
 
-        notBilgisi.sayisal = netNot;
+        notBilgisi.sayisal = sayisalNot;
 
         return notBilgisi;
     }
@@ -41,11 +42,10 @@ public:
         return notBilgisi;
     }
 
-    static Ogrenci rastgeleOgrenci(RastgeleOgrenciBilgileri bilgi)
+    static Ogrenci rastgeleOgrenci(int no, int ogrenciSayisi)
     {
-
         // Rastgele isim secimi yapilirken kulanilicak isimlerin bulundugi liste.
-        const string ad[30] = {
+        static const string ad[30] = {
             "Ali",
             "Veli",
             "Ayse",
@@ -79,7 +79,7 @@ public:
         };
 
         // Rastgele soyismi secimi yapilirken kulanilicak soyisimlerin bulundugi liste.
-        const string soyad[30] = {
+        static const string soyad[30] = {
             "Yilmaz",
             "Ates",
             "Cavus",
@@ -116,37 +116,38 @@ public:
 
         Ogrenci ogr;
 
-        ogr.no = bilgi.sira;
+        ogr.no = no;
         ogr.ad = ad[rastgeleSayi(0, 29)];
         ogr.soyad = soyad[rastgeleSayi(0, 29)];
-        ogr.vize = (float)rastgeleNot(0, bilgi);
-        ogr.kisa_sinav[0] = (float)rastgeleNot(1, bilgi);
-        ogr.kisa_sinav[1] = (float)rastgeleNot(2, bilgi);
-        ogr.odev[0] = (float)rastgeleNot(3, bilgi);
-        ogr.odev[1] = (float)rastgeleNot(4, bilgi);
-        ogr.final_sinavi = (float)rastgeleNot(5, bilgi);
+        ogr.vize = rastgeleNot(ogrenciSayisi);
+        ogr.kisa_sinav[0] = rastgeleNot(ogrenciSayisi);
+        ogr.kisa_sinav[1] = rastgeleNot(ogrenciSayisi);
+        ogr.odev[0] = rastgeleNot(ogrenciSayisi);
+        ogr.odev[1] = rastgeleNot(ogrenciSayisi);
+        ogr.final_sinavi = rastgeleNot(ogrenciSayisi);
 
         return ogr;
     }
 
 private:
     // Mevcut olan bütün modlar büyükten bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. küçügessiralanir.
-    NotBilgisi harfNotlar[9] = {
-        {"AA", 4.0, 90},
-        {"BA", 3.5, 85},
-        {"BB", 3.0, 80},
-        {"CB", 2.5, 75},
-        {"CC", 2.0, 65},
-        {"DC", 1.5, 58},
-        {"DD", 1.0, 50},
-        {"FD", 0.5, 40},
-        {"FF", 0.0, 0},
-    };
 
     // Verilen sayisal nota göre sinav notunu bulur.
     // Bulunan sinav notu harf, katsayi ve alt not bilgilerini bulundurur.
-    NotBilgisi harfNotBul(float sayisalNot)
+    static NotBilgisi harfNotBul(float sayisalNot)
     {
+        const NotBilgisi harfNotlar[9] = {
+            {"AA", 4.0, 90},
+            {"BA", 3.5, 85},
+            {"BB", 3.0, 80},
+            {"CB", 2.5, 75},
+            {"CC", 2.0, 65},
+            {"DC", 1.5, 58},
+            {"DD", 1.0, 50},
+            {"FD", 0.5, 40},
+            {"FF", 0.0, 0},
+        };
+
         // Sinav notlarindaki notlarda yüksek nottan başlayarak sirayla
         // ilerle ve not için gereken minimum not saglsndigisda bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. fonksiyondan dön.
         for (int i = 0; i < 9; i++)
@@ -170,45 +171,39 @@ private:
 
     // Rastgele bir şekilde %20'si 80 ile 100 arasi, %50'si 80 ile 50 arasi, %30'u 50 ile 0 arasi
     // ogrencinin notlarina atanabilicek notlar oluşturur.
-    static int rastgeleNot(int notNo, RastgeleOgrenciBilgileri bilgi)
+    static float rastgeleNot(int ogrenciSayisi)
     {
+        static float altNotDagilimi[2];
 
-        // Bu sekilde calistirmaKaristirici ya programin basinda rastgele atanan sayi sayesinde
-        // program her calismasinda farkli bir sekilde sinav atamalarini yapicaktir.
+        int sinavSayisi = ogrenciSayisi * 6;
 
-        int yuzdelik = bilgi.sira + bilgi.calistirmaKaristirici;
-
-        int yuzdelikDegisimSutunPeriyodu = (notNo + bilgi.calistirmaKaristirici % 6) % (bilgi.calistirmaKaristirici % 5 + 1);
-
-        // yuzdelikDegisimSutunPeriyodu == 0 : Columnu yenile
-        // yuzdelikDegisimSutunPeriyodu + siraNo % 6 == 0 : Columnu 1er 1er kaydirarak yenile
-        // yuzdelikDegisimSutunPeriyodu + (<<katsayi>> * siraNo % 6) == 0 : Columnu katsayi ile kaydirarak yenile
-
-        // Rastgele sayida sutunu rastgele bir bicimde secerek degistirir
-        // ve bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik saglar.
-        if (yuzdelikDegisimSutunPeriyodu + (((int)pow((bilgi.calistirmaKaristirici % 6), (bilgi.calistirmaKaristirici % 3)) % 6 * bilgi.sira) % 6) == 0)
+        while (true)
         {
-            yuzdelik = bilgi.ogrenciSayisi - bilgi.sira + bilgi.calistirmaKaristirici;
+            switch (rastgeleSayi(0, 2))
+            {
+            case 0:
+                if (altNotDagilimi[0] < round(sinavSayisi * 0.2))
+                {
+                    altNotDagilimi[0]++;
+                    return (float)rastgeleSayi(81, 100);
+                }
+                break;
+            case 1:
+                if (altNotDagilimi[1] < sinavSayisi - round(sinavSayisi * 0.2) - round(sinavSayisi * 0.3))
+                {
+                    altNotDagilimi[1]++;
+                    return (float)rastgeleSayi(51, 80);
+                }
+                break;
+            case 2:
+                if (altNotDagilimi[2] < round(sinavSayisi * 0.3))
+                {
+                    altNotDagilimi[2]++;
+                    return (float)rastgeleSayi(0, 50);
+                }
+                break;
+            }
         }
-
-        // 0 - 1 => 81, 100
-        // 2 - 6 => 51, 80
-        // 7 - 9 => 0, 50
-        switch (yuzdelik % 10)
-        {
-        case 0:
-        case 1:
-            return rastgeleSayi(81, 100);
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-            return rastgeleSayi(51, 81);
-        default:
-            return rastgeleSayi(0, 50);
-        }
-    }
+    };
 };
-
 #endif

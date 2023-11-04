@@ -19,7 +19,6 @@ using namespace std;
 
 #include "sinif.h"
 #include "structlar.h"
-#include "ogrenci.h"
 
 int main()
 {
@@ -60,7 +59,7 @@ int main()
 
     sinifBilgisi.ogrencileriYazdir();
 
-    sinifBilgisi.notDagilimi(true);
+    sinifBilgisi.notDagiliminiYazdir();
 
     sinifBilgisi.bilgileriYazdir();
 

@@ -1,5 +1,5 @@
-#ifndef SINIF_BILGILERI_H
-#define SINIF_BILGILERI_H
+#ifndef SINIF_H
+#define SINIF_H
 
 #include <iostream>
 #include <map>
@@ -8,35 +8,32 @@
 using namespace std;
 
 #include "structlar.h"
-#include "ogrenci.h"
+#include "Ogrenci.h"
 
-struct Sinif
+class Sinif
 {
 public:
+    map<string, int> notDagilimi;
+    int ogrenciSayisi;
+
     Sinif(int ogrenciSayisi, SinavKatsayilari katsayilar) : ogrenciSayisi(ogrenciSayisi), katsayilar(katsayilar)
     {
         // Ogrencileri depolamak icin array yaratir.
         ogrenciler = new Ogrenci[ogrenciSayisi];
 
-        int rastgeleOgrenciBilgiSayisi = rand() % 1200;
-
         // Verilen sayida rastgele ad ve soyadlar ile
         // rastgele not degeslerinde bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır ve ogrenciler oluştur.
         for (int i = 0; i < ogrenciSayisi; i++)
         {
-            RastgeleOgrenciBilgileri rastgeleBilgiler = {
-                i,
-                ogrenciSayisi,
-                rastgeleOgrenciBilgiSayisi,
-            };
-
-            Ogrenci ogr = Ogrenci::rastgeleOgrenci(rastgeleBilgiler);
+            Ogrenci ogr = Ogrenci::rastgeleOgrenci(i, ogrenciSayisi);
 
             *(ogrenciler + i) = ogr;
 
             // Hesaplanmis degerleri olustur
 
             NotBilgisi notBilgisi = ogr.netNot(katsayilar);
+
+            notDagilimi[notBilgisi.harf]++;
 
             // Ortalamayi hesapla
             ortalama += notBilgisi.sayisal / ogrenciSayisi;
@@ -56,34 +53,19 @@ public:
         standartSapma = standartSapmaHesapla(ortalama);
     }
 
-    map<string, int> notDagilimi(bool print)
+    void notDagiliminiYazdir()
     {
+        cout << endl
+             << setw(40) << "Notlarin Sayisal Dagilimi (Net Nota Gore)" << endl;
+        cout << setw(20) << "Harf Not" << setw(20) << "Alan Kisi Sayisi" << setw(20) << "Alan Kisi Yuzdesi" << endl
+             << string(60, '-') << endl;
 
-        map<string, int> dagilim;
-
-        for (unsigned int i = 0; i < ogrenciSayisi; i++)
+        for (auto [k, v] : notDagilimi)
         {
-            NotBilgisi netNotBilgisi = (*(ogrenciler + i)).netNot(katsayilar);
+            float notYuzdesi = (float)v / ogrenciSayisi * 100;
 
-            dagilim[netNotBilgisi.harf]++;
+            cout << setw(20) << k << setw(20) << v << setw(20) << yuvarlanmisString(notYuzdesi) + "%" << endl;
         }
-
-        if (print)
-        {
-            cout << endl
-                 << setw(40) << "Notlarin Sayisal Dagilimi (Net Nota Gore)" << endl;
-            cout << setw(20) << "Harf Not" << setw(20) << "Alan Kisi Sayisi" << setw(20) << "Alan Kisi Yuzdesi" << endl
-                 << string(60, '-') << endl;
-
-            for (auto [k, v] : dagilim)
-            {
-                float notYuzdesi = (float)v / ogrenciSayisi * 100;
-
-                cout << setw(20) << k << setw(20) << v << setw(20) << yuvarlanmisString(notYuzdesi) + "%" << endl;
-            }
-        }
-
-        return dagilim;
     }
 
     void ogrencileriYazdir()
@@ -125,7 +107,6 @@ public:
 
 private:
     Ogrenci *ogrenciler;
-    int ogrenciSayisi;
     SinavKatsayilari katsayilar;
 
     // Hesaplanmis degerler
