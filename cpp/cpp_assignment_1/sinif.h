@@ -1,3 +1,15 @@
+/****************************************************************************
+**					          SAKARYA ÜNİVERSİTESİ
+**			        BİLGİSAYAR VE BİLİŞİM BİLİMLERİ FAKÜLTESİ
+**				        BİLGİSAYAR MÜHENDİSLİĞİ BÖLÜMÜ
+**				          PROGRAMLAMAYA GİRİŞİ DERSİ
+**
+**				ÖDEV NUMARASI....: 1
+**				ÖĞRENCİ ADI......: Emre Soysüren
+**				ÖĞRENCİ NUMARASI.: G221210049
+**				DERS GRUBU.......: 2. Öğretim / C Grubu
+****************************************************************************/
+
 #ifndef SINIF_H
 #define SINIF_H
 
@@ -5,6 +17,7 @@
 #include <map>
 #include <string>
 #include <iomanip>
+#include <vector>
 using namespace std;
 
 #include "structlar.h"
@@ -53,29 +66,28 @@ public:
         standartSapma = standartSapmaHesapla(ortalama);
     }
 
+    ~Sinif()
+    {
+        delete[] ogrenciler;
+    }
+
     void notDagiliminiYazdir()
     {
-        cout << endl
-             << setw(40) << "Notlarin Sayisal Dagilimi (Net Nota Gore)" << endl;
-        cout << setw(20) << "Harf Not" << setw(20) << "Alan Kisi Sayisi" << setw(20) << "Alan Kisi Yuzdesi" << endl
-             << string(60, '-') << endl;
+
+        tabloYazdir({"Notlarin Sayisal Dagilimi (Net Nota Gore)", "Harf Not", "Alan Kişi Sayisi", "Alan Kişi Yüzdesi"});
 
         for (auto [k, v] : notDagilimi)
         {
             float notYuzdesi = (float)v / ogrenciSayisi * 100;
 
-            cout << setw(20) << k << setw(20) << v << setw(20) << yuvarlanmisString(notYuzdesi) + "%" << endl;
+            tabloYazdir({}, {k, to_string(v), yuvarlanmisString(notYuzdesi) + "%"});
         }
     }
 
     void ogrencileriYazdir()
     {
 
-        cout << endl
-             << setw(70) << "Ogrenciler ve Notlari" << endl;
-
-        cout << setw(10) << "Sira" << setw(20) << "Adi Soyadi" << setw(20) << "Yil Ici Not" << setw(20) << "Net Not" << endl
-             << string(70, '-') << endl;
+        tabloYazdir({"Ogrenciler ve Notlari", "Sira", "Adi Soyadi", "Yil Ici Not", "Net Not"});
 
         for (unsigned int i = 0; i < ogrenciSayisi; i++)
         {
@@ -89,20 +101,14 @@ public:
             NotBilgisi yilIciNotBilgisi = ogr.yilIciNot(katsayilar);
 
             // Ad Soyad ve Yil Sonu notunu yazdir Yazdir
-            cout << setw(10) << ogr.no + 1;
-            cout << setw(20) << ogr.ad + " " + ogr.soyad;
-            cout << setw(20) << yilIciNotBilgisi.harf + " (" + yuvarlanmisString(yilIciNotBilgisi.sayisal) + ")";
-            cout << setw(20) << netNotBilgisi.harf + " (" + yuvarlanmisString(netNotBilgisi.sayisal) + ")" << endl;
+            tabloYazdir({}, {to_string(ogr.no + 1), ogr.ad + " " + ogr.soyad, yilIciNotBilgisi.harf + " (" + yuvarlanmisString(yilIciNotBilgisi.sayisal) + ")", netNotBilgisi.harf + " (" + yuvarlanmisString(netNotBilgisi.sayisal) + ")"});
         }
     }
 
     void bilgileriYazdir()
     {
-        cout << endl
-             << setw(100) << "Sinif Bilgileri" << endl;
-        cout << setw(20) << "Ogrenci Sayisi" << setw(20) << "Yil Ici Etkisi" << setw(20) << "En Dusuk Not" << setw(20) << "En Yuksek Not" << setw(20) << "Ortalama" << setw(20) << "Standart Sapma" << endl
-             << string(120, '-') << endl;
-        cout << setw(20) << ogrenciSayisi << setw(20) << yuvarlanmisString(katsayilar.yilIciEtki * 100) + "%" << setw(20) << setprecision(5) << enDusukNot << setw(20) << setprecision(5) << enYuksekNot << setw(20) << setprecision(5) << ortalama << setw(20) << setprecision(5) << standartSapma << endl;
+        tabloYazdir({"Sinif Bilgileri", "Ogrenci Sayisi", "Yil Ici Etkisi", "En Dusuk Not", "En Yuksek Not", "Ortalama", "Standart Sapma"},
+                    {to_string(ogrenciSayisi), yuvarlanmisString(katsayilar.yilIciEtki * 100) + "%", yuvarlanmisString(enDusukNot), yuvarlanmisString(enYuksekNot), yuvarlanmisString(ortalama), yuvarlanmisString(standartSapma)});
     }
 
 private:
@@ -132,6 +138,46 @@ private:
     {
         string sayiStringi = to_string(sayi);
         return sayiStringi.substr(0, sayiStringi.find(".") + 3);
+    }
+
+    void tabloYazdir(vector<string> basliklar, vector<string> degerler = {}, int genislik = 20, bool baslik = true)
+    {
+        if (basliklar.size() > 0)
+        {
+            cout << endl;
+
+            if (baslik)
+            {
+                int satirBoyutu = genislik * (basliklar.size() - 1);
+
+                int solKenar = floor((satirBoyutu - basliklar[0].size()) / 2);
+
+                cout << setw(satirBoyutu) << string(solKenar - 2, '-') + "[ " + basliklar[0] + " ]" + string(satirBoyutu - basliklar[0].size() - solKenar - 2, '-') << endl;
+            }
+
+            for (string baslik : basliklar)
+            {
+                if (baslik == basliklar[0])
+                {
+                    continue;
+                }
+
+                cout << setw(genislik) << baslik;
+            }
+
+            cout << endl
+                 << string(genislik * (basliklar.size() - 1), '-') << endl;
+        }
+
+        if (degerler.size() > 0)
+        {
+            for (string deger : degerler)
+            {
+                cout << setw(genislik) << deger;
+            }
+
+            cout << endl;
+        }
     }
 };
 

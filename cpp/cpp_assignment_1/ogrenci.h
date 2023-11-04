@@ -1,3 +1,15 @@
+/****************************************************************************
+**					          SAKARYA ÜNİVERSİTESİ
+**			        BİLGİSAYAR VE BİLİŞİM BİLİMLERİ FAKÜLTESİ
+**				        BİLGİSAYAR MÜHENDİSLİĞİ BÖLÜMÜ
+**				          PROGRAMLAMAYA GİRİŞİ DERSİ
+**
+**				ÖDEV NUMARASI....: 1
+**				ÖĞRENCİ ADI......: Emre Soysüren
+**				ÖĞRENCİ NUMARASI.: G221210049
+**				DERS GRUBU.......: 2. Öğretim / C Grubu
+****************************************************************************/
+
 #ifndef OGRENCI_H
 #define OGRENCI_H
 
@@ -160,7 +172,7 @@ private:
             }
         }
 
-        throw "Harf not degeri cevrilemedi.";
+        throw;
     }
 
     // Verilen min ve max degeslerine bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. göre rastgele bir sayi seçer. min ve max dahildir.

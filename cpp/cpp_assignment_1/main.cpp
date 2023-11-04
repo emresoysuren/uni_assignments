@@ -1,13 +1,13 @@
 /****************************************************************************
-**					SAKARYA ÜNİVERSİTESİ
-**			         BİLGİSAYAR VE BİLİŞİM BİLİMLERİ FAKÜLTESİ
-**				    BİLGİSAYAR MÜHENDİSLİgİsBÖLÜMÜ bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır.
+**					          SAKARYA ÜNİVERSİTESİ
+**			        BİLGİSAYAR VE BİLİŞİM BİLİMLERİ FAKÜLTESİ
+**				        BİLGİSAYAR MÜHENDİSLİĞİ BÖLÜMÜ
 **				          PROGRAMLAMAYA GİRİŞİ DERSİ
 **
 **				ÖDEV NUMARASI....: 1
-**				ÖgRsNCİ bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. ADI......: Emre Soysüren
-**				ÖgRsNCİ bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. NUMARASI.: G221210049
-**				DERS GRUBU.......: C
+**				ÖĞRENCİ ADI......: Emre Soysüren
+**				ÖĞRENCİ NUMARASI.: G221210049
+**				DERS GRUBU.......: 2. Öğretim / C Grubu
 ****************************************************************************/
 
 #include <iostream>
@@ -15,14 +15,15 @@
 #include <iomanip>
 #include <cmath>
 #include <map>
+#include <locale>
 using namespace std;
 
-#include "sinif.h"
+#include "Sinif.h"
 #include "structlar.h"
 
 int main()
 {
-
+    // Ciktiyi sola dayali yazdir.
     cout << left;
 
     // Random fonksiyonunun seedini belirler.
@@ -42,13 +43,19 @@ int main()
     cout << "Vize agirligini belirleyiniz: ";
     cin >> katsayilar.vize;
 
-    while (katsayilar.yilIciEtki < 0 || 1 < katsayilar.yilIciEtki)
+    cout << "Yil içi puaninin geçme notuna etkisini belirleyiniz: ";
+
     {
-        cout << "Yil ici puaninin gecme notuna etkisini belirleyiniz (Deger 0 ile 1 arasinda olmalidir.): ";
-        cin >> katsayilar.yilIciEtki;
+        float yilIciEtki;
+
+        cin >> yilIciEtki;
+
+        yilIciEtki = yilIciEtki / pow(10, ceil(log10(yilIciEtki)));
+
+        katsayilar.yilIciEtki = yilIciEtki;
     }
 
-    cout << "Ogrenci Sayisini belirleyiniz: ";
+    cout << "Ogrenci sayisini belirleyiniz: ";
     cin >> ogrenciSayisi;
 
     // Icinde girilen ogrenci sayisi kadar ogrenci bulunan bir sinif olustur.
