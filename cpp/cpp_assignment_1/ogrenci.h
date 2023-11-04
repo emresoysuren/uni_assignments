@@ -178,7 +178,7 @@ private:
 
         int yuzdelik = bilgi.sira + bilgi.calistirmaKaristirici;
 
-        int yuzdelikDegisimSutunPeriyodu = (notNo + bilgi.calistirmaKaristirici % 6) % (bilgi.calistirmaKaristirici % 6);
+        int yuzdelikDegisimSutunPeriyodu = (notNo + bilgi.calistirmaKaristirici % 6) % (bilgi.calistirmaKaristirici % 5 + 1);
 
         // yuzdelikDegisimSutunPeriyodu == 0 : Columnu yenile
         // yuzdelikDegisimSutunPeriyodu + siraNo % 6 == 0 : Columnu 1er 1er kaydirarak yenile

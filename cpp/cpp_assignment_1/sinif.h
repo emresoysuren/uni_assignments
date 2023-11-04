@@ -21,7 +21,7 @@ public:
         int rastgeleOgrenciBilgiSayisi = rand() % 1200;
 
         // Verilen sayida rastgele ad ve soyadlar ile
-        // rastgele not degeslerinde bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. ogrenciler oluştur.
+        // rastgele not degeslerinde bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır ve ogrenciler oluştur.
         for (int i = 0; i < ogrenciSayisi; i++)
         {
             RastgeleOgrenciBilgileri rastgeleBilgiler = {
@@ -30,8 +30,30 @@ public:
                 rastgeleOgrenciBilgiSayisi,
             };
 
-            *(ogrenciler + i) = Ogrenci::rastgeleOgrenci(rastgeleBilgiler);
+            Ogrenci ogr = Ogrenci::rastgeleOgrenci(rastgeleBilgiler);
+
+            *(ogrenciler + i) = ogr;
+
+            // Hesaplanmis degerleri olustur
+
+            NotBilgisi notBilgisi = ogr.netNot(katsayilar);
+
+            // Ortalamayi hesapla
+            ortalama += notBilgisi.sayisal / ogrenciSayisi;
+
+            // "En" degerlerini belirle
+            if (enDusukNot == -1 || notBilgisi.sayisal < enDusukNot)
+            {
+                enDusukNot = notBilgisi.sayisal;
+            }
+
+            if (notBilgisi.sayisal > enYuksekNot)
+            {
+                enYuksekNot = notBilgisi.sayisal;
+            }
         }
+
+        standartSapma = standartSapmaHesapla(ortalama);
     }
 
     map<string, int> notDagilimi(bool print)
@@ -94,36 +116,11 @@ public:
 
     void bilgileriYazdir()
     {
-        float enDusukNot = -1;
-        float enYuksekNot = -1;
-        float ortalama = 0;
-
-        for (int i = 0; i < ogrenciSayisi; i++)
-        {
-            NotBilgisi notBilgisi = (ogrenciler + i)->netNot(katsayilar);
-
-            // Ortalamayi hesapla
-
-            ortalama += notBilgisi.sayisal / ogrenciSayisi;
-
-            // "En" degerlerini belirle
-
-            if (enDusukNot == -1 || notBilgisi.sayisal < enDusukNot)
-            {
-                enDusukNot = notBilgisi.sayisal;
-            }
-
-            if (notBilgisi.sayisal > enYuksekNot)
-            {
-                enYuksekNot = notBilgisi.sayisal;
-            }
-        }
-
         cout << endl
              << setw(100) << "Sinif Bilgileri" << endl;
         cout << setw(20) << "Ogrenci Sayisi" << setw(20) << "Yil Ici Etkisi" << setw(20) << "En Dusuk Not" << setw(20) << "En Yuksek Not" << setw(20) << "Ortalama" << setw(20) << "Standart Sapma" << endl
              << string(120, '-') << endl;
-        cout << setw(20) << ogrenciSayisi << setw(20) << yuvarlanmisString(katsayilar.yilIciEtki * 100) + "%" << setw(20) << setprecision(5) << enDusukNot << setw(20) << setprecision(5) << enYuksekNot << setw(20) << setprecision(5) << ortalama << setw(20) << setprecision(5) << standartSapma(ortalama) << endl;
+        cout << setw(20) << ogrenciSayisi << setw(20) << yuvarlanmisString(katsayilar.yilIciEtki * 100) + "%" << setw(20) << setprecision(5) << enDusukNot << setw(20) << setprecision(5) << enYuksekNot << setw(20) << setprecision(5) << ortalama << setw(20) << setprecision(5) << standartSapma << endl;
     }
 
 private:
@@ -131,7 +128,13 @@ private:
     int ogrenciSayisi;
     SinavKatsayilari katsayilar;
 
-    float standartSapma(float ortalama)
+    // Hesaplanmis degerler
+    float enDusukNot = -1;
+    float enYuksekNot = -1;
+    float ortalama = 0;
+    float standartSapma = 0;
+
+    float standartSapmaHesapla(float ortalama)
     {
         float deger = 0;
 
