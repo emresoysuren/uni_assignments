@@ -17,69 +17,56 @@
 #include <map>
 using namespace std;
 
-#include "sinif_bilgileri.h"
+#include "sinif.h"
 #include "structlar.h"
 #include "ogrenci.h"
 
 int main()
 {
-    SinifBilgisi sinifBilgisi;
 
     cout << left;
-
-    int rastgeleOgrenciBilgiSayisi = rand() % 1200;
 
     // Random fonksiyonunun seedini belirler.
     srand((unsigned int)time(NULL));
 
-    // Agirlik bilgilerini ve ogrenci sayisini kullanicidan al.
+    // Agirlik katsayilarini ve ogrenci sayisini kullanicidan al.
+    SinavKatsayilari katsayilar;
+
+    int ogrenciSayisi;
 
     cout << "Odevlerin (2) agirligini belirleyiniz: ";
-    cin >> sinifBilgisi.katsayilar.odev;
+    cin >> katsayilar.odev;
 
     cout << "Sinavlarin (2) agirligini belirleyiniz: ";
-    cin >> sinifBilgisi.katsayilar.kisa_sinav;
+    cin >> katsayilar.kisa_sinav;
 
     cout << "Vize agirligini belirleyiniz: ";
-    cin >> sinifBilgisi.katsayilar.vize;
+    cin >> katsayilar.vize;
 
-    while (sinifBilgisi.katsayilar.yilIciEtki < 0 || 1 < sinifBilgisi.katsayilar.yilIciEtki)
+    while (katsayilar.yilIciEtki < 0 || 1 < katsayilar.yilIciEtki)
     {
         cout << "Yil ici puaninin gecme notuna etkisini belirleyiniz (Deger 0 ile 1 arasinda olmalidir.): ";
-        cin >> sinifBilgisi.katsayilar.yilIciEtki;
+        cin >> katsayilar.yilIciEtki;
     }
 
     cout << "Ogrenci Sayisini belirleyiniz: ";
-    cin >> sinifBilgisi.ogrenciSayisi;
+    cin >> ogrenciSayisi;
 
-    // Ogrencileri depolamak icin array yaratir.
-    sinifBilgisi.ogrenciler = new Ogrenci[sinifBilgisi.ogrenciSayisi];
+    // Icinde girilen ogrenci sayisi kadar ogrenci bulunan bir sinif olustur.
 
-    // Verilen sayida rastgele ad ve soyadlar ile
-    // rastgele not degeslerinde bunlari tersten bir sekilde yuzdeliklerini belirleyerek rastgelelik yaratır. ogrenciler oluştur.
-    for (int i = 0; i < sinifBilgisi.ogrenciSayisi; i++)
-    {
-        RastgeleOgrenciBilgileri rastgeleBilgiler = {
-            i,
-            sinifBilgisi.ogrenciSayisi,
-            rastgeleOgrenciBilgiSayisi,
-        };
+    Sinif sinifBilgisi(ogrenciSayisi, katsayilar);
 
-        Ogrenci ogr = Ogrenci::rastgeleOgrenci(rastgeleBilgiler);
-
-        *(sinifBilgisi.ogrenciler + i) = ogr;
-    }
+    // Gerekli bilgileri yazdir.
 
     sinifBilgisi.ogrencileriYazdir();
 
     sinifBilgisi.notDagilimi(true);
 
-    delete[] sinifBilgisi.ogrenciler;
-
     sinifBilgisi.bilgileriYazdir();
 
-    cout << endl
-         << "Programin Sonunu";
+    // Programin sona ulastigini belirt.
+
+    cout << "\nProgramin Sonunu" << endl;
 
     return 0;
 }
