@@ -1,74 +1,66 @@
 /****************************************************************************
-**					          SAKARYA ÜNİVERSİTESİ
-**			        BİLGİSAYAR VE BİLİŞİM BİLİMLERİ FAKÜLTESİ
-**				        BİLGİSAYAR MÜHENDİSLİĞİ BÖLÜMÜ
-**				          PROGRAMLAMAYA GİRİŞİ DERSİ
+**					          SAKARYA UNIVERSITY
+**			        COMPUTER AND INFORMATION SCIENCES FACULTY
+**				        COMPUTER ENGINEERING DEPARTMENT
+**				          INTRODUCTION TO PROGRAMMING
 **
-**				ÖDEV NUMARASI....: 1
-**				ÖĞRENCİ ADI......: Emre Soysüren
-**				ÖĞRENCİ NUMARASI.: G221210049
-**				DERS GRUBU.......: 2. Öğretim / C Grubu
+**				        ASSIGNMENT NO.: 1
+**				        STUDENT NAME..: Emre Soysüren
+**				        STUDENT ID....: G221210049
+**				        GROUP.........: 2. Education / C Group
 ****************************************************************************/
 
 #include <iostream>
 #include <cmath>
 using namespace std;
 
-#include "Sinif.h"
-#include "structlar.h"
+#include "ClassInfo.h"
+#include "structs.h"
 
 int main()
 {
-    // Ciktiyi sola dayali yazdir.
+
     cout << left;
 
-    // Random fonksiyonunun seedini belirler.
     srand((unsigned int)time(NULL));
 
-    // Agirlik katsayilarini ve ogrenci sayisini kullanicidan al.
-    SinavKatsayilari katsayilar;
+    Coefficents coefficents;
 
-    int ogrenciSayisi;
+    int studentCount;
 
-    cout << "Odevlerin (2) agirligini belirleyiniz: ";
-    cin >> katsayilar.odev;
+    cout << "Define the coefficents of the assignmets: ";
+    cin >> coefficents.assignment;
 
-    cout << "Sinavlarin (2) agirligini belirleyiniz: ";
-    cin >> katsayilar.kisa_sinav;
+    cout << "Define the coefficents of the quizzes: ";
+    cin >> coefficents.quiz;
 
-    cout << "Vize agirligini belirleyiniz: ";
-    cin >> katsayilar.vize;
+    cout << "Define the coefficent of the midterm exam: ";
+    cin >> coefficents.midterm;
 
-    cout << "Yil içi puaninin geçme notuna etkisini belirleyiniz: ";
+    cout << "Define the coefficent of the year grade: ";
 
     {
-        float yilIciEtki;
+        float yearGradeCoefficent;
 
-        cin >> yilIciEtki;
+        cin >> yearGradeCoefficent;
 
-        yilIciEtki = yilIciEtki / pow(10, ceil(log10(yilIciEtki)));
+        yearGradeCoefficent = yearGradeCoefficent / pow(10, ceil(log10(yearGradeCoefficent)));
 
-        katsayilar.yilIciEtki = yilIciEtki;
+        coefficents.yearGrade = yearGradeCoefficent;
     }
 
-    cout << "Ogrenci sayisini belirleyiniz: ";
-    cin >> ogrenciSayisi;
+    cout << "Define student count: ";
+    cin >> studentCount;
 
-    // Icinde girilen ogrenci sayisi kadar ogrenci bulunan bir sinif olustur.
+    ClassInfo classInfo(studentCount, coefficents);
 
-    Sinif sinifBilgisi(ogrenciSayisi, katsayilar);
+    classInfo.printStudents();
 
-    // Gerekli bilgileri yazdir.
+    classInfo.printGradeDistribution();
 
-    sinifBilgisi.ogrencileriYazdir();
+    classInfo.printInfo();
 
-    sinifBilgisi.notDagiliminiYazdir();
-
-    sinifBilgisi.bilgileriYazdir();
-
-    // Programin sona ulastigini belirt.
-
-    cout << "\nProgramin Sonunu" << endl;
+    cout << "\nEnd of the Program" << endl;
 
     return 0;
 }
