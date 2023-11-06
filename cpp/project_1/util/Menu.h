@@ -7,91 +7,104 @@
 #include <functional>
 using namespace std;
 
-struct MenuOgesi
+struct MenuOption
 {
-    string baslik;
-    function<void()> fonksiyon;
+    string title;
+    function<void()> func;
 };
 
 class Menu
 {
 private:
-    string baslik;
-    vector<MenuOgesi> secenekler;
+    string title;
+    vector<MenuOption> options;
 
-    string numaralandirilmisSecenek(int i, bool sec = false)
+    string numberedOption(int i, bool chosed = false)
     {
-        string secenekIsareti;
+        string optionPrefix;
 
-        if (sec)
+        if (chosed)
         {
-            secenekIsareti += "> ";
+            optionPrefix += "> ";
         }
         else
         {
-            secenekIsareti += "  ";
+            optionPrefix += "  ";
         }
 
-        return secenekIsareti + "[" + to_string(i) + "] " + secenekler[i].baslik;
+        return optionPrefix + "[" + to_string(i) + "] " + options[i].title;
     }
 
-    void secimYazdir(string s)
+    void printHighlighted(string text)
     {
         cout << "\x1b[32m";
-        cout << s;
+        cout << text;
         cout << "\x1b[34m";
     }
 
-    void seciliSatiriYaz(int secim, bool sec = false)
+    void printLineAt(int selected, bool highlight = false)
     {
         cout << "\r\x1b[K";
 
-        if (sec)
+        if (highlight)
         {
-            secimYazdir(numaralandirilmisSecenek(secim, sec));
+            printHighlighted(numberedOption(selected, highlight));
             return;
         }
 
-        cout << numaralandirilmisSecenek(secim);
+        cout << numberedOption(selected);
     }
 
 public:
-    Menu(vector<MenuOgesi> secenekler, string baslik = "")
-        : secenekler(secenekler), baslik(baslik) {}
+    Menu(vector<MenuOption> options, string title = "")
+        : options(options), title(title) {}
+
     ~Menu() {}
 
-    void baslat()
+    void start()
     {
-        int secim = secenekler.size() - 1;
+        int selected = 0;
 
         cout << "\x1b[34m";
 
-        if (baslik != "")
+        if (title != "")
         {
             cout << "\x1b[4m";
 
             cout << endl;
-            cout << baslik + ":" << endl;
+            cout << title + ":" << endl;
 
             cout << "\x1b[0m";
             cout << "\x1b[34m";
         }
 
-        for (int i = 0; i < secenekler.size(); i++)
+        for (int i = 0; i < options.size(); i++)
         {
 
-            if (i == secim)
+            if (i == selected)
             {
-                seciliSatiriYaz(i, true);
-                continue;
+                printLineAt(i, true);
             }
-            seciliSatiriYaz(i);
-            cout << endl;
+            else
+            {
+                printLineAt(i);
+            }
+
+            if (i != options.size() - 1)
+            {
+                cout << endl;
+            }
         }
 
         cout << "\x1b[4i";
 
         cout << "\x1b[s";
+
+        // Go to the first element and print the line again to move the cursor to the end
+
+        cout << "\x1b[" + to_string(options.size() - 1 - selected) + "A";
+
+        printLineAt(selected, true);
 
         char c;
 
@@ -104,25 +117,25 @@ public:
             switch (c)
             {
             case 65:
-                if (secim > 0)
+                if (selected > 0)
                 {
-                    seciliSatiriYaz(secim);
-                    secim--;
+                    printLineAt(selected);
+                    selected--;
                     cout << "\x1b[A";
-                    seciliSatiriYaz(secim, true);
+                    printLineAt(selected, true);
                 }
                 break;
             case 66:
-                if (secim < secenekler.size() - 1)
+                if (selected < options.size() - 1)
                 {
-                    seciliSatiriYaz(secim);
-                    secim++;
+                    printLineAt(selected);
+                    selected++;
                     cout << "\x1b[B";
-                    seciliSatiriYaz(secim, true);
+                    printLineAt(selected, true);
                 }
                 break;
             default:
-                seciliSatiriYaz(secim, true);
+                printLineAt(selected, true);
                 break;
             }
         }
@@ -130,6 +143,6 @@ public:
         cout << "\x1b[u"
              << "\x1b[0m" << endl;
 
-        secenekler[secim].fonksiyon();
+        options[selected].func();
     }
 };

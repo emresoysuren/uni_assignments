@@ -1,78 +1,101 @@
-#include "Futbolcu.h"
-#include "Takim.h"
+#include "Player.h"
+#include "Team.h"
 #include "./util/Menu.h"
 
-void anaMenuBaslat();
-void takimMenusuBaslat();
-void oyuncuMenusuBaslat();
-void genelBilgiMenusuBaslat();
+void startMainMenu();
+void startTeamMenu();
+void startManageTeamMenu();
+void startPlayerMenu();
+void startInfoMenu();
 
 int main()
 {
 
-    anaMenuBaslat();
+    startMainMenu();
 
     return 0;
 }
 
-void anaMenuBaslat()
+void startMainMenu()
 {
     cout << "\x1b[2J";
     cout << "\x1b[H";
 
     Menu({
-             MenuOgesi{
-                 "Takimi Yonet",
-                 takimMenusuBaslat,
+             MenuOption{
+                 "Manage Teams",
+                 startTeamMenu,
              },
-             MenuOgesi{
-                 "Oyunculari Yonet",
-                 oyuncuMenusuBaslat,
+             MenuOption{
+                 "Manage Players",
+                 startPlayerMenu,
 
              },
-             MenuOgesi{
-                 "Genel Bilgileri Goster",
-                 genelBilgiMenusuBaslat,
+             MenuOption{
+                 "Show Info",
+                 startInfoMenu,
              },
          },
-         "Ana Menu")
-        .baslat();
+         "Main Menu")
+        .start();
 }
 
-void takimMenusuBaslat()
+void startTeamMenu()
 {
+    cout << "\x1b[2J";
+    cout << "\x1b[H";
+
     Menu({
-             {"Takim Olustur", []() {}},
-             {"Takim Sil", []() {}},
-             {"Takima Oyuncu Ekle", []() {}},
-             {"Takimdan Oyuncu Sil", []() {}},
-             {"Takimdaki Oyuncuyu Guncelle", []() {}},
-             {"Takimdaki Oyunculari Listele", []() {}},
-             {"Geri Don", anaMenuBaslat},
+             {"Create a New Team", []() {}},
+             {"Manage a Team", startManageTeamMenu},
+             {"Back", startMainMenu},
          },
-         "Takimi Yonet")
-        .baslat();
+         "Manage Teams")
+        .start();
 }
 
-void oyuncuMenusuBaslat()
+void startManageTeamMenu()
 {
+    cout << "\x1b[2J";
+    cout << "\x1b[H";
+
     Menu({
-             {"Oyuncu Ekle", []() {}},
-             {"Oyuncu Sil", []() {}},
-             {"Oyuncu Guncelle", []() {}},
-             {"Oyunculari Listele", []() {}},
-             {"Geri Don", anaMenuBaslat},
+             {"Add Player", []() {}},
+             {"Delete Player", []() {}},
+             {"Update Player", []() {}},
+             {"List Players", []() {}},
+             {"Delete a Player", []() {}},
+             {"Back", startTeamMenu},
          },
-         "Oyunculari Yonet")
-        .baslat();
+         "Manage Team")
+        .start();
 }
 
-void genelBilgiMenusuBaslat()
+void startPlayerMenu()
 {
+    cout << "\x1b[2J";
+    cout << "\x1b[H";
+
     Menu({
-             {"Oyun kayitlarini goster", []() {}},
-             {"Geri Don", anaMenuBaslat},
+             {"Create Player", []() {}},
+             {"Delete Player", []() {}},
+             {"Update Player", []() {}},
+             {"List Players", []() {}},
+             {"Back", startMainMenu},
          },
-         "Genel Bilgileri Goster")
-        .baslat();
+         "Manage Players")
+        .start();
+}
+
+void startInfoMenu()
+{
+    cout << "\x1b[2J";
+    cout << "\x1b[H";
+
+    Menu({
+             {"Show Game Records", []() {}},
+             {"Back", startMainMenu},
+         },
+         "Info")
+        .start();
 }
