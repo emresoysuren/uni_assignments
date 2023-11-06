@@ -10,8 +10,7 @@
 **				DERS GRUBU.......: 2. Öğretim / C Grubu
 ****************************************************************************/
 
-#ifndef SINIF_H
-#define SINIF_H
+#pragma once
 
 #include <iostream>
 #include <map>
@@ -23,7 +22,7 @@ using namespace std;
 #include "structlar.h"
 #include "Ogrenci.h"
 
-class Sinif
+struct Sinif
 {
 public:
     map<string, int> notDagilimi;
@@ -180,5 +179,3 @@ private:
         }
     }
 };
-
-#endif

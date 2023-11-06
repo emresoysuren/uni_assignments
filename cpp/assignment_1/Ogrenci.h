@@ -10,8 +10,7 @@
 **				DERS GRUBU.......: 2. Öğretim / C Grubu
 ****************************************************************************/
 
-#ifndef OGRENCI_H
-#define OGRENCI_H
+#pragma once
 
 #include <string>
 using namespace std;
@@ -19,7 +18,7 @@ using namespace std;
 #include "structlar.h"
 #include "Sinif.h"
 
-class Ogrenci
+struct Ogrenci
 {
 public:
     int no;
@@ -218,4 +217,3 @@ private:
         }
     };
 };
-#endif

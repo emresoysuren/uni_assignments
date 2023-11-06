@@ -1,16 +1,23 @@
-#ifndef MENU_H
-#define MENU_H
+#pragma once
 
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
+#include <functional>
 using namespace std;
+
+struct MenuOgesi
+{
+    string baslik;
+    function<void()> fonksiyon;
+};
 
 class Menu
 {
 private:
     string baslik;
-    vector<string> secenekler;
+    vector<MenuOgesi> secenekler;
 
     string numaralandirilmisSecenek(int i, bool sec = false)
     {
@@ -25,7 +32,7 @@ private:
             secenekIsareti += "  ";
         }
 
-        return secenekIsareti + "[" + to_string(i) + "] " + secenekler[i];
+        return secenekIsareti + "[" + to_string(i) + "] " + secenekler[i].baslik;
     }
 
     void secimYazdir(string s)
@@ -49,11 +56,11 @@ private:
     }
 
 public:
-    Menu(vector<string> secenekler, string baslik = "")
+    Menu(vector<MenuOgesi> secenekler, string baslik = "")
         : secenekler(secenekler), baslik(baslik) {}
     ~Menu() {}
 
-    int baslat()
+    void baslat()
     {
         int secim = secenekler.size() - 1;
 
@@ -123,8 +130,6 @@ public:
         cout << "\x1b[u"
              << "\x1b[0m" << endl;
 
-        return secim;
+        secenekler[secim].fonksiyon();
     }
 };
-
-#endif // MENU_H

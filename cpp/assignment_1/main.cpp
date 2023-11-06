@@ -11,11 +11,7 @@
 ****************************************************************************/
 
 #include <iostream>
-#include <string>
-#include <iomanip>
 #include <cmath>
-#include <map>
-#include <locale>
 using namespace std;
 
 #include "Sinif.h"

@@ -10,8 +10,7 @@
 **				DERS GRUBU.......: 2. Öğretim / C Grubu
 ****************************************************************************/
 
-#ifndef STRUCTLAR_H
-#define STRUCTLAR_H
+#pragma once
 
 #include <string>
 using namespace std;
@@ -31,5 +30,3 @@ struct SinavKatsayilari
     float vize;
     float yilIciEtki;
 };
-
-#endif

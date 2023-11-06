@@ -1,5 +1,4 @@
-#ifndef FUTBOLCU_H
-#define FUTBOLCU_H
+#pragma once
 
 #include <string>
 #include <ctime>
@@ -59,5 +58,3 @@ public:
     }
     ~Futbolcu() {}
 };
-
-#endif // FUTBOLCU_H

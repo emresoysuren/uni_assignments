@@ -1,5 +1,4 @@
-#ifndef TAKIM_H
-#define TAKIM_H
+#pragma once
 
 #include <string>
 using namespace std;
@@ -26,5 +25,3 @@ public:
         return Takim(takimNo, "", "", "", 0, "");
     }
 };
-
-#endif // TAKIM_H
