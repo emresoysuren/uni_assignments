@@ -15,6 +15,7 @@
 #include <string>
 using namespace std;
 
+/// @brief A struct that hold the information of the grades
 struct GradeInfo
 {
     string letter;
@@ -22,6 +23,7 @@ struct GradeInfo
     float number;
 };
 
+/// @brief A struct that hold the information of the coefficents of the exams
 struct Coefficents
 {
     float assignment;

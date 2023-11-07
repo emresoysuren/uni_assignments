@@ -20,10 +20,13 @@ using namespace std;
 int main()
 {
 
+    //  Align the output to the left
     cout << left;
 
+    //  Seed the random number generator
     srand((unsigned int)time(NULL));
 
+    // Take the coefficents and student count from the user
     Coefficents coefficents;
 
     int studentCount;
@@ -44,6 +47,7 @@ int main()
 
         cin >> yearGradeCoefficent;
 
+        // Always keep the year grade coefficent between 0 and 1
         yearGradeCoefficent = yearGradeCoefficent / pow(10, ceil(log10(yearGradeCoefficent)));
 
         coefficents.yearGrade = yearGradeCoefficent;
@@ -52,7 +56,10 @@ int main()
     cout << "Define student count: ";
     cin >> studentCount;
 
+    // Create a new ClassInfo struct with the given coefficents and student count
     ClassInfo classInfo(studentCount, coefficents);
+
+    // Print the information about the class
 
     classInfo.printStudents();
 
@@ -60,6 +67,7 @@ int main()
 
     classInfo.printInfo();
 
+    // Indicate the end of the program
     cout << "\nEnd of the Program" << endl;
 
     return 0;

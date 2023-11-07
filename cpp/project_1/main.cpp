@@ -2,6 +2,7 @@
 #include "Team.h"
 #include "./util/Menu.h"
 
+// Forward declarations
 void startMainMenu();
 void startTeamMenu();
 void startManageTeamMenu();
@@ -10,7 +11,7 @@ void startInfoMenu();
 
 int main()
 {
-
+    // Start the main menu
     startMainMenu();
 
     return 0;
@@ -18,7 +19,9 @@ int main()
 
 void startMainMenu()
 {
+    // Clear the screen
     cout << "\x1b[2J";
+    // Move the cursor to the top left
     cout << "\x1b[H";
 
     Menu({
@@ -42,7 +45,9 @@ void startMainMenu()
 
 void startTeamMenu()
 {
+    // Clear the screen
     cout << "\x1b[2J";
+    // Move the cursor to the top left
     cout << "\x1b[H";
 
     Menu({
@@ -56,7 +61,9 @@ void startTeamMenu()
 
 void startManageTeamMenu()
 {
+    // Clear the screen
     cout << "\x1b[2J";
+    // Move the cursor to the top left
     cout << "\x1b[H";
 
     Menu({
@@ -73,7 +80,9 @@ void startManageTeamMenu()
 
 void startPlayerMenu()
 {
+    // Clear the screen
     cout << "\x1b[2J";
+    // Move the cursor to the top left
     cout << "\x1b[H";
 
     Menu({
@@ -89,7 +98,9 @@ void startPlayerMenu()
 
 void startInfoMenu()
 {
+    // Clear the screen
     cout << "\x1b[2J";
+    // Move the cursor to the top left
     cout << "\x1b[H";
 
     Menu({

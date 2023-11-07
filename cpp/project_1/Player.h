@@ -7,14 +7,16 @@ using namespace std;
 
 #include "Team.h"
 
+/// @brief Enum to represent the position of a player playing in a team
 enum PlayingPosition
 {
-    kaleci,
-    defans,
-    ortasaha,
-    forvet,
+    keeper,
+    defender,
+    midfielder,
+    forward,
 };
 
+/// @brief A class to represent a player
 class Player
 {
 private:
@@ -27,33 +29,33 @@ private:
     int salary;
     tm dateOfBirth;
 
-    PlayingPosition stringToPosition(string position)
+    /// @brief Converts a number to a PlayingPosition
+    /// @param position Position of the player as a number
+    /// @return Returns the PlayingPosition corresponding to the given number
+    static PlayingPosition numToPosition(int position)
     {
-        static map<string, int> positions = {
-            {"kaleci", PlayingPosition::kaleci},
-            {"defans", PlayingPosition::defans},
-            {"ortasaha", PlayingPosition::ortasaha},
-            {"forvet", PlayingPosition::forvet},
+        static map<int, PlayingPosition> positions = {
+            {PlayingPosition::keeper, PlayingPosition::keeper},
+            {PlayingPosition::defender, PlayingPosition::defender},
+            {PlayingPosition::midfielder, PlayingPosition::midfielder},
+            {PlayingPosition::forward, PlayingPosition::forward},
         };
 
-        switch (positions[position])
-        {
-        case 0:
-            return PlayingPosition::kaleci;
-        case 1:
-            return PlayingPosition::defans;
-        case 2:
-            return PlayingPosition::ortasaha;
-        case 3:
-            return PlayingPosition::forvet;
-        default:
-            throw "Pozisyon bulunamadi";
-        }
+        return positions[position];
     }
 
 public:
-    Player(string playerID, string name, string surname, int teamID, int licenseID, string position, int salary, tm dateOfBirth)
-        : playerID(playerID), name(name), surname(surname), team(Team::idToTeam(teamID)), licenseID(licenseID), position(stringToPosition(position)), salary(salary), dateOfBirth(dateOfBirth)
+    /// @brief Creates a new Player object
+    /// @param playerID ID of the player
+    /// @param name Name of the player
+    /// @param surname Surame of the player
+    /// @param teamID The id of the team the player is in
+    /// @param licenseID License ID of the player
+    /// @param position The position of the player playing as a number
+    /// @param salary Salary of the player
+    /// @param dateOfBirth Date of birth of the player
+    Player(string playerID, string name, string surname, int teamID, int licenseID, int position, int salary, tm dateOfBirth)
+        : playerID(playerID), name(name), surname(surname), team(Team::idToTeam(teamID)), licenseID(licenseID), position(numToPosition(position)), salary(salary), dateOfBirth(dateOfBirth)
     {
     }
     ~Player() {}
