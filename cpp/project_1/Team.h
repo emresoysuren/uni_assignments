@@ -12,7 +12,7 @@ class Team
 {
 private:
     static const string FILE_PATH;
-    int teamID;
+    string teamID;
     string name;
     string address;
     string phoneNumber;
@@ -32,7 +32,7 @@ private:
             result.push_back(word);
         }
 
-        return Team(stoi(result[0]), result[1], result[2], result[3], result[4]);
+        return Team(result[0], result[1], result[2], result[3], result[4]);
     }
 
     static void saveTeam(Team team)
@@ -51,7 +51,7 @@ public:
     /// @param address Adress of the team
     /// @param phoneNumber Phone number of the team
     /// @param director Current director of the team
-    Team(int teamID, string name, string address, string phoneNumber, string director)
+    Team(string teamID, string name, string address, string phoneNumber, string director)
         : teamID(teamID), name(name), address(address), phoneNumber(phoneNumber), director(director)
     {
     }
@@ -80,35 +80,26 @@ public:
     };
 
     // @todo It's not working
-    static void deleteTeam(int teamID)
+    static void deleteTeam(string teamID)
     {
-        string line;
-
-        vector<string> lines;
-
         ifstream rfile(FILE_PATH);
+        ofstream temp("temp.data");
+
+        string line;
 
         while (getline(rfile, line))
         {
-            if (line.substr(0, line.find(" ")) == to_string(teamID))
+            if (line.substr(0, line.find(" ")) != teamID)
             {
-                continue;
+                temp << line << endl;
             }
-            lines.push_back(line);
         }
 
         rfile.close();
+        temp.close();
 
-        ofstream wfile(FILE_PATH);
-
-        for (string line : lines)
-        {
-            wfile << line << endl;
-        }
-
-        wfile.close();
-
-        cout << "Team (" + to_string(teamID) + ") deleted" << endl;
+        remove(FILE_PATH.c_str());
+        rename("temp.data", FILE_PATH.c_str());
     }
 
     static vector<Team> getAllTeams()
@@ -136,7 +127,7 @@ public:
     static Team createTeam(string name, string address, string phoneNumber, string director)
     {
         // @todo Create UUIDs instead of giving random numbers
-        Team team(rand(), name, address, phoneNumber, director);
+        Team team(to_string(rand()), name, address, phoneNumber, director);
 
         saveTeam(team);
 
@@ -150,7 +141,7 @@ public:
         return name;
     }
 
-    int getID()
+    string getID()
     {
         return teamID;
     }

@@ -11,6 +11,8 @@ void startTeamMenu();
 void startTeamListMenu();
 Team createTeam();
 void startManageTeamMenu(Team);
+void startManagePlayerMenu(Player);
+void startPlayersListMenu();
 void startPlayerMenu();
 void startInfoMenu();
 
@@ -84,6 +86,37 @@ Team createTeam()
     return Team::createTeam(name, address, phoneNumber, director);
 }
 
+Player createPlayer()
+{
+    // Clear the screen
+    cout << "\x1b[2J";
+    // Move the cursor to the top left
+    cout << "\x1b[H";
+
+    string name, surname;
+    int position, salary;
+    tm dateOfBirth;
+
+    cout << "Enter the information of the player:" << endl;
+
+    cout << "Name: ";
+    cin >> name;
+
+    cout << "Surname: ";
+    cin >> surname;
+
+    cout << "Position: ";
+    cin >> position;
+
+    cout << "Salary: ";
+    cin >> salary;
+
+    cout << "Date of Birth: ";
+    cin >> dateOfBirth.tm_mday >> dateOfBirth.tm_mon >> dateOfBirth.tm_year;
+
+    return Player::createPlayer(name, surname, Player::numToPosition(position), salary, dateOfBirth);
+}
+
 void startTeamMenu()
 {
     // Clear the screen
@@ -138,10 +171,8 @@ void startManageTeamMenu(Team team)
 
     Menu({
              {"Add Player", []() {}},
-             {"Delete Player", []() {}},
-             {"Update Player", []() {}},
+             {"Remove Player", []() {}},
              {"List Players", []() {}},
-             {"Delete a Player", []() {}},
              {
                  "Delete the Team",
                  [ID = team.getID()]()
@@ -164,13 +195,60 @@ void startPlayerMenu()
     cout << "\x1b[H";
 
     Menu({
-             {"Create Player", []() {}},
-             {"Delete Player", []() {}},
-             {"Update Player", []() {}},
-             {"List Players", []() {}},
+             {"Create Player", []()
+              {
+                  startManagePlayerMenu(createPlayer());
+              }},
+             {"Manage a Player", startPlayersListMenu},
              {"Back", startMainMenu},
          },
          "Manage Players")
+        .start();
+}
+
+void startPlayersListMenu()
+{
+    // Clear the screen
+    cout << "\x1b[2J";
+    // Move the cursor to the top left
+    cout << "\x1b[H";
+
+    vector<MenuOption> options = {};
+
+    for (Player player : Player::getAllPlayers())
+    {
+        options.push_back(MenuOption{
+            player.getName(),
+            [player]()
+            {
+                startManagePlayerMenu(player);
+            },
+        });
+    }
+
+    // @todo: Fix here it doesn't show any team and wired count of teams
+    options.push_back({"Back", startPlayerMenu});
+
+    Menu(options, "Manage a Player (Found " + to_string(options.size() - 1) + " players)").start();
+}
+
+void startManagePlayerMenu(Player player)
+{
+    // Clear the screen
+    cout << "\x1b[2J";
+    // Move the cursor to the top left
+    cout << "\x1b[H";
+
+    Menu({
+             {"Delete Player", [ID = player.getID()]()
+              {
+                  Player::deletePlayer(ID);
+                  startPlayersListMenu();
+              }},
+             {"Update Player", []() {}},
+             {"Back", startPlayersListMenu},
+         },
+         "Managing Player: " + player.getName() + " " + player.getSurname())
         .start();
 }
 
