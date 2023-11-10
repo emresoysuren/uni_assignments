@@ -111,6 +111,12 @@ public:
             cout << "\x1b[34m";
         }
 
+        if (options.size() == 0)
+        {
+            cout << "No options to show" << endl;
+            return;
+        }
+
         for (int i = 0; i < options.size(); i++)
         {
             // Print option
@@ -137,7 +143,7 @@ public:
         {
             // Get single char without enter
             system("stty raw");
-            c = getwchar();
+            c = getchar();
             system("stty cooked");
 
             // Handle input
