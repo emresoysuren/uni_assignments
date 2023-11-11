@@ -206,8 +206,11 @@ void startManageTeamPlayerMenu(Team team, Player player)
               {
                   startManagePlayerMenu(player);
               }},
-             // @todo: Add remove player from team fuctionality
-             {"Remove Player from the Team", []() {}},
+             {"Remove Player from the Team", [team, ID = player.getID()]()
+              {
+                  Team::removeTeamOrPlayerWithID(ID);
+                  startManagePlayersOfTeam(team);
+              }},
              {"Back", [team]()
               {
                   startManagePlayersOfTeam(team);

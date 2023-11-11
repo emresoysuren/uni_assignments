@@ -9,6 +9,8 @@ using namespace std;
 
 #include "Player.h"
 
+class Player;
+
 /// @brief Class representing a soccer team
 class Team
 {
@@ -24,28 +26,9 @@ private:
     /// @brief Converts a string to a Team object
     /// @param line String to convert
     /// @return Returns the converted Team object
-    static Team fromString(string line)
-    {
-        string word;
-        stringstream ss(line);
-        vector<string> result;
+    static Team fromString(string line);
 
-        while (getline(ss, word, ' '))
-        {
-            result.push_back(word);
-        }
-
-        return Team(result[0], result[1], result[2], result[3], result[4]);
-    }
-
-    static void saveTeam(Team team)
-    {
-        ofstream file(FILE_PATH, ios::app);
-
-        file << team.teamID << " " << team.name << " " << team.address << " " << team.phoneNumber << " " << team.director << endl;
-
-        file.close();
-    }
+    static void saveTeam(Team team);
 
 public:
     /// @brief Creates a new Team object
@@ -54,165 +37,32 @@ public:
     /// @param address Adress of the team
     /// @param phoneNumber Phone number of the team
     /// @param director Current director of the team
-    Team(string teamID, string name, string address, string phoneNumber, string director)
-        : teamID(teamID), name(name), address(address), phoneNumber(phoneNumber), director(director)
-    {
-    }
-    ~Team() {}
+    Team(string teamID, string name, string address, string phoneNumber, string director);
+    ~Team();
 
     /// @brief Finds a team by its ID
     /// @param teamID ID of the team to find
     /// @return Returns the team with the given ID or throws an error if it doesn't exist
-    static Team idToTeam(string teamID)
-    {
-        string line;
+    static Team idToTeam(string teamID);
 
-        ifstream file(FILE_PATH, ios::app);
+    static void deleteTeam(string teamID);
 
-        while (getline(file, line))
-        {
-            if (line.substr(0, line.find(" ")) == teamID)
-            {
-                return fromString(line);
-            }
-        }
-
-        file.close();
-
-        throw "Team not found";
-    };
-
-    // @todo It's not working
-    static void deleteTeam(string teamID)
-    {
-        ifstream rfile(FILE_PATH);
-        ofstream temp("temp.data");
-
-        string line;
-
-        while (getline(rfile, line))
-        {
-            if (line.substr(0, line.find(" ")) != teamID)
-            {
-                temp << line << endl;
-            }
-        }
-
-        rfile.close();
-        temp.close();
-
-        removeTeamOrPlayerWithID(teamID);
-
-        remove(FILE_PATH.c_str());
-        rename("temp.data", FILE_PATH.c_str());
-    }
-
-    static vector<Team> getAllTeams()
-    {
-        vector<Team> teams;
-        string line;
-
-        ifstream file(FILE_PATH, ios::app);
-
-        while (getline(file, line))
-        {
-            teams.push_back(fromString(line));
-        }
-
-        file.close();
-
-        return teams;
-    };
+    static vector<Team> getAllTeams();
 
     /// @brief Creates a new team with a new ID
     /// @param name Name of the team
     /// @param address Adress of the team
     /// @param phoneNumber Phone number of the team
     /// @param director Current director of the team
-    static Team createTeam(string name, string address, string phoneNumber, string director)
-    {
-        // @todo Create UUIDs instead of giving random numbers
-        Team team(to_string(rand()), name, address, phoneNumber, director);
+    static Team createTeam(string name, string address, string phoneNumber, string director);
 
-        saveTeam(team);
+    string getName();
 
-        cout << "Team created: " << team.teamID << " " << team.name << " " << team.address << " " << team.phoneNumber << " " << team.director << endl;
+    string getID();
 
-        return team;
-    }
+    void addPlayer(string playerID);
 
-    string getName()
-    {
-        return name;
-    }
+    vector<Player> getPlayers();
 
-    string getID()
-    {
-        return teamID;
-    }
-
-    void addPlayer(string playerID)
-    {
-        fstream file(TEAM_PLAYER_FILE_PATH, ios::app);
-
-        string line;
-
-        // @todo: It's causing an error
-        while (getline(file, line))
-        {
-            if (line.substr(line.find(" ") + 1) == playerID)
-            {
-                file.close();
-                return;
-            }
-        }
-
-        file << teamID << " " << playerID << endl;
-
-        file.close();
-    }
-
-    vector<Player> getPlayers()
-    {
-        ifstream file(TEAM_PLAYER_FILE_PATH, ios::app);
-
-        vector<Player> players;
-
-        string line;
-
-        while (getline(file, line))
-        {
-            if (line.substr(0, line.find(" ")) == teamID)
-            {
-                players.push_back(Player::idToPlayer(line.substr(line.find(" ") + 1)));
-            }
-        }
-
-        return players;
-    }
-
-    static void removeTeamOrPlayerWithID(string ID)
-    {
-        ifstream rfile(TEAM_PLAYER_FILE_PATH);
-        ofstream temp("temp.data");
-
-        string line;
-
-        while (getline(rfile, line))
-        {
-            if (line.substr(0, line.find(" ")) != ID && line.substr(line.find(" ") + 1) != ID)
-            {
-                temp << line << endl;
-            }
-        }
-
-        rfile.close();
-        temp.close();
-
-        remove(TEAM_PLAYER_FILE_PATH.c_str());
-        rename("temp.data", TEAM_PLAYER_FILE_PATH.c_str());
-    }
+    static void removeTeamOrPlayerWithID(string ID);
 };
-
-const string Team::FILE_PATH = "teams.data";
-const string Team::TEAM_PLAYER_FILE_PATH = "team_player.data";
