@@ -1,7 +1,11 @@
 #pragma once
 
 #include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <ctime>
+#include <vector>
 #include <map>
 using namespace std;
 
@@ -20,6 +24,7 @@ enum PlayingPosition
 class Player
 {
 private:
+    static const string FILE_PATH;
     string playerID;
     string name;
     string surname;
@@ -27,8 +32,6 @@ private:
     PlayingPosition position;
     int salary;
     tm dateOfBirth;
-
-    static const string FILE_PATH;
 
     static void savePlayer(Player player)
     {
@@ -45,7 +48,6 @@ public:
     /// @param playerID ID of the player
     /// @param name Name of the player
     /// @param surname Surame of the player
-    /// @param teamID The id of the team the player is in
     /// @param position The position of the player playing in the team
     /// @param salary Salary of the player
     /// @param dateOfBirth Date of birth of the player
@@ -79,6 +81,8 @@ public:
 
         file.close();
         temp.close();
+
+        Team::removeTeamOrPlayerWithID(playerID);
 
         remove(FILE_PATH.c_str());
         rename("temp.data", FILE_PATH.c_str());
@@ -142,6 +146,25 @@ public:
 
         return Player(result[0], result[1], result[2], stoi(result[3]), numToPosition(stoi(result[4])), stoi(result[5]), dateOfBirth);
     }
+
+    static Player idToPlayer(string playerID)
+    {
+        string line;
+
+        ifstream file(FILE_PATH, ios::app);
+
+        while (getline(file, line))
+        {
+            if (line.substr(0, line.find(" ")) == playerID)
+            {
+                return fromString(line);
+            }
+        }
+
+        file.close();
+
+        throw "Player not found";
+    };
 
     string getID()
     {

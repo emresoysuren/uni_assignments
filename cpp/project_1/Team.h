@@ -7,11 +7,14 @@
 #include <vector>
 using namespace std;
 
+#include "Player.h"
+
 /// @brief Class representing a soccer team
 class Team
 {
 private:
     static const string FILE_PATH;
+    static const string TEAM_PLAYER_FILE_PATH;
     string teamID;
     string name;
     string address;
@@ -60,7 +63,7 @@ public:
     /// @brief Finds a team by its ID
     /// @param teamID ID of the team to find
     /// @return Returns the team with the given ID or throws an error if it doesn't exist
-    static Team idToTeam(int teamID)
+    static Team idToTeam(string teamID)
     {
         string line;
 
@@ -68,7 +71,7 @@ public:
 
         while (getline(file, line))
         {
-            if (line.substr(0, line.find(" ")) == to_string(teamID))
+            if (line.substr(0, line.find(" ")) == teamID)
             {
                 return fromString(line);
             }
@@ -97,6 +100,8 @@ public:
 
         rfile.close();
         temp.close();
+
+        removeTeamOrPlayerWithID(teamID);
 
         remove(FILE_PATH.c_str());
         rename("temp.data", FILE_PATH.c_str());
@@ -146,10 +151,68 @@ public:
         return teamID;
     }
 
-    // vector<Player> getPlayers()
-    // {
-    //     return Player::getPlayersIn(teamID);
-    // }
+    void addPlayer(string playerID)
+    {
+        fstream file(TEAM_PLAYER_FILE_PATH, ios::app);
+
+        string line;
+
+        // @todo: It's causing an error
+        while (getline(file, line))
+        {
+            if (line.substr(line.find(" ") + 1) == playerID)
+            {
+                file.close();
+                return;
+            }
+        }
+
+        file << teamID << " " << playerID << endl;
+
+        file.close();
+    }
+
+    vector<Player> getPlayers()
+    {
+        ifstream file(TEAM_PLAYER_FILE_PATH, ios::app);
+
+        vector<Player> players;
+
+        string line;
+
+        while (getline(file, line))
+        {
+            if (line.substr(0, line.find(" ")) == teamID)
+            {
+                players.push_back(Player::idToPlayer(line.substr(line.find(" ") + 1)));
+            }
+        }
+
+        return players;
+    }
+
+    static void removeTeamOrPlayerWithID(string ID)
+    {
+        ifstream rfile(TEAM_PLAYER_FILE_PATH);
+        ofstream temp("temp.data");
+
+        string line;
+
+        while (getline(rfile, line))
+        {
+            if (line.substr(0, line.find(" ")) != ID && line.substr(line.find(" ") + 1) != ID)
+            {
+                temp << line << endl;
+            }
+        }
+
+        rfile.close();
+        temp.close();
+
+        remove(TEAM_PLAYER_FILE_PATH.c_str());
+        rename("temp.data", TEAM_PLAYER_FILE_PATH.c_str());
+    }
 };
 
 const string Team::FILE_PATH = "teams.data";
+const string Team::TEAM_PLAYER_FILE_PATH = "team_player.data";

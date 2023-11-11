@@ -16,7 +16,6 @@
 using namespace std;
 
 #include "structs.h"
-#include "ClassInfo.h"
 
 /// @brief A struct that hold the information of a student
 struct Student

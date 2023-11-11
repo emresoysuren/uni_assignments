@@ -1,4 +1,5 @@
 #include <iostream>
+#include <functional>
 using namespace std;
 
 #include "Player.h"
@@ -10,9 +11,13 @@ void startMainMenu();
 void startTeamMenu();
 void startTeamListMenu();
 Team createTeam();
+void startAddPlayerMenu(Team);
 void startManageTeamMenu(Team);
 void startManagePlayerMenu(Player);
-void startPlayersListMenu();
+void startManagePlayersOfTeam(Team team);
+void startPlayersListMenu(function<void(Player)> = startManagePlayerMenu);
+void startManageTeamPlayerMenu(Team team, Player player);
+void addPlayer(Team, Player);
 void startPlayerMenu();
 void startInfoMenu();
 
@@ -156,10 +161,60 @@ void startTeamListMenu()
         });
     }
 
-    // @todo: Fix here it doesn't show any team and wired count of teams
     options.push_back({"Back", startTeamMenu});
 
     Menu(options, "Manage a Team (Found " + to_string(options.size() - 1) + " teams)").start();
+}
+
+void startManagePlayersOfTeam(Team team)
+{
+    // Clear the screen
+    cout << "\x1b[2J";
+    // Move the cursor to the top left
+    cout << "\x1b[H";
+
+    vector<MenuOption> options = {};
+
+    for (Player player : team.getPlayers())
+    {
+        options.push_back(MenuOption{
+            player.getName(),
+            [team, player]()
+            {
+                startManageTeamPlayerMenu(team, player);
+            },
+        });
+    }
+
+    options.push_back({"Back", [team]()
+                       {
+                           startManageTeamMenu(team);
+                       }});
+
+    Menu(options, "Manage Player in " + team.getName() + " (Found " + to_string(options.size() - 1) + " players)").start();
+}
+
+void startManageTeamPlayerMenu(Team team, Player player)
+{
+    // Clear the screen
+    cout << "\x1b[2J";
+    // Move the cursor to the top left
+    cout << "\x1b[H";
+
+    Menu({
+             {"Manage Player", [player]()
+              {
+                  startManagePlayerMenu(player);
+              }},
+             // @todo: Add remove player from team fuctionality
+             {"Remove Player from the Team", []() {}},
+             {"Back", [team]()
+              {
+                  startManagePlayersOfTeam(team);
+              }},
+         },
+         "Managing Team:" + team.getName())
+        .start();
 }
 
 void startManageTeamMenu(Team team)
@@ -170,9 +225,15 @@ void startManageTeamMenu(Team team)
     cout << "\x1b[H";
 
     Menu({
-             {"Add Player", []() {}},
-             {"Remove Player", []() {}},
-             {"List Players", []() {}},
+             {"Add Player", [team]()
+              {
+                  startAddPlayerMenu(team);
+              }},
+             {"Manage Players", [team]()
+              {
+                  startManagePlayersOfTeam(team);
+              }},
+             {"Update Team", []() {}},
              {
                  "Delete the Team",
                  [ID = team.getID()]()
@@ -183,7 +244,7 @@ void startManageTeamMenu(Team team)
              },
              {"Back", startTeamListMenu},
          },
-         "Managing " + team.getName() + " Team")
+         "Managing Team:" + team.getName())
         .start();
 }
 
@@ -199,14 +260,17 @@ void startPlayerMenu()
               {
                   startManagePlayerMenu(createPlayer());
               }},
-             {"Manage a Player", startPlayersListMenu},
+             {"Manage a Player", []()
+              {
+                  startPlayersListMenu();
+              }},
              {"Back", startMainMenu},
          },
          "Manage Players")
         .start();
 }
 
-void startPlayersListMenu()
+void startPlayersListMenu(function<void(Player)> callback)
 {
     // Clear the screen
     cout << "\x1b[2J";
@@ -219,17 +283,34 @@ void startPlayersListMenu()
     {
         options.push_back(MenuOption{
             player.getName(),
-            [player]()
+            [player, callback]()
             {
-                startManagePlayerMenu(player);
+                callback(player);
             },
         });
     }
 
-    // @todo: Fix here it doesn't show any team and wired count of teams
     options.push_back({"Back", startPlayerMenu});
 
     Menu(options, "Manage a Player (Found " + to_string(options.size() - 1) + " players)").start();
+}
+
+void addPlayer(Team team, Player player)
+{
+    team.addPlayer(player.getID());
+}
+
+void startAddPlayerMenu(Team team)
+{
+    // Clear the screen
+    cout << "\x1b[2J";
+    // Move the cursor to the top left
+    cout << "\x1b[H";
+
+    startPlayersListMenu([team](Player player)
+                         {
+                             addPlayer(team, player);
+                             startManageTeamMenu(team); });
 }
 
 void startManagePlayerMenu(Player player)
@@ -240,13 +321,16 @@ void startManagePlayerMenu(Player player)
     cout << "\x1b[H";
 
     Menu({
+             {"Update Player", []() {}},
              {"Delete Player", [ID = player.getID()]()
               {
                   Player::deletePlayer(ID);
                   startPlayersListMenu();
               }},
-             {"Update Player", []() {}},
-             {"Back", startPlayersListMenu},
+             {"Back", []()
+              {
+                  startPlayersListMenu();
+              }},
          },
          "Managing Player: " + player.getName() + " " + player.getSurname())
         .start();
