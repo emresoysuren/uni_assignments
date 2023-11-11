@@ -15,10 +15,10 @@ void startAddPlayerMenu(Team);
 void startManageTeamMenu(Team);
 void startManagePlayerMenu(Player);
 void startManagePlayersOfTeam(Team team);
-void startPlayersListMenu(function<void(Player)> = startManagePlayerMenu);
+void startPlayerMenu();
+void startPlayersListMenu(function<void(Player)> = startManagePlayerMenu, function<void()> = startPlayerMenu, string = "Manage a Player");
 void startManageTeamPlayerMenu(Team team, Player player);
 void addPlayer(Team, Player);
-void startPlayerMenu();
 void startInfoMenu();
 
 int main()
@@ -191,7 +191,7 @@ void startManagePlayersOfTeam(Team team)
                            startManageTeamMenu(team);
                        }});
 
-    Menu(options, "Manage Player in " + team.getName() + " (Found " + to_string(options.size() - 1) + " players)").start();
+    Menu(options, "Manage the Players of " + team.getName() + " (Team) (Found " + to_string(options.size() - 1) + " players)").start();
 }
 
 void startManageTeamPlayerMenu(Team team, Player player)
@@ -216,7 +216,7 @@ void startManageTeamPlayerMenu(Team team, Player player)
                   startManagePlayersOfTeam(team);
               }},
          },
-         "Managing Team:" + team.getName())
+         "Managing " + team.getName() + " (Team)")
         .start();
 }
 
@@ -247,7 +247,7 @@ void startManageTeamMenu(Team team)
              },
              {"Back", startTeamListMenu},
          },
-         "Managing Team:" + team.getName())
+         "Managing " + team.getName() + " (Team)")
         .start();
 }
 
@@ -273,7 +273,7 @@ void startPlayerMenu()
         .start();
 }
 
-void startPlayersListMenu(function<void(Player)> callback)
+void startPlayersListMenu(function<void(Player)> callback, function<void()> backCallback, string title)
 {
     // Clear the screen
     cout << "\x1b[2J";
@@ -293,9 +293,9 @@ void startPlayersListMenu(function<void(Player)> callback)
         });
     }
 
-    options.push_back({"Back", startPlayerMenu});
+    options.push_back({"Back", backCallback});
 
-    Menu(options, "Manage a Player (Found " + to_string(options.size() - 1) + " players)").start();
+    Menu(options, title + " (Found " + to_string(options.size() - 1) + " players)").start();
 }
 
 void addPlayer(Team team, Player player)
@@ -313,7 +313,12 @@ void startAddPlayerMenu(Team team)
     startPlayersListMenu([team](Player player)
                          {
                              addPlayer(team, player);
-                             startManageTeamMenu(team); });
+                             startManageTeamMenu(team); },
+                         [team]()
+                         {
+                             startManageTeamMenu(team);
+                         },
+                         "Managing the Players of " + team.getName() + " (Team)");
 }
 
 void startManagePlayerMenu(Player player)
@@ -335,7 +340,7 @@ void startManagePlayerMenu(Player player)
                   startPlayersListMenu();
               }},
          },
-         "Managing Player: " + player.getName() + " " + player.getSurname())
+         "Managing " + player.getName() + " " + player.getSurname() + " (Player)")
         .start();
 }
 

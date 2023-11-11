@@ -37,6 +37,8 @@ private:
     void printLineAt(int selected, bool highlight = false);
 
 public:
+    bool loopOptions = true;
+
     /// @brief Create a menu with the given options and title
     /// @param options The options of the menu
     /// @param title The title of the menu

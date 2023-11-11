@@ -18,13 +18,12 @@ string Menu::numberedOption(int i, bool chosed)
 
 void Menu::printHighlighted(string text)
 {
-
+    // Green color
     cout << "\x1b[32m";
-    cout << "\x1b[1m";
 
     cout << text;
 
-    cout << "\x1b[22m";
+    // Reset color
     cout << "\x1b[34m";
 }
 
@@ -84,9 +83,15 @@ void Menu::start()
         }
     }
 
+    // Save cursor position
     cout << "\x1b[s";
 
-    cout << "\x1b[" + to_string(options.size() - 1 - selected) + "A";
+    // Move cursor up
+    if (options.size() > 1)
+    {
+        cout << "\x1b[" + to_string(options.size() - 1 - selected) + "A";
+    }
+
     printLineAt(selected, true);
 
     char c;
@@ -101,8 +106,9 @@ void Menu::start()
         switch (c)
         {
 
+        // Up arrow
         case 65:
-
+            // If the selected option is not the first one
             if (selected > 0)
             {
                 printLineAt(selected);
@@ -111,9 +117,17 @@ void Menu::start()
                 printLineAt(selected, true);
                 break;
             }
+
+            if (loopOptions && options.size() > 1)
+            {
+                printLineAt(selected);
+                selected = options.size() - 1;
+                cout << "\x1b[" + to_string(options.size() - 1) + "B";
+            }
+
             printLineAt(selected, true);
             break;
-
+        // Down arrow
         case 66:
 
             if (selected < options.size() - 1)
@@ -124,6 +138,14 @@ void Menu::start()
                 printLineAt(selected, true);
                 break;
             }
+
+            if (loopOptions && options.size() > 1)
+            {
+                printLineAt(selected);
+                selected = 0;
+                cout << "\x1b[" + to_string(options.size() - 1) + "A";
+            }
+
             printLineAt(selected, true);
             break;
         default:
