@@ -15,8 +15,15 @@ void MenuContext::startMenu(Menu menu)
 
 void MenuContext::push(Menu menu)
 {
-    context.push_back(menu);
+    context.push_back([menu]()
+                      { return menu; });
     startMenu(menu);
+}
+
+void MenuContext::push(function<Menu()> menu)
+{
+    context.push_back(menu);
+    startMenu(menu());
 }
 
 bool MenuContext::isRoot()
@@ -32,7 +39,7 @@ void MenuContext::pop()
     }
 
     context.pop_back();
-    startMenu(context.back());
+    startMenu(context.back()());
 }
 
 void MenuContext::run(Menu menu)

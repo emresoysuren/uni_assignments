@@ -81,7 +81,7 @@ Menu teamMenu()
                         "Manage a Team",
                         [](MenuContext context)
                         {
-                            context.push(teamListMenu());
+                            context.push(teamListMenu);
                         },
                     },
                 },
@@ -154,14 +154,16 @@ Menu manageTeamMenu(Team team)
                         "Add Player",
                         [team](MenuContext context)
                         {
-                            context.push(addPlayerMenu(team));
+                            context.push([team]()
+                                         { return addPlayerMenu(team); });
                         },
                     },
                     {
                         "Manage Players",
                         [team](MenuContext context)
                         {
-                            context.push(managePlayersOfTeam(team));
+                            context.push([team]()
+                                         { return managePlayersOfTeam(team); });
                         },
                     },
                     {
@@ -195,7 +197,8 @@ Menu playerMenu()
                         "Manage a Player",
                         [](MenuContext context)
                         {
-                            context.push(playersListMenu());
+                            context.push([]()
+                                         { return playersListMenu(); });
                         },
                     },
                 },

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 using namespace std;
 
 #include "Menu.h"
@@ -9,7 +10,7 @@ class Menu;
 class MenuContext
 {
 private:
-    vector<Menu> context;
+    vector<function<Menu()>> context;
 
     void startMenu(Menu menu);
 
@@ -20,6 +21,7 @@ public:
     bool isRoot();
 
     void push(Menu menu);
+    void push(function<Menu()> menu);
 
     void pop();
 
