@@ -7,11 +7,14 @@
 #include <functional>
 using namespace std;
 
+#include "MenuContext.h"
+class MenuContext;
+
 // Menu option struct
 struct MenuOption
 {
     string title;
-    function<void()> func;
+    function<void(MenuContext)> func;
 };
 
 /// @brief A class to create and handle menus visually in the terminal
@@ -47,5 +50,5 @@ public:
     ~Menu();
 
     /// @brief Start the menu with the given options
-    void start();
+    void start(MenuContext context);
 };

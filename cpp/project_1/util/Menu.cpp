@@ -45,8 +45,18 @@ Menu::Menu(vector<MenuOption> options, string title)
 
 Menu::~Menu() {}
 
-void Menu::start()
+void Menu::start(MenuContext context)
 {
+    vector<MenuOption> opitons = this->options;
+
+    options.push_back({
+        context.isRoot() ? "Exit" : "Back",
+        [](MenuContext context)
+        {
+            context.pop();
+        },
+    });
+
     int selected = 0;
 
     cout << "\x1b[?25l";
@@ -74,7 +84,6 @@ void Menu::start()
 
     for (int i = 0; i < options.size(); i++)
     {
-
         printLineAt(i);
 
         if (i != options.size() - 1)
@@ -159,5 +168,5 @@ void Menu::start()
          << "\x1b[0m"
          << "\x1b[?25h" << endl;
 
-    options[selected].func();
+    options[selected].func(context);
 }
