@@ -6,9 +6,9 @@ MenuContext::~MenuContext() {}
 void MenuContext::startMenu(Menu menu)
 {
     // Clear the screen
-    cout << "\x1b[2J";
+    std::cout << "\x1b[2J";
     // Move the cursor to the top left
-    cout << "\x1b[H";
+    std::cout << "\x1b[H";
 
     menu.start(*this);
 }
@@ -20,7 +20,7 @@ void MenuContext::push(Menu menu)
     startMenu(menu);
 }
 
-void MenuContext::push(function<Menu()> menu)
+void MenuContext::push(std::function<Menu()> menu)
 {
     context.push_back(menu);
     startMenu(menu());

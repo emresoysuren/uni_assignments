@@ -1,8 +1,8 @@
 #include "Menu.h"
 
-string Menu::numberedOption(int i, vector<MenuOption> *opt, bool chosed) const
+std::string Menu::numberedOption(int i, std::vector<MenuOption> *opt, bool chosed) const
 {
-    string optionPrefix;
+    std::string optionPrefix;
 
     if (chosed)
     {
@@ -13,23 +13,23 @@ string Menu::numberedOption(int i, vector<MenuOption> *opt, bool chosed) const
         optionPrefix += "  ";
     }
 
-    return optionPrefix + "[" + to_string(i) + "] " + (*opt)[i].title;
+    return optionPrefix + "[" + std::to_string(i) + "] " + (*opt)[i].title;
 }
 
-void Menu::printHighlighted(string text) const
+void Menu::printHighlighted(std::string text) const
 {
     // Green color
-    cout << "\x1b[32m";
+    std::cout << "\x1b[32m";
 
-    cout << text;
+    std::cout << text;
 
     // Reset color
-    cout << "\x1b[34m";
+    std::cout << "\x1b[34m";
 }
 
-void Menu::printLineAt(int selected, vector<MenuOption> *opt, bool highlight) const
+void Menu::printLineAt(int selected, std::vector<MenuOption> *opt, bool highlight) const
 {
-    cout << "\r\x1b[K";
+    std::cout << "\r\x1b[K";
 
     if (highlight)
     {
@@ -37,17 +37,64 @@ void Menu::printLineAt(int selected, vector<MenuOption> *opt, bool highlight) co
         return;
     }
 
-    cout << numberedOption(selected, opt);
+    std::cout << numberedOption(selected, opt);
 }
 
-Menu::Menu(vector<MenuOption> options, string title)
-    : options(options), title(title) {}
+#ifdef _WIN32
+// Windows specific code
+#include <conio.h>
+
+int Menu::getKey()
+{
+    int key;
+
+    key = getch();
+
+    return key;
+}
+
+const int Menu::UP_ARROW = 119;
+const int Menu::DOWN_ARROW = 115;
+const int Menu::ENTER_KEY = 13;
+
+#else
+// Unix/Linux specific code
+#include <unistd.h>
+#include <termios.h>
+
+int Menu::getKey()
+{
+    struct termios originalTermios;
+    int key;
+
+    tcgetattr(STDIN_FILENO, &originalTermios);
+    struct termios raw = originalTermios;
+    raw.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+
+    key = getchar();
+
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &originalTermios);
+
+    return key;
+}
+
+const int Menu::UP_ARROW = 65;
+const int Menu::DOWN_ARROW = 66;
+const int Menu::ENTER_KEY = 10;
+
+#endif
+
+Menu::Menu(std::vector<MenuOption> options, std::string title)
+    : options(options), title(title)
+{
+}
 
 Menu::~Menu() {}
 
 void Menu::start(MenuContext context) const
 {
-    vector<MenuOption> opt = this->options;
+    std::vector<MenuOption> opt = this->options;
 
     opt.push_back({
         context.isRoot() ? "Exit" : "Back",
@@ -59,26 +106,26 @@ void Menu::start(MenuContext context) const
 
     int selected = 0;
 
-    cout << "\x1b[?25l";
+    std::cout << "\x1b[?25l";
 
-    cout << "\x1b[34m";
+    std::cout << "\x1b[34m";
 
     if (title != "")
     {
 
-        cout << "\x1b[4m";
+        std::cout << "\x1b[4m";
 
-        cout << endl;
-        cout << title + ":" << endl;
+        std::cout << std::endl;
+        std::cout << title + ":" << std::endl;
 
-        cout << "\x1b[24m";
+        std::cout << "\x1b[24m";
 
-        cout << "\x1b[34m";
+        std::cout << "\x1b[34m";
     }
 
     if (options.size() == 0)
     {
-        cout << "  No options to show" << endl;
+        std::cout << "  No options to show" << std::endl;
     }
 
     for (int i = 0; i < opt.size(); i++)
@@ -87,41 +134,38 @@ void Menu::start(MenuContext context) const
 
         if (i != opt.size() - 1)
         {
-            cout << endl;
+            std::cout << std::endl;
         }
     }
 
     // Save cursor position
-    cout << "\x1b[s";
+    std::cout << "\x1b[s";
 
     // Move cursor up
     if (opt.size() > 1)
     {
-        cout << "\x1b[" + to_string(opt.size() - 1 - selected) + "A";
+        std::cout << "\x1b[" + std::to_string(opt.size() - 1 - selected) + "A";
     }
 
     printLineAt(selected, &opt, true);
 
     char c;
 
-    while (c != 13)
+    while (c != ENTER_KEY)
     {
-
-        system("stty raw");
-        c = getchar();
-        system("stty cooked");
+        c = getKey();
 
         switch (c)
         {
 
         // Up arrow
-        case 65:
+        case UP_ARROW:
             // If the selected option is not the first one
             if (selected > 0)
             {
                 printLineAt(selected, &opt);
                 selected--;
-                cout << "\x1b[A";
+                std::cout << "\x1b[A";
                 printLineAt(selected, &opt, true);
                 break;
             }
@@ -130,19 +174,19 @@ void Menu::start(MenuContext context) const
             {
                 printLineAt(selected, &opt);
                 selected = opt.size() - 1;
-                cout << "\x1b[" + to_string(opt.size() - 1) + "B";
+                std::cout << "\x1b[" + std::to_string(opt.size() - 1) + "B";
             }
 
             printLineAt(selected, &opt, true);
             break;
         // Down arrow
-        case 66:
+        case DOWN_ARROW:
 
             if (selected < opt.size() - 1)
             {
                 printLineAt(selected, &opt);
                 selected++;
-                cout << "\x1b[B";
+                std::cout << "\x1b[B";
                 printLineAt(selected, &opt, true);
                 break;
             }
@@ -151,21 +195,20 @@ void Menu::start(MenuContext context) const
             {
                 printLineAt(selected, &opt);
                 selected = 0;
-                cout << "\x1b[" + to_string(opt.size() - 1) + "A";
+                std::cout << "\x1b[" + std::to_string(opt.size() - 1) + "A";
             }
 
             printLineAt(selected, &opt, true);
             break;
         default:
-
             printLineAt(selected, &opt, true);
             break;
         }
     }
 
-    cout << "\x1b[u"
-         << "\x1b[0m"
-         << "\x1b[?25h" << endl;
+    std::cout << "\x1b[u"
+              << "\x1b[0m"
+              << "\x1b[?25h" << std::endl;
 
     opt[selected].func(context);
 }

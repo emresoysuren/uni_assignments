@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <functional>
-using namespace std;
 
 #include "Menu.h"
 class Menu;
@@ -10,7 +9,7 @@ class Menu;
 class MenuContext
 {
 private:
-    vector<function<Menu()>> context;
+    std::vector<std::function<Menu()>> context;
 
     void startMenu(Menu menu);
 
@@ -21,7 +20,7 @@ public:
     bool isRoot() const;
 
     void push(Menu menu);
-    void push(function<Menu()> menu);
+    void push(std::function<Menu()> menu);
 
     void pop();
 
