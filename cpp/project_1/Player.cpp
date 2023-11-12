@@ -125,17 +125,17 @@ Player Player::idToPlayer(string playerID)
     throw "Player not found";
 };
 
-string Player::getID()
+string Player::getID() const
 {
     return playerID;
 }
 
-string Player::getName()
+string Player::getName() const
 {
     return name;
 }
 
-string Player::getSurname()
+string Player::getSurname() const
 {
     return surname;
 }

@@ -28,16 +28,16 @@ private:
     /// @param i The index of the option to format
     /// @param chosed Whether to format the option as chosed or not
     /// @return The formatted option
-    string numberedOption(int i, bool chosed = false);
+    string numberedOption(int i, vector<MenuOption> *opt, bool chosed = false) const;
 
     /// @brief Prints the given text in green and bold
     /// @param text The text to print
-    void printHighlighted(string text);
+    void printHighlighted(string text) const;
 
     /// @brief Prints the option at the given index
     /// @param selected The index of the option to print
     /// @param highlight Whether to highlight the option or not
-    void printLineAt(int selected, bool highlight = false);
+    void printLineAt(int selected, vector<MenuOption> *opt, bool highlight = false) const;
 
 public:
     bool loopOptions = true;
@@ -50,5 +50,5 @@ public:
     ~Menu();
 
     /// @brief Start the menu with the given options
-    void start(MenuContext context);
+    void start(MenuContext context) const;
 };

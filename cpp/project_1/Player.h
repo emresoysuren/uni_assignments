@@ -64,9 +64,9 @@ public:
 
     static Player idToPlayer(string playerID);
 
-    string getID();
+    string getID() const;
 
-    string getName();
+    string getName() const;
 
-    string getSurname();
+    string getSurname() const;
 };

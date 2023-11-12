@@ -26,7 +26,7 @@ void MenuContext::push(function<Menu()> menu)
     startMenu(menu());
 }
 
-bool MenuContext::isRoot()
+bool MenuContext::isRoot() const
 {
     return context.size() == 1;
 }

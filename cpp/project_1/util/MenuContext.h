@@ -18,7 +18,7 @@ public:
     MenuContext();
     ~MenuContext();
 
-    bool isRoot();
+    bool isRoot() const;
 
     void push(Menu menu);
     void push(function<Menu()> menu);

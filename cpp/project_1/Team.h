@@ -56,13 +56,13 @@ public:
     /// @param director Current director of the team
     static Team createTeam(string name, string address, string phoneNumber, string director);
 
-    string getName();
+    string getName() const;
 
-    string getID();
+    string getID() const;
 
-    void addPlayer(string playerID);
+    void addPlayer(string playerID) const;
 
-    vector<Player> getPlayers();
+    vector<Player> getPlayers() const;
 
     static void removeTeamOrPlayerWithID(string ID);
 };

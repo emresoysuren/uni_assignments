@@ -24,7 +24,6 @@ Menu playersListMenu(
     { context.push(managePlayerMenu(player)); },
     string = "Manage a Player");
 Menu manageTeamPlayerMenu(Team team, Player player);
-void addPlayer(Team, Player);
 Menu infoMenu();
 
 int main()
@@ -126,7 +125,6 @@ Menu managePlayersOfTeam(Team team)
 
 Menu manageTeamPlayerMenu(Team team, Player player)
 {
-
     return Menu({
                     {
                         "Manage Player",
@@ -228,8 +226,8 @@ Menu addPlayerMenu(Team team)
 {
     return playersListMenu([team](MenuContext context, Player player)
                            {
-                             addPlayer(team, player);
-                             context.pop(); },
+                            team.addPlayer(player.getID());
+                            context.pop(); },
                            "Managing the Players of " + team.getName() + " (Team)");
 }
 
@@ -264,11 +262,6 @@ Menu infoMenu()
 }
 
 // Functional units
-
-void addPlayer(Team team, Player player)
-{
-    team.addPlayer(player.getID());
-}
 
 Team createTeam()
 {

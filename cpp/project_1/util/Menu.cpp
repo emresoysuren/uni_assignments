@@ -1,6 +1,6 @@
 #include "Menu.h"
 
-string Menu::numberedOption(int i, bool chosed)
+string Menu::numberedOption(int i, vector<MenuOption> *opt, bool chosed) const
 {
     string optionPrefix;
 
@@ -13,10 +13,10 @@ string Menu::numberedOption(int i, bool chosed)
         optionPrefix += "  ";
     }
 
-    return optionPrefix + "[" + to_string(i) + "] " + options[i].title;
+    return optionPrefix + "[" + to_string(i) + "] " + (*opt)[i].title;
 }
 
-void Menu::printHighlighted(string text)
+void Menu::printHighlighted(string text) const
 {
     // Green color
     cout << "\x1b[32m";
@@ -27,17 +27,17 @@ void Menu::printHighlighted(string text)
     cout << "\x1b[34m";
 }
 
-void Menu::printLineAt(int selected, bool highlight)
+void Menu::printLineAt(int selected, vector<MenuOption> *opt, bool highlight) const
 {
     cout << "\r\x1b[K";
 
     if (highlight)
     {
-        printHighlighted(numberedOption(selected, highlight));
+        printHighlighted(numberedOption(selected, opt, highlight));
         return;
     }
 
-    cout << numberedOption(selected);
+    cout << numberedOption(selected, opt);
 }
 
 Menu::Menu(vector<MenuOption> options, string title)
@@ -45,11 +45,11 @@ Menu::Menu(vector<MenuOption> options, string title)
 
 Menu::~Menu() {}
 
-void Menu::start(MenuContext context)
+void Menu::start(MenuContext context) const
 {
-    vector<MenuOption> opitons = this->options;
+    vector<MenuOption> opt = this->options;
 
-    options.push_back({
+    opt.push_back({
         context.isRoot() ? "Exit" : "Back",
         [](MenuContext context)
         {
@@ -78,15 +78,14 @@ void Menu::start(MenuContext context)
 
     if (options.size() == 0)
     {
-        cout << "No options to show" << endl;
-        return;
+        cout << "  No options to show" << endl;
     }
 
-    for (int i = 0; i < options.size(); i++)
+    for (int i = 0; i < opt.size(); i++)
     {
-        printLineAt(i);
+        printLineAt(i, &opt);
 
-        if (i != options.size() - 1)
+        if (i != opt.size() - 1)
         {
             cout << endl;
         }
@@ -96,12 +95,12 @@ void Menu::start(MenuContext context)
     cout << "\x1b[s";
 
     // Move cursor up
-    if (options.size() > 1)
+    if (opt.size() > 1)
     {
-        cout << "\x1b[" + to_string(options.size() - 1 - selected) + "A";
+        cout << "\x1b[" + to_string(opt.size() - 1 - selected) + "A";
     }
 
-    printLineAt(selected, true);
+    printLineAt(selected, &opt, true);
 
     char c;
 
@@ -120,46 +119,46 @@ void Menu::start(MenuContext context)
             // If the selected option is not the first one
             if (selected > 0)
             {
-                printLineAt(selected);
+                printLineAt(selected, &opt);
                 selected--;
                 cout << "\x1b[A";
-                printLineAt(selected, true);
+                printLineAt(selected, &opt, true);
                 break;
             }
 
-            if (loopOptions && options.size() > 1)
+            if (loopOptions && opt.size() > 1)
             {
-                printLineAt(selected);
-                selected = options.size() - 1;
-                cout << "\x1b[" + to_string(options.size() - 1) + "B";
+                printLineAt(selected, &opt);
+                selected = opt.size() - 1;
+                cout << "\x1b[" + to_string(opt.size() - 1) + "B";
             }
 
-            printLineAt(selected, true);
+            printLineAt(selected, &opt, true);
             break;
         // Down arrow
         case 66:
 
-            if (selected < options.size() - 1)
+            if (selected < opt.size() - 1)
             {
-                printLineAt(selected);
+                printLineAt(selected, &opt);
                 selected++;
                 cout << "\x1b[B";
-                printLineAt(selected, true);
+                printLineAt(selected, &opt, true);
                 break;
             }
 
-            if (loopOptions && options.size() > 1)
+            if (loopOptions && opt.size() > 1)
             {
-                printLineAt(selected);
+                printLineAt(selected, &opt);
                 selected = 0;
-                cout << "\x1b[" + to_string(options.size() - 1) + "A";
+                cout << "\x1b[" + to_string(opt.size() - 1) + "A";
             }
 
-            printLineAt(selected, true);
+            printLineAt(selected, &opt, true);
             break;
         default:
 
-            printLineAt(selected, true);
+            printLineAt(selected, &opt, true);
             break;
         }
     }
@@ -168,5 +167,5 @@ void Menu::start(MenuContext context)
          << "\x1b[0m"
          << "\x1b[?25h" << endl;
 
-    options[selected].func(context);
+    opt[selected].func(context);
 }

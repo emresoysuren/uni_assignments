@@ -108,17 +108,17 @@ Team Team::createTeam(string name, string address, string phoneNumber, string di
     return team;
 }
 
-string Team::getName()
+string Team::getName() const
 {
     return name;
 }
 
-string Team::getID()
+string Team::getID() const
 {
     return teamID;
 }
 
-void Team::addPlayer(string playerID)
+void Team::addPlayer(string playerID) const
 {
     ifstream file(TEAM_PLAYER_FILE_PATH);
 
@@ -142,7 +142,7 @@ void Team::addPlayer(string playerID)
     wfile.close();
 }
 
-vector<Player> Team::getPlayers()
+vector<Player> Team::getPlayers() const
 {
     ifstream file(TEAM_PLAYER_FILE_PATH, ios::app);
 
