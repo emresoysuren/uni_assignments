@@ -5,30 +5,28 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-using namespace std;
 
-#include "Player.h"
-
+class Match;
 class Player;
 
 /// @brief Class representing a soccer team
 class Team
 {
 private:
-    static const string FILE_PATH;
-    static const string TEAM_PLAYER_FILE_PATH;
-    string teamID;
-    string name;
-    string address;
-    string phoneNumber;
-    string director;
+    static const std::string FILE_PATH;
+    static const std::string TEAM_PLAYER_FILE_PATH;
+    std::string teamID;
+    std::string name;
+    std::string address;
+    std::string phoneNumber;
+    std::string director;
 
     /// @brief Converts a string to a Team object
     /// @param line String to convert
     /// @return Returns the converted Team object
-    static Team fromString(string line);
+    static Team fromString(std::string line);
 
-    static void saveTeam(Team team);
+    void save() const;
 
 public:
     /// @brief Creates a new Team object
@@ -37,32 +35,32 @@ public:
     /// @param address Adress of the team
     /// @param phoneNumber Phone number of the team
     /// @param director Current director of the team
-    Team(string teamID, string name, string address, string phoneNumber, string director);
+    Team(std::string teamID, std::string name, std::string address, std::string phoneNumber, std::string director);
     ~Team();
 
     /// @brief Finds a team by its ID
     /// @param teamID ID of the team to find
     /// @return Returns the team with the given ID or throws an error if it doesn't exist
-    static Team idToTeam(string teamID);
+    static Team idToTeam(std::string teamID);
 
-    static void deleteTeam(string teamID);
+    static void deleteTeam(std::string teamID);
 
-    static vector<Team> getAllTeams();
+    static std::vector<Team> getAllTeams();
 
     /// @brief Creates a new team with a new ID
     /// @param name Name of the team
     /// @param address Adress of the team
     /// @param phoneNumber Phone number of the team
     /// @param director Current director of the team
-    static Team createTeam(string name, string address, string phoneNumber, string director);
+    static Team createTeam(std::string name, std::string address, std::string phoneNumber, std::string director);
 
-    string getName() const;
+    std::string getName() const;
 
-    string getID() const;
+    std::string getID() const;
 
-    void addPlayer(string playerID) const;
+    void addPlayer(std::string playerID) const;
 
-    vector<Player> getPlayers() const;
+    std::vector<Player> getPlayers() const;
 
-    static void removeTeamOrPlayerWithID(string ID);
+    static void removeTeamOrPlayerWithID(std::string ID);
 };

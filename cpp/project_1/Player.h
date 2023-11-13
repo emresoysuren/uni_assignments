@@ -7,10 +7,8 @@
 #include <ctime>
 #include <vector>
 #include <map>
-using namespace std;
 
-#include "Team.h"
-
+class Utils;
 class Team;
 
 /// @brief Enum to represent the position of a player playing in a team
@@ -26,16 +24,16 @@ enum PlayingPosition
 class Player
 {
 private:
-    static const string FILE_PATH;
-    string playerID;
-    string name;
-    string surname;
+    static const std::string FILE_PATH;
+    std::string playerID;
+    std::string name;
+    std::string surname;
     int licenseID;
     PlayingPosition position;
     int salary;
-    tm dateOfBirth;
+    std::tm dateOfBirth;
 
-    static void savePlayer(Player player);
+    void save() const;
 
 public:
     /// @brief Creates a new Player object
@@ -45,28 +43,28 @@ public:
     /// @param position The position of the player playing in the team
     /// @param salary Salary of the player
     /// @param dateOfBirth Date of birth of the player
-    Player(string playerID, string name, string surname, int licenseID, PlayingPosition position, int salary, tm dateOfBirth);
+    Player(std::string playerID, std::string name, std::string surname, int licenseID, PlayingPosition position, int salary, tm dateOfBirth);
 
     ~Player();
 
-    static Player createPlayer(string name, string surname, PlayingPosition position, int salary, tm dateOfBirth);
+    static Player createPlayer(std::string name, std::string surname, PlayingPosition position, int salary, tm dateOfBirth);
 
-    static void deletePlayer(string playerID);
+    static void deletePlayer(std::string playerID);
 
     /// @brief Converts a number to a PlayingPosition
     /// @param position Position of the player as a number
     /// @return Returns the PlayingPosition corresponding to the given number
     static PlayingPosition numToPosition(int position);
 
-    static vector<Player> getAllPlayers();
+    static std::vector<Player> getAllPlayers();
 
-    static Player fromString(string line);
+    static Player fromString(std::string line);
 
-    static Player idToPlayer(string playerID);
+    static Player idToPlayer(std::string playerID);
 
-    string getID() const;
+    std::string getID() const;
 
-    string getName() const;
+    std::string getName() const;
 
-    string getSurname() const;
+    std::string getSurname() const;
 };

@@ -1,4 +1,5 @@
 #include "Menu.h"
+#include "MenuContext.h"
 
 std::string Menu::numberedOption(int i, std::vector<MenuOption> *opt, bool chosed) const
 {

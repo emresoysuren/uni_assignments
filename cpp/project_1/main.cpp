@@ -1,21 +1,28 @@
 #include <iostream>
 #include <functional>
 #include <vector>
+#include <ctime>
 using namespace std;
 
 #include "Player.h"
 #include "Team.h"
+#include "TeamStats.h"
+#include "Match.h"
 #include "./util/Menu.h"
 #include "./util/MenuContext.h"
+#include "./util/Utils.h"
 
 // Forward declarations
 Menu mainMenu();
 Menu teamMenu();
-Menu teamListMenu();
+Menu manageTeamMenu(Team);
+Menu teamListMenu(
+    function<void(MenuContext, Team)> = [](MenuContext context, Team team)
+    { context.push(manageTeamMenu(team)); },
+    string = "Manage a Team");
 Team createTeam();
 Player createPlayer();
 Menu addPlayerMenu(Team);
-Menu manageTeamMenu(Team);
 Menu managePlayerMenu(Player);
 Menu managePlayersOfTeam(Team team);
 Menu playerMenu();
@@ -24,7 +31,10 @@ Menu playersListMenu(
     { context.push(managePlayerMenu(player)); },
     string = "Manage a Player");
 Menu manageTeamPlayerMenu(Team team, Player player);
-Menu infoMenu();
+Menu manageGameRecordsMenu();
+Menu manageMatchMenu(Match match);
+Menu matchListMenu();
+Match createMatch();
 
 int main()
 {
@@ -56,10 +66,10 @@ Menu mainMenu()
 
                     },
                     MenuOption{
-                        "Show Info",
+                        "Manage Game Records",
                         [](MenuContext context)
                         {
-                            context.push(infoMenu());
+                            context.push(manageGameRecordsMenu());
                         },
                     },
                 },
@@ -80,14 +90,15 @@ Menu teamMenu()
                         "Manage a Team",
                         [](MenuContext context)
                         {
-                            context.push(teamListMenu);
+                            context.push([]()
+                                         { return teamListMenu(); });
                         },
                     },
                 },
                 "Manage Teams");
 }
 
-Menu teamListMenu()
+Menu teamListMenu(function<void(MenuContext, Team)> callback, string title)
 {
     vector<MenuOption> options = {};
 
@@ -95,14 +106,14 @@ Menu teamListMenu()
     {
         options.push_back(MenuOption{
             team.getName(),
-            [team](MenuContext context)
+            [team, callback](MenuContext context)
             {
-                context.push(manageTeamMenu(team));
+                callback(context, team);
             },
         });
     }
 
-    return Menu(options, "Manage a Team (Found " + to_string(options.size()) + " teams)");
+    return Menu(options, title + " (Found " + to_string(options.size()) + " teams)");
 }
 
 Menu managePlayersOfTeam(Team team)
@@ -250,15 +261,76 @@ Menu managePlayerMenu(Player player)
                 "Managing " + player.getName() + " " + player.getSurname() + " (Player)");
 }
 
-Menu infoMenu()
+Menu manageGameRecordsMenu()
 {
     return Menu({
                     {
+                        "Create a Game Record",
+                        [](MenuContext context)
+                        {
+                            context.push(manageMatchMenu(createMatch()));
+                        },
+                    },
+                    {
+                        "Manage a Game Record",
+                        [](MenuContext context)
+                        {
+                            context.push(matchListMenu);
+                        },
+                    },
+                    {
                         "Show Game Records",
+                        [](MenuContext context) {
+
+                        },
+                    },
+                    {
+                        "Show Scores",
+                        [](MenuContext context) {},
+                    },
+                    {
+                        "Matches in This Week",
                         [](MenuContext context) {},
                     },
                 },
-                "Info");
+                "Manage Game Records");
+}
+
+Menu matchListMenu()
+{
+    vector<MenuOption> options = {};
+
+    for (Match match : Match::getAllMatches())
+    {
+        options.push_back(MenuOption{
+            match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]",
+            [match](MenuContext context)
+            {
+                context.push(manageMatchMenu(match));
+            },
+        });
+    }
+
+    return Menu(options, "Manage a Team (Found " + to_string(options.size()) + " teams)");
+}
+
+Menu manageMatchMenu(Match match)
+{
+    return Menu({
+                    {
+                        "Update Match",
+                        [](MenuContext context) {},
+                    },
+                    {
+                        "Delete Match",
+                        [ID = match.getID()](MenuContext context)
+                        {
+                            Match::deleteMatch(ID);
+                            context.pop();
+                        },
+                    },
+                },
+                match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]" + " (Match)");
 }
 
 // Functional units
@@ -318,4 +390,52 @@ Player createPlayer()
     cin >> dateOfBirth.tm_mday >> dateOfBirth.tm_mon >> dateOfBirth.tm_year;
 
     return Player::createPlayer(name, surname, Player::numToPosition(position), salary, dateOfBirth);
+}
+
+Match createMatch()
+{
+
+    TeamStats *stats = (TeamStats *)calloc(2, sizeof(TeamStats));
+    Team *t = (Team *)calloc(1, sizeof(Team));
+
+    for (int i = 0; i < 2; i++)
+    {
+        int goals;
+
+        MenuContext::run(teamListMenu([t](MenuContext context, Team team)
+                                      { *t = team; },
+                                      "Select the #" + to_string(i + 1) + " Team"));
+
+        // Clear the screen
+        cout << "\x1b[2J";
+        // Move the cursor to the top left
+        cout << "\x1b[H";
+
+        cout << "Enter the goals of " << t->getName() << ": ";
+        cin >> goals;
+
+        stats[i] = TeamStats(*t, goals);
+
+        cin.ignore();
+    }
+
+    delete t;
+
+    // Clear the screen
+    cout << "\x1b[2J";
+    // Move the cursor to the top left
+    cout << "\x1b[H";
+
+    tm date;
+
+    cout << "Enter the date of the match: ";
+    cin >> date.tm_mday >> date.tm_mon >> date.tm_year;
+
+    Match match = Match::createMatch(date, stats[0], stats[1]);
+
+    delete stats;
+
+    cin.ignore();
+
+    return match;
 }

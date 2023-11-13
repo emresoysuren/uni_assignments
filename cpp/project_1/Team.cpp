@@ -1,16 +1,18 @@
 #include "Team.h"
+#include "Match.h"
+#include "Player.h"
 
-const string Team::FILE_PATH = "teams.data";
-const string Team::TEAM_PLAYER_FILE_PATH = "team_player.data";
+const std::string Team::FILE_PATH = "teams.data";
+const std::string Team::TEAM_PLAYER_FILE_PATH = "team_player.data";
 
 /// @brief Converts a string to a Team object
 /// @param line String to convert
 /// @return Returns the converted Team object
-Team Team::fromString(string line)
+Team Team::fromString(std::string line)
 {
-    string word;
-    stringstream ss(line);
-    vector<string> result;
+    std::string word;
+    std::stringstream ss(line);
+    std::vector<std::string> result;
 
     while (getline(ss, word, ' '))
     {
@@ -20,27 +22,27 @@ Team Team::fromString(string line)
     return Team(result[0], result[1], result[2], result[3], result[4]);
 }
 
-void Team::saveTeam(Team team)
+void Team::save() const
 {
-    ofstream file(FILE_PATH, ios::app);
+    std::ofstream file(FILE_PATH, std::ios::app);
 
-    file << team.teamID << " " << team.name << " " << team.address << " " << team.phoneNumber << " " << team.director << endl;
+    file << teamID << " " << name << " " << address << " " << phoneNumber << " " << director << std::endl;
 
     file.close();
 }
 
-Team::Team(string teamID, string name, string address, string phoneNumber, string director)
+Team::Team(std::string teamID, std::string name, std::string address, std::string phoneNumber, std::string director)
     : teamID(teamID), name(name), address(address), phoneNumber(phoneNumber), director(director)
 {
 }
 
 Team::~Team() {}
 
-Team Team::idToTeam(string teamID)
+Team Team::idToTeam(std::string teamID)
 {
-    string line;
+    std::string line;
 
-    ifstream file(FILE_PATH, ios::app);
+    std::ifstream file(FILE_PATH);
 
     while (getline(file, line))
     {
@@ -55,20 +57,21 @@ Team Team::idToTeam(string teamID)
     throw "Team not found";
 };
 
-void Team::deleteTeam(string teamID)
+void Team::deleteTeam(std::string teamID)
 {
     removeTeamOrPlayerWithID(teamID);
+    Match::deleteStatsOfTeamWithID(teamID);
 
-    ifstream rfile(FILE_PATH);
-    ofstream temp("temp.data");
+    std::ifstream rfile(FILE_PATH);
+    std::ofstream temp("temp.data");
 
-    string line;
+    std::string line;
 
     while (getline(rfile, line))
     {
         if (line.substr(0, line.find(" ")) != teamID)
         {
-            temp << line << endl;
+            temp << line << std::endl;
         }
     }
 
@@ -79,12 +82,12 @@ void Team::deleteTeam(string teamID)
     rename("temp.data", FILE_PATH.c_str());
 }
 
-vector<Team> Team::getAllTeams()
+std::vector<Team> Team::getAllTeams()
 {
-    vector<Team> teams;
-    string line;
+    std::vector<Team> teams;
+    std::string line;
 
-    ifstream file(FILE_PATH, ios::app);
+    std::ifstream file(FILE_PATH, std::ios::app);
 
     while (getline(file, line))
     {
@@ -96,33 +99,31 @@ vector<Team> Team::getAllTeams()
     return teams;
 };
 
-Team Team::createTeam(string name, string address, string phoneNumber, string director)
+Team Team::createTeam(std::string name, std::string address, std::string phoneNumber, std::string director)
 {
     // @todo Create UUIDs instead of giving random numbers
-    Team team(to_string(rand()), name, address, phoneNumber, director);
+    Team team(std::to_string(rand()), name, address, phoneNumber, director);
 
-    saveTeam(team);
-
-    cout << "Team created: " << team.teamID << " " << team.name << " " << team.address << " " << team.phoneNumber << " " << team.director << endl;
+    team.save();
 
     return team;
 }
 
-string Team::getName() const
+std::string Team::getName() const
 {
     return name;
 }
 
-string Team::getID() const
+std::string Team::getID() const
 {
     return teamID;
 }
 
-void Team::addPlayer(string playerID) const
+void Team::addPlayer(std::string playerID) const
 {
-    ifstream file(TEAM_PLAYER_FILE_PATH);
+    std::ifstream file(TEAM_PLAYER_FILE_PATH);
 
-    string line;
+    std::string line;
 
     while (getline(file, line))
     {
@@ -135,20 +136,20 @@ void Team::addPlayer(string playerID) const
 
     file.close();
 
-    ofstream wfile(TEAM_PLAYER_FILE_PATH, ios::app);
+    std::ofstream wfile(TEAM_PLAYER_FILE_PATH, std::ios::app);
 
-    wfile << teamID << " " << playerID << endl;
+    wfile << teamID << " " << playerID << std::endl;
 
     wfile.close();
 }
 
-vector<Player> Team::getPlayers() const
+std::vector<Player> Team::getPlayers() const
 {
-    ifstream file(TEAM_PLAYER_FILE_PATH, ios::app);
+    std::ifstream file(TEAM_PLAYER_FILE_PATH, std::ios::app);
 
-    vector<Player> players;
+    std::vector<Player> players;
 
-    string line;
+    std::string line;
 
     while (getline(file, line))
     {
@@ -163,18 +164,18 @@ vector<Player> Team::getPlayers() const
     return players;
 }
 
-void Team::removeTeamOrPlayerWithID(string ID)
+void Team::removeTeamOrPlayerWithID(std::string ID)
 {
-    ifstream rfile(TEAM_PLAYER_FILE_PATH);
-    ofstream temp("temp.data");
+    std::ifstream rfile(TEAM_PLAYER_FILE_PATH);
+    std::ofstream temp("temp.data");
 
-    string line;
+    std::string line;
 
     while (getline(rfile, line))
     {
         if (line.substr(0, line.find(" ")) != ID && line.substr(line.find(" ") + 1) != ID)
         {
-            temp << line << endl;
+            temp << line << std::endl;
         }
     }
 

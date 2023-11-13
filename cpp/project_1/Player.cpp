@@ -1,45 +1,49 @@
 #include "Player.h"
+#include "util/Utils.h"
+#include "Team.h"
+#include "Match.h"
 
-const string Player::FILE_PATH = "players.data";
+const std::string Player::FILE_PATH = "players.data";
 
-void Player::savePlayer(Player player)
+void Player::save() const
 {
-    ofstream file(FILE_PATH, ios::app);
+    std::ofstream file(FILE_PATH, std::ios::app);
 
-    file << player.playerID << " " << player.name << " " << player.surname << " " << player.licenseID << " " << player.position << " " << player.salary << " ";
-    file << to_string(player.dateOfBirth.tm_mday) + "-" + to_string(player.dateOfBirth.tm_mon) + "-" + to_string(player.dateOfBirth.tm_year) << endl;
+    file << playerID << " " << name << " " << surname << " " << licenseID << " " << position << " " << salary << " ";
+    file << Utils::dateToString(dateOfBirth) << std::endl;
 
     file.close();
 }
 
-Player::Player(string playerID, string name, string surname, int licenseID, PlayingPosition position, int salary, tm dateOfBirth)
+Player::Player(std::string playerID, std::string name, std::string surname, int licenseID, PlayingPosition position, int salary, tm dateOfBirth)
     : playerID(playerID), name(name), surname(surname), licenseID(licenseID), position(numToPosition(position)), salary(salary), dateOfBirth(dateOfBirth) {}
 
 Player::~Player() {}
 
-Player Player::createPlayer(string name, string surname, PlayingPosition position, int salary, tm dateOfBirth)
+Player Player::createPlayer(std::string name, std::string surname, PlayingPosition position, int salary, tm dateOfBirth)
 {
-    Player player(to_string(rand()), name, surname, rand(), position, salary, dateOfBirth);
+    Player player(std::to_string(rand()), name, surname, rand(), position, salary, dateOfBirth);
 
-    savePlayer(player);
+    player.save();
 
     return player;
 }
 
-void Player::deletePlayer(string playerID)
+void Player::deletePlayer(std::string playerID)
 {
     Team::removeTeamOrPlayerWithID(playerID);
+    Match::deleteStatsOfTeamWithID(playerID);
 
-    ifstream rfile(FILE_PATH);
-    ofstream temp("temp.data", ios::app);
+    std::ifstream rfile(FILE_PATH);
+    std::ofstream temp("temp.data", std::ios::app);
 
-    string line;
+    std::string line;
 
     while (getline(rfile, line))
     {
         if (line.substr(0, line.find(" ")) != playerID)
         {
-            temp << line << endl;
+            temp << line << std::endl;
         }
     }
 
@@ -52,7 +56,7 @@ void Player::deletePlayer(string playerID)
 
 PlayingPosition Player::numToPosition(int position)
 {
-    static map<int, PlayingPosition> positions = {
+    static std::map<int, PlayingPosition> positions = {
         {PlayingPosition::keeper, PlayingPosition::keeper},
         {PlayingPosition::defender, PlayingPosition::defender},
         {PlayingPosition::midfielder, PlayingPosition::midfielder},
@@ -62,12 +66,12 @@ PlayingPosition Player::numToPosition(int position)
     return positions[position];
 }
 
-vector<Player> Player::getAllPlayers()
+std::vector<Player> Player::getAllPlayers()
 {
-    vector<Player> players;
-    string line;
+    std::vector<Player> players;
+    std::string line;
 
-    ifstream file(FILE_PATH);
+    std::ifstream file(FILE_PATH);
 
     while (getline(file, line))
     {
@@ -79,38 +83,25 @@ vector<Player> Player::getAllPlayers()
     return players;
 };
 
-Player Player::fromString(string line)
+Player Player::fromString(std::string line)
 {
-    string word;
-    stringstream ss(line);
-    vector<string> result;
+    std::string word;
+    std::stringstream ss(line);
+    std::vector<std::string> result;
 
     while (getline(ss, word, ' '))
     {
         result.push_back(word);
     }
 
-    tm dateOfBirth;
-
-    ss = stringstream(result[6]);
-
-    getline(ss, word, '-');
-    dateOfBirth.tm_mday = stoi(word);
-
-    getline(ss, word, '-');
-    dateOfBirth.tm_mon = stoi(word);
-
-    getline(ss, word, '-');
-    dateOfBirth.tm_year = stoi(word);
-
-    return Player(result[0], result[1], result[2], stoi(result[3]), numToPosition(stoi(result[4])), stoi(result[5]), dateOfBirth);
+    return Player(result[0], result[1], result[2], stoi(result[3]), numToPosition(stoi(result[4])), stoi(result[5]), Utils::stringToDate(result[6]));
 }
 
-Player Player::idToPlayer(string playerID)
+Player Player::idToPlayer(std::string playerID)
 {
-    string line;
+    std::string line;
 
-    ifstream file(FILE_PATH, ios::app);
+    std::ifstream file(FILE_PATH, std::ios::app);
 
     while (getline(file, line))
     {
@@ -125,17 +116,17 @@ Player Player::idToPlayer(string playerID)
     throw "Player not found";
 };
 
-string Player::getID() const
+std::string Player::getID() const
 {
     return playerID;
 }
 
-string Player::getName() const
+std::string Player::getName() const
 {
     return name;
 }
 
-string Player::getSurname() const
+std::string Player::getSurname() const
 {
     return surname;
 }

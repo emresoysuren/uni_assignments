@@ -3,7 +3,6 @@
 #include <vector>
 #include <functional>
 
-#include "Menu.h"
 class Menu;
 
 class MenuContext
