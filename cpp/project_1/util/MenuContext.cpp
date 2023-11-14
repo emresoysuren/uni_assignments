@@ -4,7 +4,7 @@
 MenuContext::MenuContext() {}
 MenuContext::~MenuContext() {}
 
-void MenuContext::startMenu(Menu menu)
+void MenuContext::startMenu(Menu menu) const
 {
     // Clear the screen
     std::cout << "\x1b[2J";
@@ -40,6 +40,11 @@ void MenuContext::pop()
     }
 
     context.pop_back();
+    startMenu(context.back()());
+}
+
+void MenuContext::reload() const
+{
     startMenu(context.back()());
 }
 

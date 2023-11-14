@@ -10,7 +10,7 @@ class MenuContext
 private:
     std::vector<std::function<Menu()>> context;
 
-    void startMenu(Menu menu);
+    void startMenu(Menu menu) const;
 
 public:
     MenuContext();
@@ -22,6 +22,8 @@ public:
     void push(std::function<Menu()> menu);
 
     void pop();
+
+    void reload() const;
 
     static void run(Menu menu);
 };

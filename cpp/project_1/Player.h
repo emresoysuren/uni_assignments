@@ -34,6 +34,7 @@ private:
     std::tm dateOfBirth;
 
     void save() const;
+    void resave() const;
 
 public:
     /// @brief Creates a new Player object

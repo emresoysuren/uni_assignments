@@ -15,6 +15,33 @@ void Player::save() const
     file.close();
 }
 
+void Player::resave() const
+{
+    std::ifstream file(FILE_PATH);
+    std::ofstream temp("temp.data");
+
+    std::string line;
+
+    while (getline(file, line))
+    {
+        if (line.substr(0, line.find(" ")) == playerID)
+        {
+            temp << playerID << " " << name << " " << surname << " " << licenseID << " " << position << " " << salary << " ";
+            temp << Utils::dateToString(dateOfBirth) << std::endl;
+        }
+        else
+        {
+            temp << line << std::endl;
+        }
+    }
+
+    file.close();
+    temp.close();
+
+    remove(FILE_PATH.c_str());
+    rename("temp.data", FILE_PATH.c_str());
+}
+
 Player::Player(std::string playerID, std::string name, std::string surname, std::string licenseID, PlayingPosition position, int salary, tm dateOfBirth)
     : playerID(playerID), name(name), surname(surname), licenseID(licenseID), position(numToPosition(position)), salary(salary), dateOfBirth(dateOfBirth) {}
 
@@ -156,29 +183,35 @@ std::string Player::getLicenseID() const
 void Player::setDate(std::tm date)
 {
     dateOfBirth = date;
+    resave();
 }
 
 void Player::setName(std::string name)
 {
     this->name = name;
+    resave();
 }
 
 void Player::setSurname(std::string surname)
 {
     this->surname = surname;
+    resave();
 }
 
 void Player::setSalary(int salary)
 {
     this->salary = salary;
+    resave();
 }
 
 void Player::setPosition(PlayingPosition position)
 {
     this->position = position;
+    resave();
 }
 
 void Player::setLicenseID(std::string licenseID)
 {
     this->licenseID = licenseID;
+    resave();
 }

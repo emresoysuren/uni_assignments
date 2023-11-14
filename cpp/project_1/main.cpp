@@ -28,13 +28,16 @@ Menu managePlayersOfTeam(Team team);
 Menu playerMenu();
 Menu playersListMenu(
     function<void(MenuContext, Player)> = [](MenuContext context, Player player)
-    { context.push(managePlayerMenu(player)); },
+    { context.push([player]()
+                   { return managePlayerMenu(player); }); },
     string = "Manage a Player");
 Menu manageTeamPlayerMenu(Team team, Player player);
 Menu manageGameRecordsMenu();
 Menu manageMatchMenu(Match match);
 Menu matchListMenu();
 Match createMatch();
+Menu updatePlayerMenu(Player);
+void updatePlayerName(Player);
 
 int main()
 {
@@ -141,7 +144,8 @@ Menu manageTeamPlayerMenu(Team team, Player player)
                         "Manage Player",
                         [player](MenuContext context)
                         {
-                            context.push(managePlayerMenu(player));
+                            context.push([player]()
+                                         { return managePlayerMenu(player); });
                         },
                     },
                     {
@@ -199,7 +203,8 @@ Menu playerMenu()
                         "Create Player",
                         [](MenuContext context)
                         {
-                            context.push(managePlayerMenu(createPlayer()));
+                            context.push([]()
+                                         { return managePlayerMenu(createPlayer()); });
                         },
                     },
                     {
@@ -244,10 +249,17 @@ Menu addPlayerMenu(Team team)
 
 Menu managePlayerMenu(Player player)
 {
+    // In order the menu to be updated, we need to access the player object from the file
+    player = Player::idToPlayer(player.getID());
+
     return Menu({
                     {
                         "Update Player",
-                        [](MenuContext context) {},
+                        [player](MenuContext context)
+                        {
+                            context.push([player]()
+                                         { return updatePlayerMenu(player); });
+                        },
                     },
                     {
                         "Delete Player",
@@ -335,6 +347,114 @@ Menu manageMatchMenu(Match match)
 
 // Functional units
 
+// Update functions
+
+Menu updatePlayerMenu(Player player)
+{
+    // In order the menu to be updated, we need to access the player object from the file
+    player = Player::idToPlayer(player.getID());
+
+    return Menu({
+                    {
+                        "Name: " + player.getName(),
+                        [player](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            string name;
+                            cout << "Enter the new name: ";
+                            cin >> name;
+                            player.setName(name);
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                    {
+                        "Surname: " + player.getSurname(),
+                        [player](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            string surname;
+                            cout << "Enter the new surname: ";
+                            cin >> surname;
+                            player.setSurname(surname);
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                    {
+                        "License ID: " + player.getLicenseID(),
+                        [player](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            string licenseID;
+                            cout << "Enter the new license ID: ";
+                            cin >> licenseID;
+                            player.setLicenseID(licenseID);
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                    {
+                        "Position: " + to_string(player.getPosition()),
+                        [player](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            int pos;
+                            cout << "Enter the new position: ";
+                            cin >> pos;
+                            player.setPosition(Player::numToPosition(pos));
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                    {
+                        "Salary: " + to_string(player.getSalary()),
+                        [player](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            int salary;
+                            cout << "Enter the new salary: ";
+                            cin >> salary;
+                            player.setSalary(salary);
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                    {
+                        "Date Of Birth: " + Utils::dateToString(player.getDate()),
+                        [player](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            string date;
+                            cout << "Enter the new date of birth: ";
+                            cin >> date;
+                            player.setDate(Utils::stringToDate(date));
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                },
+                "Update " + player.getName() + " (Player)");
+}
+
 // Creation functions
 
 Team createTeam()
@@ -356,6 +476,8 @@ Team createTeam()
 
     cout << "Director: ";
     cin >> director;
+
+    cin.ignore();
 
     return Team::createTeam(name, address, phoneNumber, director);
 }
@@ -387,6 +509,8 @@ Player createPlayer()
 
     cout << "Date of Birth: ";
     cin >> dateOfBirth.tm_mday >> dateOfBirth.tm_mon >> dateOfBirth.tm_year;
+
+    cin.ignore();
 
     return Player::createPlayer(name, surname, licenseID, Player::numToPosition(position), salary, dateOfBirth);
 }
