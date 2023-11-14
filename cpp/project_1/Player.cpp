@@ -2,44 +2,18 @@
 #include "util/Utils.h"
 #include "Team.h"
 #include "Match.h"
+#include "TeamPlayer.h"
 
 const std::string Player::FILE_PATH = "players.data";
 
-void Player::save() const
+std::vector<std::string> Player::getArgs() const
 {
-    std::ofstream file(FILE_PATH, std::ios::app);
-
-    file << playerID << " " << name << " " << surname << " " << licenseID << " " << position << " " << salary << " ";
-    file << Utils::dateToString(dateOfBirth) << std::endl;
-
-    file.close();
+    return {playerID, name, surname, licenseID, std::to_string(position), std::to_string(salary), Utils::dateToString(dateOfBirth)};
 }
 
-void Player::resave() const
+std::string Player::getPath() const
 {
-    std::ifstream file(FILE_PATH);
-    std::ofstream temp("temp.data");
-
-    std::string line;
-
-    while (getline(file, line))
-    {
-        if (line.substr(0, line.find(" ")) == playerID)
-        {
-            temp << playerID << " " << name << " " << surname << " " << licenseID << " " << position << " " << salary << " ";
-            temp << Utils::dateToString(dateOfBirth) << std::endl;
-        }
-        else
-        {
-            temp << line << std::endl;
-        }
-    }
-
-    file.close();
-    temp.close();
-
-    remove(FILE_PATH.c_str());
-    rename("temp.data", FILE_PATH.c_str());
+    return FILE_PATH;
 }
 
 Player::Player(std::string playerID, std::string name, std::string surname, std::string licenseID, PlayingPosition position, int salary, tm dateOfBirth)
@@ -56,29 +30,12 @@ Player Player::createPlayer(std::string name, std::string surname, std::string l
     return player;
 }
 
-void Player::deletePlayer(std::string playerID)
+void Player::deletePlayer() const
 {
-    Team::removeTeamOrPlayerWithID(playerID);
+    TeamPlayer::removeTeamOrPlayerWithID(playerID);
     Match::deleteStatsOfTeamWithID(playerID);
 
-    std::ifstream rfile(FILE_PATH);
-    std::ofstream temp("temp.data", std::ios::app);
-
-    std::string line;
-
-    while (getline(rfile, line))
-    {
-        if (line.substr(0, line.find(" ")) != playerID)
-        {
-            temp << line << std::endl;
-        }
-    }
-
-    rfile.close();
-    temp.close();
-
-    remove(FILE_PATH.c_str());
-    rename("temp.data", FILE_PATH.c_str());
+    deleteStored();
 }
 
 PlayingPosition Player::numToPosition(int position)
@@ -96,51 +53,20 @@ PlayingPosition Player::numToPosition(int position)
 std::vector<Player> Player::getAllPlayers()
 {
     std::vector<Player> players;
-    std::string line;
 
-    std::ifstream file(FILE_PATH);
-
-    while (getline(file, line))
+    for (std::vector<std::string> player : StorableUnit::getAllStored(FILE_PATH))
     {
-        players.push_back(fromString(line));
+        players.push_back(Player(player[0], player[1], player[2], player[3], numToPosition(stoi(player[4])), stoi(player[5]), Utils::stringToDate(player[6])));
     }
-
-    file.close();
 
     return players;
 };
 
-Player Player::fromString(std::string line)
-{
-    std::string word;
-    std::stringstream ss(line);
-    std::vector<std::string> result;
-
-    while (getline(ss, word, ' '))
-    {
-        result.push_back(word);
-    }
-
-    return Player(result[0], result[1], result[2], result[3], numToPosition(stoi(result[4])), stoi(result[5]), Utils::stringToDate(result[6]));
-}
-
 Player Player::idToPlayer(std::string playerID)
 {
-    std::string line;
+    std::vector<std::string> player = getStored(FILE_PATH, playerID);
 
-    std::ifstream file(FILE_PATH, std::ios::app);
-
-    while (getline(file, line))
-    {
-        if (line.substr(0, line.find(" ")) == playerID)
-        {
-            return fromString(line);
-        }
-    }
-
-    file.close();
-
-    throw "Player not found";
+    return Player(player[0], player[1], player[2], player[3], numToPosition(stoi(player[4])), stoi(player[5]), Utils::stringToDate(player[6]));
 };
 
 // Getters and setters

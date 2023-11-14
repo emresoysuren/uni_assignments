@@ -8,6 +8,8 @@
 #include <vector>
 #include <map>
 
+#include "util/StorableUnit.h"
+
 class Utils;
 class Team;
 
@@ -21,7 +23,7 @@ enum PlayingPosition
 };
 
 /// @brief A class to represent a player
-class Player
+class Player : public StorableUnit
 {
 private:
     static const std::string FILE_PATH;
@@ -33,8 +35,8 @@ private:
     int salary;
     std::tm dateOfBirth;
 
-    void save() const;
-    void resave() const;
+    virtual std::vector<std::string> getArgs() const;
+    virtual std::string getPath() const;
 
 public:
     /// @brief Creates a new Player object
@@ -50,7 +52,7 @@ public:
 
     static Player createPlayer(std::string name, std::string surname, std::string licenseID, PlayingPosition position, int salary, tm dateOfBirth);
 
-    static void deletePlayer(std::string playerID);
+    void deletePlayer() const;
 
     /// @brief Converts a number to a PlayingPosition
     /// @param position Position of the player as a number
@@ -58,8 +60,6 @@ public:
     static PlayingPosition numToPosition(int position);
 
     static std::vector<Player> getAllPlayers();
-
-    static Player fromString(std::string line);
 
     static Player idToPlayer(std::string playerID);
 

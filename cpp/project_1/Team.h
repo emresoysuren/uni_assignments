@@ -6,28 +6,24 @@
 #include <sstream>
 #include <vector>
 
+#include "util/StorableUnit.h"
+
 class Match;
 class Player;
 
 /// @brief Class representing a soccer team
-class Team
+class Team : public StorableUnit
 {
 private:
     static const std::string FILE_PATH;
-    static const std::string TEAM_PLAYER_FILE_PATH;
     std::string teamID;
     std::string name;
     std::string address;
     std::string phoneNumber;
     std::string director;
 
-    /// @brief Converts a string to a Team object
-    /// @param line String to convert
-    /// @return Returns the converted Team object
-    static Team fromString(std::string line);
-
-    void save() const;
-    void resave() const;
+    virtual std::vector<std::string> getArgs() const;
+    virtual std::string getPath() const;
 
 public:
     /// @brief Creates a new Team object
@@ -44,7 +40,7 @@ public:
     /// @return Returns the team with the given ID or throws an error if it doesn't exist
     static Team idToTeam(std::string teamID);
 
-    static void deleteTeam(std::string teamID);
+    void deleteTeam() const;
 
     static std::vector<Team> getAllTeams();
 
@@ -55,11 +51,9 @@ public:
     /// @param director Current director of the team
     static Team createTeam(std::string name, std::string address, std::string phoneNumber, std::string director);
 
-    void addPlayer(std::string playerID) const;
+    void addPlayer(Player) const;
 
     std::vector<Player> getPlayers() const;
-
-    static void removeTeamOrPlayerWithID(std::string ID);
 
     // Getter and setters
 

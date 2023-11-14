@@ -11,6 +11,7 @@ using namespace std;
 #include "./util/Menu.h"
 #include "./util/MenuContext.h"
 #include "./util/Utils.h"
+#include "TeamPlayer.h"
 
 // Forward declarations
 Menu mainMenu();
@@ -18,7 +19,8 @@ Menu teamMenu();
 Menu manageTeamMenu(Team);
 Menu teamListMenu(
     function<void(MenuContext, Team)> = [](MenuContext context, Team team)
-    { context.push(manageTeamMenu(team)); },
+    { context.push([team]()
+                   { return manageTeamMenu(team); }); },
     string = "Manage a Team");
 Team createTeam();
 Player createPlayer();
@@ -151,9 +153,9 @@ Menu manageTeamPlayerMenu(Team team, Player player)
                     },
                     {
                         "Remove Player from the Team",
-                        [team, ID = player.getID()](MenuContext context)
+                        [ID = player.getID()](MenuContext context)
                         {
-                            Team::removeTeamOrPlayerWithID(ID);
+                            TeamPlayer::removeTeamOrPlayerWithID(ID);
                             context.pop();
                         },
                     },
@@ -163,6 +165,9 @@ Menu manageTeamPlayerMenu(Team team, Player player)
 
 Menu manageTeamMenu(Team team)
 {
+    // In order the menu to be updated, we need to access the team object from the file
+    team = Team::idToTeam(team.getID());
+
     return Menu({
                     {
                         "Add Player",
@@ -190,9 +195,9 @@ Menu manageTeamMenu(Team team)
                     },
                     {
                         "Delete the Team",
-                        [ID = team.getID()](MenuContext context)
+                        [team](MenuContext context)
                         {
-                            Team::deleteTeam(ID);
+                            team.deleteTeam();
                             context.pop();
                         },
                     },
@@ -247,7 +252,7 @@ Menu addPlayerMenu(Team team)
 {
     return playersListMenu([team](MenuContext context, Player player)
                            {
-                            team.addPlayer(player.getID());
+                            team.addPlayer(player);
                             context.pop(); },
                            "Managing the Players of " + team.getName() + " (Team)");
 }
@@ -268,9 +273,9 @@ Menu managePlayerMenu(Player player)
                     },
                     {
                         "Delete Player",
-                        [ID = player.getID()](MenuContext context)
+                        [player](MenuContext context)
                         {
-                            Player::deletePlayer(ID);
+                            player.deletePlayer();
                             context.pop();
                         },
                     },
