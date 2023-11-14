@@ -31,6 +31,32 @@ void Team::save() const
     file.close();
 }
 
+void Team::resave() const
+{
+    std::ifstream file(FILE_PATH);
+    std::ofstream temp("temp.data");
+
+    std::string line;
+
+    while (getline(file, line))
+    {
+        if (line.substr(0, line.find(" ")) == teamID)
+        {
+            temp << teamID << " " << name << " " << address << " " << phoneNumber << " " << director << std::endl;
+        }
+        else
+        {
+            temp << line << std::endl;
+        }
+    }
+
+    file.close();
+    temp.close();
+
+    remove(FILE_PATH.c_str());
+    rename("temp.data", FILE_PATH.c_str());
+}
+
 Team::Team(std::string teamID, std::string name, std::string address, std::string phoneNumber, std::string director)
     : teamID(teamID), name(name), address(address), phoneNumber(phoneNumber), director(director)
 {
@@ -109,16 +135,6 @@ Team Team::createTeam(std::string name, std::string address, std::string phoneNu
     return team;
 }
 
-std::string Team::getName() const
-{
-    return name;
-}
-
-std::string Team::getID() const
-{
-    return teamID;
-}
-
 void Team::addPlayer(std::string playerID) const
 {
     std::ifstream file(TEAM_PLAYER_FILE_PATH);
@@ -184,4 +200,53 @@ void Team::removeTeamOrPlayerWithID(std::string ID)
 
     remove(TEAM_PLAYER_FILE_PATH.c_str());
     rename("temp.data", TEAM_PLAYER_FILE_PATH.c_str());
+}
+
+std::string Team::getName() const
+{
+    return name;
+}
+
+std::string Team::getID() const
+{
+    return teamID;
+}
+
+std::string Team::getAddr() const
+{
+    return address;
+}
+
+std::string Team::getPhone() const
+{
+    return phoneNumber;
+}
+
+std::string Team::getDirector() const
+{
+    return director;
+}
+
+void Team::setName(std::string newValue)
+{
+    name = newValue;
+    resave();
+}
+
+void Team::setAddr(std::string newValue)
+{
+    address = newValue;
+    resave();
+}
+
+void Team::setPhone(std::string newValue)
+{
+    phoneNumber = newValue;
+    resave();
+}
+
+void Team::setDirector(std::string newValue)
+{
+    director = newValue;
+    resave();
 }

@@ -24,20 +24,21 @@ Team createTeam();
 Player createPlayer();
 Menu addPlayerMenu(Team);
 Menu managePlayerMenu(Player);
-Menu managePlayersOfTeam(Team team);
+Menu managePlayersOfTeam(Team);
 Menu playerMenu();
 Menu playersListMenu(
     function<void(MenuContext, Player)> = [](MenuContext context, Player player)
     { context.push([player]()
                    { return managePlayerMenu(player); }); },
     string = "Manage a Player");
-Menu manageTeamPlayerMenu(Team team, Player player);
+Menu manageTeamPlayerMenu(Team, Player);
 Menu manageGameRecordsMenu();
-Menu manageMatchMenu(Match match);
+Menu manageMatchMenu(Match);
 Menu matchListMenu();
 Match createMatch();
 Menu updatePlayerMenu(Player);
 void updatePlayerName(Player);
+Menu updateTeamMenu(Team);
 
 int main()
 {
@@ -126,7 +127,7 @@ Menu managePlayersOfTeam(Team team)
     for (Player player : team.getPlayers())
     {
         options.push_back(MenuOption{
-            player.getName(),
+            player.getName() + " " + player.getSurname(),
             [team, player](MenuContext context)
             {
                 context.push(manageTeamPlayerMenu(team, player));
@@ -181,7 +182,11 @@ Menu manageTeamMenu(Team team)
                     },
                     {
                         "Update Team",
-                        [](MenuContext context) {},
+                        [team](MenuContext context)
+                        {
+                            context.push([team]()
+                                         { return updateTeamMenu(team); });
+                        },
                     },
                     {
                         "Delete the Team",
@@ -452,7 +457,81 @@ Menu updatePlayerMenu(Player player)
                         },
                     },
                 },
-                "Update " + player.getName() + " (Player)");
+                "Update " + player.getName() + " " + player.getSurname() + " (Player)");
+}
+
+Menu updateTeamMenu(Team team)
+{
+    // In order the menu to be updated, we need to access the player object from the file
+    team = Team::idToTeam(team.getID());
+
+    return Menu({{
+                     "Name: " + team.getName(),
+                     [team](MenuContext context) mutable
+                     {
+                         Utils::clearScreen();
+
+                         string name;
+                         cout << "Enter the new name: ";
+                         cin >> name;
+                         team.setName(name);
+
+                         cin.ignore();
+
+                         context.reload();
+                     },
+                 },
+                 {
+                     "Address: " + team.getAddr(),
+                     [team](MenuContext context) mutable
+                     {
+                         Utils::clearScreen();
+
+                         string address;
+                         cout << "Enter the new address: ";
+                         cin >> address;
+                         team.setAddr(address);
+
+                         cin.ignore();
+
+                         context.reload();
+                     },
+                 },
+                 {
+                     "Phone Number: " + team.getPhone(),
+                     [team](MenuContext context) mutable
+                     {
+                         Utils::clearScreen();
+
+                         string phoneNumber;
+                         cout << "Enter the new phone number: ";
+                         cin >> phoneNumber;
+                         team.setPhone(phoneNumber);
+
+                         cin.ignore();
+
+                         context.reload();
+                     },
+                 },
+                 {
+                     "Director: " + team.getDirector(),
+                     [team](MenuContext context) mutable
+                     {
+                         Utils::clearScreen();
+
+                         string director;
+                         cout << "Enter the new director: ";
+                         cin >> director;
+                         team.setDirector(director);
+
+                         cin.ignore();
+
+                         context.reload();
+                     },
+                 }
+
+                },
+                "Update " + team.getName() + " (Team)");
 }
 
 // Creation functions

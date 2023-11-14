@@ -27,6 +27,7 @@ private:
     static Team fromString(std::string line);
 
     void save() const;
+    void resave() const;
 
 public:
     /// @brief Creates a new Team object
@@ -54,13 +55,29 @@ public:
     /// @param director Current director of the team
     static Team createTeam(std::string name, std::string address, std::string phoneNumber, std::string director);
 
-    std::string getName() const;
-
-    std::string getID() const;
-
     void addPlayer(std::string playerID) const;
 
     std::vector<Player> getPlayers() const;
 
     static void removeTeamOrPlayerWithID(std::string ID);
+
+    // Getter and setters
+
+    std::string getName() const;
+
+    std::string getID() const;
+
+    std::string getAddr() const;
+
+    std::string getPhone() const;
+
+    std::string getDirector() const;
+
+    void setName(std::string);
+
+    void setAddr(std::string);
+
+    void setPhone(std::string);
+
+    void setDirector(std::string);
 };
