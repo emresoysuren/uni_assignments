@@ -28,7 +28,7 @@ private:
     std::string playerID;
     std::string name;
     std::string surname;
-    int licenseID;
+    std::string licenseID;
     PlayingPosition position;
     int salary;
     std::tm dateOfBirth;
@@ -43,11 +43,11 @@ public:
     /// @param position The position of the player playing in the team
     /// @param salary Salary of the player
     /// @param dateOfBirth Date of birth of the player
-    Player(std::string playerID, std::string name, std::string surname, int licenseID, PlayingPosition position, int salary, tm dateOfBirth);
+    Player(std::string playerID, std::string name, std::string surname, std::string licenseID, PlayingPosition position, int salary, tm dateOfBirth);
 
     ~Player();
 
-    static Player createPlayer(std::string name, std::string surname, PlayingPosition position, int salary, tm dateOfBirth);
+    static Player createPlayer(std::string name, std::string surname, std::string licenseID, PlayingPosition position, int salary, tm dateOfBirth);
 
     static void deletePlayer(std::string playerID);
 
@@ -63,8 +63,17 @@ public:
     static Player idToPlayer(std::string playerID);
 
     std::string getID() const;
-
     std::string getName() const;
-
     std::string getSurname() const;
+    std::tm getDate() const;
+    int getSalary() const;
+    PlayingPosition getPosition() const;
+    std::string getLicenseID() const;
+
+    void setDate(std::tm date);
+    void setName(std::string name);
+    void setSurname(std::string surname);
+    void setSalary(int salary);
+    void setPosition(PlayingPosition position);
+    void setLicenseID(std::string licenseID);
 };

@@ -40,3 +40,11 @@ std::vector<std::string> Utils::spiltString(std::string str, char delimiter)
 
     return result;
 }
+
+void Utils::clearScreen()
+{
+    // Clear the screen
+    std::cout << "\x1b[2J";
+    // Move the cursor to the top left
+    std::cout << "\x1b[H";
+}

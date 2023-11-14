@@ -93,17 +93,20 @@ Menu::Menu(std::vector<MenuOption> options, std::string title)
 
 Menu::~Menu() {}
 
-void Menu::start(MenuContext context) const
+void Menu::start(MenuContext context, bool useContext) const
 {
     std::vector<MenuOption> opt = this->options;
 
-    opt.push_back({
-        context.isRoot() ? "Exit" : "Back",
-        [](MenuContext context)
-        {
-            context.pop();
-        },
-    });
+    if (useContext)
+    {
+        opt.push_back({
+            context.isRoot() ? "Exit" : "Back",
+            [](MenuContext context)
+            {
+                context.pop();
+            },
+        });
+    }
 
     int selected = 0;
 
@@ -116,7 +119,7 @@ void Menu::start(MenuContext context) const
 
         std::cout << "\x1b[4m";
 
-        std::cout << std::endl;
+        // std::cout << std::endl;
         std::cout << title + ":" << std::endl;
 
         std::cout << "\x1b[24m";
@@ -212,4 +215,14 @@ void Menu::start(MenuContext context) const
               << "\x1b[?25h" << std::endl;
 
     opt[selected].func(context);
+}
+
+void Menu::start(MenuContext context) const
+{
+    start(context, true);
+}
+
+void Menu::start() const
+{
+    start(MenuContext(), false);
 }

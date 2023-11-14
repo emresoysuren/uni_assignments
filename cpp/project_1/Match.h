@@ -42,6 +42,8 @@ public:
 
     std::string getID() const;
 
+    std::tm getDate() const;
+
     static void deleteMatch(std::string matchID);
 
     static std::vector<Match> getAllMatches();

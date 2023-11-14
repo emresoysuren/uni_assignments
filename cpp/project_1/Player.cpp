@@ -15,14 +15,14 @@ void Player::save() const
     file.close();
 }
 
-Player::Player(std::string playerID, std::string name, std::string surname, int licenseID, PlayingPosition position, int salary, tm dateOfBirth)
+Player::Player(std::string playerID, std::string name, std::string surname, std::string licenseID, PlayingPosition position, int salary, tm dateOfBirth)
     : playerID(playerID), name(name), surname(surname), licenseID(licenseID), position(numToPosition(position)), salary(salary), dateOfBirth(dateOfBirth) {}
 
 Player::~Player() {}
 
-Player Player::createPlayer(std::string name, std::string surname, PlayingPosition position, int salary, tm dateOfBirth)
+Player Player::createPlayer(std::string name, std::string surname, std::string licenseID, PlayingPosition position, int salary, tm dateOfBirth)
 {
-    Player player(std::to_string(rand()), name, surname, rand(), position, salary, dateOfBirth);
+    Player player(std::to_string(rand()), name, surname, licenseID, position, salary, dateOfBirth);
 
     player.save();
 
@@ -94,7 +94,7 @@ Player Player::fromString(std::string line)
         result.push_back(word);
     }
 
-    return Player(result[0], result[1], result[2], stoi(result[3]), numToPosition(stoi(result[4])), stoi(result[5]), Utils::stringToDate(result[6]));
+    return Player(result[0], result[1], result[2], result[3], numToPosition(stoi(result[4])), stoi(result[5]), Utils::stringToDate(result[6]));
 }
 
 Player Player::idToPlayer(std::string playerID)
@@ -116,6 +116,8 @@ Player Player::idToPlayer(std::string playerID)
     throw "Player not found";
 };
 
+// Getters and setters
+
 std::string Player::getID() const
 {
     return playerID;
@@ -129,4 +131,54 @@ std::string Player::getName() const
 std::string Player::getSurname() const
 {
     return surname;
+}
+
+std::tm Player::getDate() const
+{
+    return dateOfBirth;
+}
+
+int Player::getSalary() const
+{
+    return salary;
+}
+
+PlayingPosition Player::getPosition() const
+{
+    return position;
+}
+
+std::string Player::getLicenseID() const
+{
+    return licenseID;
+}
+
+void Player::setDate(std::tm date)
+{
+    dateOfBirth = date;
+}
+
+void Player::setName(std::string name)
+{
+    this->name = name;
+}
+
+void Player::setSurname(std::string surname)
+{
+    this->surname = surname;
+}
+
+void Player::setSalary(int salary)
+{
+    this->salary = salary;
+}
+
+void Player::setPosition(PlayingPosition position)
+{
+    this->position = position;
+}
+
+void Player::setLicenseID(std::string licenseID)
+{
+    this->licenseID = licenseID;
 }

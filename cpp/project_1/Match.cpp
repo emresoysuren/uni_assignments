@@ -190,3 +190,8 @@ Match Match::fromString(std::string str)
 
     return match;
 }
+
+std::tm Match::getDate() const
+{
+    return date;
+}

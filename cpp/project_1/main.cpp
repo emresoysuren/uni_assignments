@@ -222,7 +222,7 @@ Menu playersListMenu(function<void(MenuContext, Player)> callback, string title)
     for (Player player : Player::getAllPlayers())
     {
         options.push_back(MenuOption{
-            player.getName(),
+            player.getName() + " " + player.getSurname(),
             [player, callback](MenuContext context)
             {
                 callback(context, player);
@@ -303,7 +303,7 @@ Menu matchListMenu()
     for (Match match : Match::getAllMatches())
     {
         options.push_back(MenuOption{
-            match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]",
+            Utils::dateToString(match.getDate()) + " " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]",
             [match](MenuContext context)
             {
                 context.push(manageMatchMenu(match));
@@ -335,12 +335,11 @@ Menu manageMatchMenu(Match match)
 
 // Functional units
 
+// Creation functions
+
 Team createTeam()
 {
-    // Clear the screen
-    cout << "\x1b[2J";
-    // Move the cursor to the top left
-    cout << "\x1b[H";
+    Utils::clearScreen();
 
     string name, address, phoneNumber, director;
 
@@ -363,12 +362,9 @@ Team createTeam()
 
 Player createPlayer()
 {
-    // Clear the screen
-    cout << "\x1b[2J";
-    // Move the cursor to the top left
-    cout << "\x1b[H";
+    Utils::clearScreen();
 
-    string name, surname;
+    string name, surname, licenseID;
     int position, salary;
     tm dateOfBirth;
 
@@ -383,13 +379,16 @@ Player createPlayer()
     cout << "Position: ";
     cin >> position;
 
+    cout << "License ID: ";
+    cin >> licenseID;
+
     cout << "Salary: ";
     cin >> salary;
 
     cout << "Date of Birth: ";
     cin >> dateOfBirth.tm_mday >> dateOfBirth.tm_mon >> dateOfBirth.tm_year;
 
-    return Player::createPlayer(name, surname, Player::numToPosition(position), salary, dateOfBirth);
+    return Player::createPlayer(name, surname, licenseID, Player::numToPosition(position), salary, dateOfBirth);
 }
 
 Match createMatch()
@@ -402,29 +401,27 @@ Match createMatch()
     {
         int goals;
 
-        MenuContext::run(teamListMenu([t](MenuContext context, Team team)
-                                      { *t = team; },
-                                      "Select the #" + to_string(i + 1) + " Team"));
+        Utils::clearScreen();
 
-        // Clear the screen
-        cout << "\x1b[2J";
-        // Move the cursor to the top left
-        cout << "\x1b[H";
+        teamListMenu([t](MenuContext context, Team team)
+                     { *t = team; },
+                     "Select the #" + to_string(i + 1) + " Team")
+            .start();
+
+        Utils::clearScreen();
 
         cout << "Enter the goals of " << t->getName() << ": ";
         cin >> goals;
 
         stats[i] = TeamStats(*t, goals);
 
+        // @TODO : Find out why this is needed
         cin.ignore();
     }
 
     delete t;
 
-    // Clear the screen
-    cout << "\x1b[2J";
-    // Move the cursor to the top left
-    cout << "\x1b[H";
+    Utils::clearScreen();
 
     tm date;
 

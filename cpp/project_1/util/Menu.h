@@ -42,6 +42,8 @@ private:
     static const int DOWN_ARROW;
     static const int ENTER_KEY;
 
+    void start(MenuContext context, bool useContext) const;
+
 public:
     bool loopOptions = true;
 
@@ -54,4 +56,6 @@ public:
 
     /// @brief Start the menu with the given options
     void start(MenuContext context) const;
+
+    void start() const;
 };
