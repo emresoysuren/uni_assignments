@@ -55,6 +55,8 @@ public:
 
     std::vector<Player> getPlayers() const;
 
+    std::vector<Match> getMatches() const;
+
     // Getter and setters
 
     std::string getName() const;
@@ -66,6 +68,12 @@ public:
     std::string getPhone() const;
 
     std::string getDirector() const;
+
+    int getTotalGoals() const;
+
+    int getTotalWins() const;
+
+    int getTotalLosses() const;
 
     void setName(std::string);
 

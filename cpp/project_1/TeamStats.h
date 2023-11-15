@@ -28,6 +28,8 @@ public:
 
     static std::vector<TeamStats> getTeamStatsWithMatch(Match);
 
+    static std::vector<Match> getMatchesWithTeam(Team);
+
     static void removeTeamMatchesWithTeamID(std::string);
 
     int getGoals() const;

@@ -19,7 +19,9 @@ class Menu
 {
 private:
     std::string title = "";
+    std::string description;
     std::vector<MenuOption> options;
+    bool showNoOptions;
 
     /// @brief Formats the option at the given index
     /// @param i The index of the option to format
@@ -36,6 +38,8 @@ private:
     /// @param highlight Whether to highlight the option or not
     void printLineAt(int selected, std::vector<MenuOption> *opt, bool highlight = false) const;
 
+    void printDescription() const;
+
     static int getKey();
 
     static const int UP_ARROW;
@@ -50,7 +54,7 @@ public:
     /// @brief Create a menu with the given options and title
     /// @param options The options of the menu
     /// @param title The title of the menu
-    Menu(std::vector<MenuOption> options, std::string title);
+    Menu(std::vector<MenuOption>, std::string, std::string = "", bool = true);
 
     ~Menu();
 

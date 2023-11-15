@@ -49,6 +49,18 @@ void TeamStats::removeTeamMatchesWithTeamID(std::string teamID)
     }
 }
 
+std::vector<Match> TeamStats::getMatchesWithTeam(Team team)
+{
+    std::vector<Match> matches;
+
+    for (std::string key : StorableUnit::findKeysContains(FILE_PATH, team.getID()))
+    {
+        matches.push_back(Match::idToMatch(key));
+    }
+
+    return matches;
+}
+
 int TeamStats::getGoals() const
 {
     return goals;

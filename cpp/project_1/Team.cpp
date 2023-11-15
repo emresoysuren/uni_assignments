@@ -68,6 +68,54 @@ std::string Team::getPath() const
     return FILE_PATH;
 }
 
+int Team::getTotalGoals() const
+{
+    int total = 0;
+
+    for (Match match : TeamStats::getMatchesWithTeam(*this))
+    {
+        for (TeamStats stats : match.getStats())
+        {
+            if (stats.getTeam().getID() == teamID)
+            {
+                total += stats.getGoals();
+            }
+        }
+    }
+
+    return total;
+}
+
+int Team::getTotalWins() const
+{
+    int total = 0;
+
+    for (Match match : TeamStats::getMatchesWithTeam(*this))
+    {
+        if (match.getWinner().getTeam().getID() == teamID)
+        {
+            total++;
+        }
+    }
+
+    return total;
+}
+
+int Team::getTotalLosses() const
+{
+    int total = 0;
+
+    for (Match match : TeamStats::getMatchesWithTeam(*this))
+    {
+        if (match.getLoser().getTeam().getID() == teamID)
+        {
+            total++;
+        }
+    }
+
+    return total;
+}
+
 std::string Team::getName() const
 {
     return name;

@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "Menu.h"
 #include "MenuContext.h"
 
@@ -86,10 +88,20 @@ const int Menu::ENTER_KEY = 10;
 
 #endif
 
-Menu::Menu(std::vector<MenuOption> options, std::string title)
-    : options(options), title(title)
+void Menu::printDescription() const
 {
+    std::stringstream ss(description);
+
+    std::string line;
+
+    while (getline(ss, line))
+    {
+        std::cout << "  " + line << std::endl;
+    }
 }
+
+Menu::Menu(std::vector<MenuOption> options, std::string title, std::string description, bool showNoOptions)
+    : options(options), title(title), description(description), showNoOptions(showNoOptions) {}
 
 Menu::~Menu() {}
 
@@ -127,7 +139,9 @@ void Menu::start(MenuContext context, bool useContext) const
         std::cout << "\x1b[34m";
     }
 
-    if (options.size() == 0)
+    printDescription();
+
+    if (showNoOptions && options.size() == 0)
     {
         std::cout << "  No options to show" << std::endl;
     }

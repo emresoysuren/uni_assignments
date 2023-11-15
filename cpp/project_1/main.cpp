@@ -2,6 +2,8 @@
 #include <functional>
 #include <vector>
 #include <ctime>
+#include <sstream>
+#include <iomanip>
 using namespace std;
 
 #include "Player.h"
@@ -41,6 +43,7 @@ Match createMatch();
 Menu updatePlayerMenu(Player);
 void updatePlayerName(Player);
 Menu updateTeamMenu(Team);
+Menu allTimeStatsOfTeamsMenu();
 
 int main()
 {
@@ -301,21 +304,46 @@ Menu manageGameRecordsMenu()
                         },
                     },
                     {
-                        "Show Game Records",
-                        [](MenuContext context) {
-
+                        "All Time Stats Of Teams",
+                        [](MenuContext context)
+                        {
+                            context.push(allTimeStatsOfTeamsMenu());
                         },
                     },
                     {
-                        "Show Scores",
+                        "Stats Of Teams Until Given Week",
                         [](MenuContext context) {},
                     },
                     {
-                        "Matches in This Week",
+                        "Stats of Teams Weekly",
                         [](MenuContext context) {},
                     },
                 },
                 "Manage Game Records");
+}
+
+Menu allTimeStatsOfTeamsMenu()
+{
+    vector<Team> teams = Team::getAllTeams();
+
+    stringstream desc("");
+    desc << left;
+
+    desc << endl
+         << string(42, '-') << endl
+         << "|" << setw(10) << "Team" << setw(10) << "Goals" << setw(10) << "Wins" << setw(10) << "Losses"
+         << "|" << endl
+         << "|" << string(40, '-') << "|" << endl;
+
+    for (Team team : teams)
+    {
+        desc << "|" << setw(10) << team.getName() << setw(10) << to_string(team.getTotalGoals()) << setw(10) << to_string(team.getTotalWins()) << setw(10) << to_string(team.getTotalLosses()) << "|" << endl;
+    }
+
+    desc << string(42, '-') << endl
+         << endl;
+
+    return Menu({}, "All Time Stats Of Teams (Found " + to_string(teams.size()) + " teams)", desc.str(), false);
 }
 
 Menu matchListMenu()
