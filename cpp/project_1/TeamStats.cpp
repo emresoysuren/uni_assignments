@@ -3,12 +3,15 @@
 
 const std::string TeamStats::FILE_PATH = "match_team_stats.data";
 
+TeamStats::TeamStats(std::string statsID, Match match, Team team, int goals)
+    : statsID(statsID), match(match), team(team), goals(goals) {}
+
 TeamStats::TeamStats(Match match, Team team, int goals)
-    : match(match), team(team), goals(goals) {}
+    : statsID(std::to_string(rand())), match(match), team(team), goals(goals) {}
 
 std::vector<std::string> TeamStats::getArgs() const
 {
-    return {match.getID(), team.getID(), std::to_string(goals)};
+    return {statsID, match.getID(), team.getID(), std::to_string(goals)};
 }
 
 std::string TeamStats::getPath() const
@@ -32,9 +35,9 @@ std::vector<TeamStats> TeamStats::getTeamStatsWithMatch(Match match)
 
     for (std::vector<std::string> args : getAllStored(FILE_PATH))
     {
-        if (args[0] == match.getID())
+        if (args[1] == match.getID())
         {
-            stats.push_back(TeamStats(match, Team::idToTeam(args[1]), std::stoi(args[2])));
+            stats.push_back(TeamStats(args[0], match, Team::idToTeam(args[2]), std::stoi(args[3])));
         }
     }
 
@@ -66,7 +69,36 @@ int TeamStats::getGoals() const
     return goals;
 }
 
+std::string TeamStats::getID() const
+{
+    return statsID;
+}
+
 Team TeamStats::getTeam() const
 {
     return team;
+}
+
+Match TeamStats::getMatch() const
+{
+    return match;
+}
+
+TeamStats TeamStats::idToTeamStats(std::string statsID)
+{
+    std::vector<std::string> stats = getStored(FILE_PATH, statsID);
+
+    return TeamStats(stats[0], Match::idToMatch(stats[1]), Team::idToTeam(stats[2]), std::stoi(stats[3]));
+}
+
+void TeamStats::setGoals(int newValue)
+{
+    goals = newValue;
+    resave();
+}
+
+void TeamStats::setTeam(Team newValue)
+{
+    team = newValue;
+    resave();
 }

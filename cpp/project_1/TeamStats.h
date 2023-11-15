@@ -12,6 +12,7 @@ class TeamStats : public StorableUnit
 {
 private:
     static const std::string FILE_PATH;
+    std::string statsID;
     Match match;
     Team team;
     int goals;
@@ -20,6 +21,8 @@ private:
     virtual std::string getPath() const;
 
 public:
+    TeamStats(std::string, Match, Team, int = 0);
+
     TeamStats(Match, Team, int = 0);
 
     void save() const;
@@ -32,7 +35,17 @@ public:
 
     static void removeTeamMatchesWithTeamID(std::string);
 
+    static TeamStats idToTeamStats(std::string);
+
     int getGoals() const;
 
+    std::string getID() const;
+
     Team getTeam() const;
+
+    Match getMatch() const;
+
+    void setGoals(int);
+
+    void setTeam(Team);
 };

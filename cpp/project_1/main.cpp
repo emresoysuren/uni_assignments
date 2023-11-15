@@ -44,6 +44,8 @@ Menu updatePlayerMenu(Player);
 void updatePlayerName(Player);
 Menu updateTeamMenu(Team);
 Menu allTimeStatsOfTeamsMenu();
+Menu updateMatchMenu(Match);
+Menu updateStatsMenu(TeamStats);
 
 int main()
 {
@@ -92,7 +94,9 @@ Menu teamMenu()
                         "Create a New Team",
                         [](MenuContext context)
                         {
-                            context.push(manageTeamMenu(createTeam()));
+                            Team team = createTeam();
+                            context.push([team]()
+                                         { return manageTeamMenu(team); });
                         },
                     },
                     {
@@ -135,7 +139,8 @@ Menu managePlayersOfTeam(Team team)
             player.getName() + " " + player.getSurname(),
             [team, player](MenuContext context)
             {
-                context.push(manageTeamPlayerMenu(team, player));
+                context.push([team, player]()
+                             { return manageTeamPlayerMenu(team, player); });
             },
         });
     }
@@ -145,6 +150,10 @@ Menu managePlayersOfTeam(Team team)
 
 Menu manageTeamPlayerMenu(Team team, Player player)
 {
+    // In order the menu to be updated, we need to access the team and player objects from the file
+    team = Team::idToTeam(team.getID());
+    player = Player::idToPlayer(player.getID());
+
     return Menu({
                     {
                         "Manage Player",
@@ -163,7 +172,7 @@ Menu manageTeamPlayerMenu(Team team, Player player)
                         },
                     },
                 },
-                "Managing " + team.getName() + " (Team)");
+                "Managing " + player.getName() + " " + player.getSurname() + " (Player) from " + team.getName() + " (Team)");
 }
 
 Menu manageTeamMenu(Team team)
@@ -216,8 +225,9 @@ Menu playerMenu()
                         "Create Player",
                         [](MenuContext context)
                         {
-                            context.push([]()
-                                         { return managePlayerMenu(createPlayer()); });
+                            Player player = createPlayer();
+                            context.push([player]()
+                                         { return managePlayerMenu(player); });
                         },
                     },
                     {
@@ -293,7 +303,9 @@ Menu manageGameRecordsMenu()
                         "Create a Game Record",
                         [](MenuContext context)
                         {
-                            context.push(manageMatchMenu(createMatch()));
+                            Match match = createMatch();
+                            context.push([match]()
+                                         { return manageMatchMenu(match); });
                         },
                     },
                     {
@@ -356,7 +368,8 @@ Menu matchListMenu()
             Utils::dateToString(match.getDate()) + " " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]",
             [match](MenuContext context)
             {
-                context.push(manageMatchMenu(match));
+                context.push([match]()
+                             { return manageMatchMenu(match); });
             },
         });
     }
@@ -366,10 +379,17 @@ Menu matchListMenu()
 
 Menu manageMatchMenu(Match match)
 {
+    // In order the menu to be updated, we need to access the match object from the file
+    match = Match::idToMatch(match.getID());
+
     return Menu({
                     {
                         "Update Match",
-                        [](MenuContext context) {},
+                        [match](MenuContext context)
+                        {
+                            context.push([match]()
+                                         { return updateMatchMenu(match); });
+                        },
                     },
                     {
                         "Delete Match",
@@ -386,6 +406,91 @@ Menu manageMatchMenu(Match match)
 // Functional units
 
 // Update functions
+
+Menu updateMatchMenu(Match match)
+{
+    // In order the menu to be updated, we need to access the match object from the file
+    match = Match::idToMatch(match.getID());
+
+    return Menu({
+                    {
+                        "Date: " + Utils::dateToString(match.getDate()),
+                        [match](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            string date;
+                            cout << "Enter the new date: ";
+                            cin >> date;
+                            match.setDate(Utils::stringToDate(date));
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                    {
+                        "Team 1 Stats: " + match.getWinner().getTeam().getName() + " team, " + to_string(match.getWinner().getGoals()) + " goals",
+                        [match](MenuContext context)
+                        {
+                            context.push(
+                                [match]()
+                                {
+                                    return updateStatsMenu(match.getWinner());
+                                });
+                        },
+                    },
+                    {
+                        "Team 2 Stats: " + match.getLoser().getTeam().getName() + " team, " + to_string(match.getLoser().getGoals()) + " goals",
+                        [match](MenuContext context)
+                        {
+                            context.push(
+                                [match]()
+                                {
+                                    return updateStatsMenu(match.getLoser());
+                                });
+                        },
+                    },
+                },
+                "Update " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]" + " (Match)");
+}
+
+Menu updateStatsMenu(TeamStats stats)
+{
+    // In order the menu to be updated, we need to access the stats object from the file
+    stats = TeamStats::idToTeamStats(stats.getID());
+
+    return Menu({
+                    {
+                        "Team: " + stats.getTeam().getName(),
+                        [stats](MenuContext context) mutable
+                        {
+                            context.push(teamListMenu([stats](MenuContext context, Team team) mutable
+                                                      { 
+                                                        stats.setTeam(team);
+                                                        context.pop(); },
+                                                      "Select the new Team"));
+                        },
+                    },
+                    {
+                        "Goals: " + to_string(stats.getGoals()),
+                        [stats](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            int goals;
+                            cout << "Enter the new goal count: ";
+                            cin >> goals;
+                            stats.setGoals(goals);
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                },
+                "Update the Stats of " + stats.getTeam().getName() + " Team");
+}
 
 Menu updatePlayerMenu(Player player)
 {
@@ -640,7 +745,9 @@ Match createMatch()
 
     cin.ignore();
 
-    TeamStats *stats = (TeamStats *)calloc(2, sizeof(TeamStats));
+    vector<TeamStats> stats;
+    stats.reserve(2);
+
     Team *t = (Team *)calloc(1, sizeof(Team));
 
     for (int i = 0; i < 2; i++)
@@ -659,17 +766,14 @@ Match createMatch()
         cout << "Enter the goals of " << t->getName() << ": ";
         cin >> goals;
 
-        stats[i] = TeamStats(match, *t, goals);
+        stats.push_back(TeamStats(match, *t, goals));
 
-        // @TODO : Find out why this is needed
         cin.ignore();
     }
 
     delete t;
 
     match.create(stats[0], stats[1]);
-
-    delete stats;
 
     return match;
 }

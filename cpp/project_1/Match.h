@@ -41,6 +41,8 @@ public:
 
     std::tm getDate() const;
 
+    void setDate(std::tm);
+
     void deleteMatch() const;
 
     static Match idToMatch(std::string);

@@ -97,3 +97,9 @@ std::tm Match::getDate() const
 {
     return date;
 }
+
+void Match::setDate(std::tm newValue)
+{
+    date = newValue;
+    resave();
+}
