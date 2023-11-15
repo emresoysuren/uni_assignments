@@ -30,5 +30,7 @@ protected:
 
     static void deleteOnAnyMatch(std::string, std::string);
 
+    static std::vector<std::string> findKeysContains(std::string, std::string);
+
 public:
 };

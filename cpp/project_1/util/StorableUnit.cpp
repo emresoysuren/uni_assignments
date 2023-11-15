@@ -174,3 +174,30 @@ void StorableUnit::deleteOnAnyMatch(std::string path, std::string key)
     remove(path.c_str());
     rename("temp.data", path.c_str());
 }
+
+std::vector<std::string> StorableUnit::findKeysContains(std::string path, std::string key)
+{
+    std::vector<std::string> result;
+
+    std::ifstream rfile(path);
+
+    std::string line;
+
+    while (getline(rfile, line))
+    {
+        std::vector<std::string> words = Utils::spiltString(line, ';');
+
+        for (std::string word : words)
+        {
+            if (word == key)
+            {
+                result.push_back(words[0]);
+                break;
+            }
+        }
+    }
+
+    rfile.close();
+
+    return result;
+}

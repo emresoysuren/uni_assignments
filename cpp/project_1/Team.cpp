@@ -2,6 +2,7 @@
 #include "Match.h"
 #include "Player.h"
 #include "TeamPlayer.h"
+#include "TeamStats.h"
 
 const std::string Team::FILE_PATH = "teams.data";
 
@@ -22,7 +23,7 @@ Team Team::idToTeam(std::string teamID)
 void Team::deleteTeam() const
 {
     TeamPlayer::removeTeamOrPlayerWithID(teamID);
-    Match::deleteStatsOfTeamWithID(teamID);
+    TeamStats::removeTeamMatchesWithTeamID(teamID);
     deleteStored();
 }
 

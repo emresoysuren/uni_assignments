@@ -8,33 +8,30 @@
 #include <ctime>
 #include <array>
 
+#include "util/StorableUnit.h"
+
 class Utils;
 class Team;
-
-#include "TeamStats.h"
 class TeamStats;
 
-class Match
+class Match : public StorableUnit
 {
 private:
     static const std::string FILE_PATH;
-    static const std::string STATS_FILE_PATH;
     std::string matchID;
-    TeamStats team1;
-    TeamStats team2;
     std::tm date;
 
-    void saveMatch() const;
-
-    void saveStats() const;
-
-    static Match fromString(std::string line);
+    virtual std::vector<std::string> getArgs() const;
+    virtual std::string getPath() const;
 
 public:
-    Match(std::string matchID, std::tm date, TeamStats team1, TeamStats team2);
+    Match(std::string matchID, std::tm date);
+    Match(std::tm date);
     ~Match();
 
-    static Match createMatch(std::tm date, TeamStats team1, TeamStats team2);
+    void create(TeamStats team1, TeamStats team2);
+
+    std::vector<TeamStats> getStats() const;
 
     TeamStats getWinner() const;
 
@@ -44,11 +41,9 @@ public:
 
     std::tm getDate() const;
 
-    static void deleteMatch(std::string matchID);
+    void deleteMatch() const;
+
+    static Match idToMatch(std::string);
 
     static std::vector<Match> getAllMatches();
-
-    static void deleteStatsOfMatchWithID(std::string matchID);
-
-    static void deleteStatsOfTeamWithID(std::string playerID);
 };

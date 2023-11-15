@@ -345,9 +345,9 @@ Menu manageMatchMenu(Match match)
                     },
                     {
                         "Delete Match",
-                        [ID = match.getID()](MenuContext context)
+                        [match](MenuContext context)
                         {
-                            Match::deleteMatch(ID);
+                            match.deleteMatch();
                             context.pop();
                         },
                     },
@@ -601,6 +601,16 @@ Player createPlayer()
 
 Match createMatch()
 {
+    Utils::clearScreen();
+
+    tm date;
+
+    cout << "Enter the date of the match: ";
+    cin >> date.tm_mday >> date.tm_mon >> date.tm_year;
+
+    Match match = Match(date);
+
+    cin.ignore();
 
     TeamStats *stats = (TeamStats *)calloc(2, sizeof(TeamStats));
     Team *t = (Team *)calloc(1, sizeof(Team));
@@ -621,7 +631,7 @@ Match createMatch()
         cout << "Enter the goals of " << t->getName() << ": ";
         cin >> goals;
 
-        stats[i] = TeamStats(*t, goals);
+        stats[i] = TeamStats(match, *t, goals);
 
         // @TODO : Find out why this is needed
         cin.ignore();
@@ -629,18 +639,9 @@ Match createMatch()
 
     delete t;
 
-    Utils::clearScreen();
-
-    tm date;
-
-    cout << "Enter the date of the match: ";
-    cin >> date.tm_mday >> date.tm_mon >> date.tm_year;
-
-    Match match = Match::createMatch(date, stats[0], stats[1]);
+    match.create(stats[0], stats[1]);
 
     delete stats;
-
-    cin.ignore();
 
     return match;
 }

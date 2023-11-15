@@ -33,8 +33,6 @@ Player Player::createPlayer(std::string name, std::string surname, std::string l
 void Player::deletePlayer() const
 {
     TeamPlayer::removeTeamOrPlayerWithID(playerID);
-    Match::deleteStatsOfTeamWithID(playerID);
-
     deleteStored();
 }
 
