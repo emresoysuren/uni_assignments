@@ -14,6 +14,13 @@ using namespace std;
 #include "./util/Utils.h"
 #include "TeamPlayer.h"
 
+// Define the description of the controls
+#ifdef _WIN32
+#define CONTROL_DESCRIPTION "Use the W and S keys to navigate, Enter to select an option and Backspace to go back"
+#else
+#define CONTROL_DESCRIPTION "Use the Up and Down arrow keys to navigate, Enter to select an option and Left arrow key to go back"
+#endif
+
 // Forward declarations
 Menu mainMenu();
 Menu teamMenu();
@@ -84,7 +91,7 @@ Menu mainMenu()
                         },
                     },
                 },
-                "Main Menu");
+                "Main Menu", CONTROL_DESCRIPTION);
 }
 
 Menu teamMenu()
@@ -285,8 +292,6 @@ Menu addPlayerMenu(Team team)
                 },
             });
         }
-        // if (teamOfPlayer.value().getID() == team.getID())
-        //     continue;
     }
 
     return Menu(options, "Add a Player to " + team.getName() + " (Team) (Found " + to_string(options.size()) + " players)");
@@ -409,10 +414,10 @@ Menu statsOfTeamsMenu(DateConstraint constraint)
     desc << left;
 
     desc << endl
-         << string(42, '-') << endl
+         << "+" + string(40, '-') + "+" << endl
          << "|" << setw(10) << "Team" << setw(10) << "Goals" << setw(10) << "Wins" << setw(10) << "Losses"
          << "|" << endl
-         << "|" << string(40, '-') << "|" << endl;
+         << "+" + string(40, '-') + "+" << endl;
 
     for (Team team : Team::getAllTeams())
     {
@@ -428,7 +433,7 @@ Menu statsOfTeamsMenu(DateConstraint constraint)
         desc << "|" << setw(10) << team.getName() << setw(10) << to_string(goals) << setw(10) << to_string(wins) << setw(10) << to_string(losses) << "|" << endl;
     }
 
-    desc << string(42, '-') << endl
+    desc << "+" + string(40, '-') + "+" << endl
          << endl;
 
     string title = "All Time";

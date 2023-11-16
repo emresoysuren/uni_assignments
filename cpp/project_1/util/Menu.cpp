@@ -68,9 +68,10 @@ int Menu::getKey()
     return key;
 }
 
-const int Menu::UP_ARROW = 119;
-const int Menu::DOWN_ARROW = 115;
-const int Menu::ENTER_KEY = 13;
+#define UP_KEY 119
+#define DOWN_KEY 115
+#define ENTER_KEY 13
+#define BACK_KEY '\b'
 
 #else
 // Unix/Linux specific code
@@ -94,9 +95,10 @@ int Menu::getKey()
     return key;
 }
 
-const int Menu::UP_ARROW = 65;
-const int Menu::DOWN_ARROW = 66;
-const int Menu::ENTER_KEY = 10;
+#define UP_KEY 65
+#define DOWN_KEY 66
+#define ENTER_KEY 10
+#define BACK_KEY 68
 
 #endif
 
@@ -105,6 +107,8 @@ void Menu::printDescription() const
     std::stringstream ss(description);
 
     std::string line;
+
+    std::cout << "\x1b[36m";
 
     while (getline(ss, line))
     {
@@ -147,8 +151,6 @@ void Menu::start(MenuContext context, bool useContext) const
         std::cout << title + ":" << std::endl;
 
         std::cout << "\x1b[24m";
-
-        std::cout << "\x1b[34m";
     }
 
     printDescription();
@@ -188,20 +190,16 @@ void Menu::start(MenuContext context, bool useContext) const
         switch (c)
         {
         // Up arrow
-        case UP_ARROW:
-            // If the selected option is not the first one
+        case UP_KEY:
+            printLineAt(selected, &opt);
+
             if (selected > 0)
             {
-                printLineAt(selected, &opt);
                 selected--;
                 std::cout << "\x1b[A";
-                printLineAt(selected, &opt, true);
-                break;
             }
-
-            if (loopOptions && opt.size() > 1)
+            else if (loopOptions && opt.size() > 1)
             {
-                printLineAt(selected, &opt);
                 selected = opt.size() - 1;
                 std::cout << "\x1b[" + std::to_string(opt.size() - 1) + "B";
             }
@@ -209,25 +207,25 @@ void Menu::start(MenuContext context, bool useContext) const
             printLineAt(selected, &opt, true);
             break;
         // Down arrow
-        case DOWN_ARROW:
+        case DOWN_KEY:
+            printLineAt(selected, &opt);
 
             if (selected < opt.size() - 1)
             {
-                printLineAt(selected, &opt);
                 selected++;
                 std::cout << "\x1b[B";
-                printLineAt(selected, &opt, true);
-                break;
             }
-
-            if (loopOptions && opt.size() > 1)
+            else if (loopOptions && opt.size() > 1)
             {
-                printLineAt(selected, &opt);
                 selected = 0;
                 std::cout << "\x1b[" + std::to_string(opt.size() - 1) + "A";
             }
 
             printLineAt(selected, &opt, true);
+            break;
+        case BACK_KEY:
+            selected = opt.size() - 1;
+            c = ENTER_KEY;
             break;
         default:
             printLineAt(selected, &opt, true);
@@ -235,9 +233,7 @@ void Menu::start(MenuContext context, bool useContext) const
         }
     }
 
-    std::cout << "\x1b[u"
-              << "\x1b[0m"
-              << "\x1b[?25h" << std::endl;
+    resetConsole();
 
     opt[selected].func.value()(context);
 }
@@ -250,4 +246,11 @@ void Menu::start(MenuContext context) const
 void Menu::start() const
 {
     start(MenuContext(), false);
+}
+
+void Menu::resetConsole()
+{
+    std::cout << "\x1b[u"
+              << "\x1b[0m"
+              << "\x1b[?25h" << std::endl;
 }

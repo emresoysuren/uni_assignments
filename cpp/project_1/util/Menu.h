@@ -37,11 +37,9 @@ private:
 
     void printDescription() const;
 
-    static int getKey();
+    static void resetConsole();
 
-    static const int UP_ARROW;
-    static const int DOWN_ARROW;
-    static const int ENTER_KEY;
+    static int getKey();
 
     void start(MenuContext context, bool useContext) const;
 
