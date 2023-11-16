@@ -34,6 +34,7 @@ Menu managePlayersOfTeam(Team);
 Menu playerMenu();
 Menu playersListMenu(function<void(MenuContext, Player)>, string, string = "");
 Menu manageTeamPlayerMenu(Team, Player);
+Menu managePlayerTeamMenu(Player, Team);
 Menu manageGameRecordsMenu();
 Menu manageMatchMenu(Match);
 Menu matchListMenu();
@@ -176,6 +177,33 @@ Menu manageTeamPlayerMenu(Team team, Player player)
                     },
                 },
                 "Managing " + player.getName() + " " + player.getSurname() + " (Player) from " + team.getName() + " (Team)", "Manage the player or remove them from the team.");
+}
+
+Menu managePlayerTeamMenu(Player player, Team team)
+{
+    // In order the menu to be updated, we need to access the team and player objects from the file
+    player = Player::idToPlayer(player.getID());
+    team = Team::idToTeam(team.getID());
+
+    return Menu({
+                    {
+                        "Show Team",
+                        [team](MenuContext context)
+                        {
+                            context.push([team]()
+                                         { return manageTeamMenu(team); });
+                        },
+                    },
+                    {
+                        "Remove from " + team.getName() + " (Team)",
+                        [ID = player.getID()](MenuContext context)
+                        {
+                            TeamPlayer::removeTeamOrPlayerWithID(ID);
+                            context.pop();
+                        },
+                    },
+                },
+                "Managing " + player.getName() + " " + player.getSurname() + " (Player) in " + team.getName() + " (Team)", "Show the team or remove the player from the team.");
 }
 
 Menu manageTeamMenu(Team team)
@@ -599,6 +627,8 @@ Menu updatePlayerMenu(Player player)
     // In order the menu to be updated, we need to access the player object from the file
     player = Player::idToPlayer(player.getID());
 
+    optional<Team> team = TeamPlayer::getTeamOfPlayer(player);
+
     return Menu({
                     {
                         "Name: " + player.getName(),
@@ -694,6 +724,29 @@ Menu updatePlayerMenu(Player player)
                             cin.ignore();
 
                             context.reload();
+                        },
+                    },
+                    {
+                        "Team: " + (team.has_value() ? team.value().getName() : "Not Set"),
+                        [team, player](MenuContext context)
+                        {
+                            if (team.has_value())
+                            {
+                                context.push([team, player]()
+                                             { return managePlayerTeamMenu(player, team.value()); });
+                            }
+                            else
+                            {
+                                context.push([player]()
+                                             { return teamListMenu(
+                                                   [player](MenuContext context, Team team)
+                                                   {
+                                                       team.addPlayer(player);
+                                                       context.pop();
+                                                   },
+                                                   "Add " + player.getName() + " " + player.getSurname() + " to a Team",
+                                                   "Select a team to add the player to."); });
+                            }
                         },
                     },
                 },
