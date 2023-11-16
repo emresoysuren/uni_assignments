@@ -244,7 +244,6 @@ Menu playerMenu()
 
 Menu playersListMenu(function<void(MenuContext, Player)> callback, string title)
 {
-
     vector<MenuOption> options = {};
 
     for (Player player : Player::getAllPlayers())
@@ -263,11 +262,34 @@ Menu playersListMenu(function<void(MenuContext, Player)> callback, string title)
 
 Menu addPlayerMenu(Team team)
 {
-    return playersListMenu([team](MenuContext context, Player player)
-                           {
-                            team.addPlayer(player);
-                            context.pop(); },
-                           "Managing the Players of " + team.getName() + " (Team)");
+    vector<MenuOption> options = {};
+
+    for (Player player : Player::getAllPlayers())
+    {
+        std::optional<Team> teamOfPlayer = TeamPlayer::getTeamOfPlayer(player);
+
+        if (teamOfPlayer.has_value())
+        {
+            options.push_back(MenuOption{
+                player.getName() + " " + player.getSurname() + " (in " + teamOfPlayer.value().getName() + ")",
+            });
+        }
+        else
+        {
+            options.push_back(MenuOption{
+                player.getName() + " " + player.getSurname(),
+                [player, team](MenuContext context)
+                {
+                    team.addPlayer(player);
+                    context.pop();
+                },
+            });
+        }
+        // if (teamOfPlayer.value().getID() == team.getID())
+        //     continue;
+    }
+
+    return Menu(options, "Add a Player to " + team.getName() + " (Team) (Found " + to_string(options.size()) + " players)");
 }
 
 Menu managePlayerMenu(Player player)
@@ -328,6 +350,7 @@ Menu manageGameRecordsMenu()
 
 Menu showTeamStatsMenu()
 {
+    // @todo Find a way to do it without using static variables
     static DateConstraint constraint;
 
     return Menu({

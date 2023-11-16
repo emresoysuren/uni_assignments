@@ -7,6 +7,7 @@
 #include <ctime>
 #include <vector>
 #include <map>
+#include <optional>
 
 #include "util/StorableUnit.h"
 
@@ -63,6 +64,7 @@ public:
 
     static Player idToPlayer(std::string playerID);
 
+    std::optional<Team> getTeam() const;
     std::string getID() const;
     std::string getName() const;
     std::string getSurname() const;

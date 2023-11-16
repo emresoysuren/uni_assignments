@@ -46,3 +46,13 @@ void TeamPlayer::removeTeamOrPlayerWithID(std::string ID)
 {
     deleteOnAnyMatch(FILE_PATH, ID);
 }
+
+std::optional<Team> TeamPlayer::getTeamOfPlayer(Player player)
+{
+    for (std::vector<std::string> args : StorableUnit::findKeysContains(FILE_PATH, player.getID(), true))
+    {
+        return Team::idToTeam(args[0]);
+    }
+
+    return std::nullopt;
+}

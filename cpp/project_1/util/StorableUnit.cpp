@@ -176,7 +176,7 @@ void StorableUnit::deleteOnAnyMatch(std::string path, std::string key)
     rename("temp.data", path.c_str());
 }
 
-std::vector<std::vector<std::string>> StorableUnit::findKeysContains(std::string path, std::string key)
+std::vector<std::vector<std::string>> StorableUnit::findKeysContains(std::string path, std::string key, bool findFirst)
 {
     std::vector<std::vector<std::string>> result;
 
@@ -193,6 +193,13 @@ std::vector<std::vector<std::string>> StorableUnit::findKeysContains(std::string
             if (word == key)
             {
                 result.push_back(words);
+
+                if (findFirst)
+                {
+                    rfile.close();
+                    return result;
+                }
+
                 break;
             }
         }

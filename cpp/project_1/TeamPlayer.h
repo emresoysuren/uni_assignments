@@ -1,5 +1,9 @@
 #pragma once
 
+#include <optional>
+#include <string>
+#include <vector>
+
 #include "util/StorableUnit.h"
 #include "Team.h"
 #include "Player.h"
@@ -22,6 +26,8 @@ public:
     void save() const;
 
     static std::vector<Player> getPlayersOfTeam(Team team);
+
+    static std::optional<Team> getTeamOfPlayer(Player player);
 
     static void removeTeamOrPlayerWithID(std::string ID);
 };

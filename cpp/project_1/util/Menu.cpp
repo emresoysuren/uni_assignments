@@ -19,28 +19,40 @@ std::string Menu::numberedOption(int i, std::vector<MenuOption> *opt, bool chose
     return optionPrefix + "[" + std::to_string(i) + "] " + (*opt)[i].title;
 }
 
-void Menu::printHighlighted(std::string text) const
-{
-    // Green color
-    std::cout << "\x1b[32m";
-
-    std::cout << text;
-
-    // Reset color
-    std::cout << "\x1b[34m";
-}
-
-void Menu::printLineAt(int selected, std::vector<MenuOption> *opt, bool highlight) const
+void Menu::printLineAt(int index, std::vector<MenuOption> *opt, bool highlight) const
 {
     std::cout << "\r\x1b[K";
 
     if (highlight)
     {
-        printHighlighted(numberedOption(selected, opt, highlight));
+        if ((*opt)[index].func.has_value())
+        {
+            // Green color
+            std::cout << "\x1b[32m";
+        }
+        else
+        {
+            // Red color
+            std::cout << "\x1b[31m";
+        }
+
+        std::cout << numberedOption(index, opt, highlight);
+
         return;
     }
 
-    std::cout << numberedOption(selected, opt);
+    if ((*opt)[index].func.has_value())
+    {
+        // Blue color
+        std::cout << "\x1b[34m";
+    }
+    else
+    {
+        // Black color
+        std::cout << "\x1b[30m";
+    }
+
+    std::cout << numberedOption(index, opt);
 }
 
 #ifdef _WIN32
@@ -169,13 +181,12 @@ void Menu::start(MenuContext context, bool useContext) const
 
     char c;
 
-    while (c != ENTER_KEY)
+    while (c != ENTER_KEY || !opt[selected].func.has_value())
     {
         c = getKey();
 
         switch (c)
         {
-
         // Up arrow
         case UP_ARROW:
             // If the selected option is not the first one
@@ -228,7 +239,7 @@ void Menu::start(MenuContext context, bool useContext) const
               << "\x1b[0m"
               << "\x1b[?25h" << std::endl;
 
-    opt[selected].func(context);
+    opt[selected].func.value()(context);
 }
 
 void Menu::start(MenuContext context) const

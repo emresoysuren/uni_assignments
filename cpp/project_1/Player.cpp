@@ -67,6 +67,11 @@ Player Player::idToPlayer(std::string playerID)
     return Player(player[0], player[1], player[2], player[3], numToPosition(stoi(player[4])), stoi(player[5]), Utils::stringToDate(player[6]));
 };
 
+std::optional<Team> Player::getTeam() const
+{
+    return TeamPlayer::getTeamOfPlayer(*this);
+}
+
 // Getters and setters
 
 std::string Player::getID() const

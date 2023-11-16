@@ -5,13 +5,14 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <optional>
 
 class MenuContext;
 
 struct MenuOption
 {
     std::string title;
-    std::function<void(MenuContext)> func;
+    std::optional<std::function<void(MenuContext)>> func;
 };
 
 /// @brief A class to create and handle menus visually in the terminal
@@ -29,14 +30,10 @@ private:
     /// @return The formatted option
     std::string numberedOption(int i, std::vector<MenuOption> *opt, bool chosed = false) const;
 
-    /// @brief Prints the given text in green and bold
-    /// @param text The text to print
-    void printHighlighted(std::string text) const;
-
     /// @brief Prints the option at the given index
-    /// @param selected The index of the option to print
+    /// @param index The index of the option to print
     /// @param highlight Whether to highlight the option or not
-    void printLineAt(int selected, std::vector<MenuOption> *opt, bool highlight = false) const;
+    void printLineAt(int index, std::vector<MenuOption> *opt, bool highlight = false) const;
 
     void printDescription() const;
 
