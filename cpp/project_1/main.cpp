@@ -16,31 +16,23 @@ using namespace std;
 
 // Define the description of the controls
 #ifdef _WIN32
-#define CONTROL_DESCRIPTION "Use the W and S keys to navigate, Enter to select an option and Backspace to go back"
+#define CONTROL_DESCRIPTION "Use the W and S keys to navigate between options,\nEnter to select an option and Backspace to go back."
 #else
-#define CONTROL_DESCRIPTION "Use the Up and Down arrow keys to navigate, Enter to select an option and Left arrow key to go back"
+#define CONTROL_DESCRIPTION "Use the Up and Down arrow keys to navigate between options,\nEnter to select an option and Left arrow key to go back."
 #endif
 
 // Forward declarations
 Menu mainMenu();
 Menu teamMenu();
 Menu manageTeamMenu(Team);
-Menu teamListMenu(
-    function<void(MenuContext, Team)> = [](MenuContext context, Team team)
-    { context.push([team]()
-                   { return manageTeamMenu(team); }); },
-    string = "Manage a Team");
+Menu teamListMenu(function<void(MenuContext, Team)>, string, string = "");
 Team createTeam();
 Player createPlayer();
 Menu addPlayerMenu(Team);
 Menu managePlayerMenu(Player);
 Menu managePlayersOfTeam(Team);
 Menu playerMenu();
-Menu playersListMenu(
-    function<void(MenuContext, Player)> = [](MenuContext context, Player player)
-    { context.push([player]()
-                   { return managePlayerMenu(player); }); },
-    string = "Manage a Player");
+Menu playersListMenu(function<void(MenuContext, Player)>, string, string = "");
 Menu manageTeamPlayerMenu(Team, Player);
 Menu manageGameRecordsMenu();
 Menu manageMatchMenu(Match);
@@ -69,14 +61,14 @@ Menu mainMenu()
 {
     return Menu({
                     MenuOption{
-                        "Manage Teams",
+                        "Team Menu",
                         [](MenuContext context)
                         {
                             context.push(teamMenu());
                         },
                     },
                     MenuOption{
-                        "Manage Players",
+                        "Player Menu",
                         [](MenuContext context)
                         {
                             context.push(playerMenu());
@@ -84,7 +76,7 @@ Menu mainMenu()
 
                     },
                     MenuOption{
-                        "Manage Game Records",
+                        "Game Records Menu",
                         [](MenuContext context)
                         {
                             context.push(manageGameRecordsMenu());
@@ -98,7 +90,7 @@ Menu teamMenu()
 {
     return Menu({
                     {
-                        "Create a New Team",
+                        "Create Team",
                         [](MenuContext context)
                         {
                             Team team = createTeam();
@@ -107,18 +99,22 @@ Menu teamMenu()
                         },
                     },
                     {
-                        "Manage a Team",
+                        "Show Teams",
                         [](MenuContext context)
                         {
                             context.push([]()
-                                         { return teamListMenu(); });
+                                         { return teamListMenu(
+                                               [](MenuContext context, Team team)
+                                               { context.push([team]()
+                                                              { return manageTeamMenu(team); }); },
+                                               "Showing Teams", "You can manage, or learn more about a team by selecting them."); });
                         },
                     },
                 },
-                "Manage Teams");
+                "Teams", "You can create a team, or manage an existing one by selecting them.\nTo see the list of all teams, select the \"Show Teams\" option.");
 }
 
-Menu teamListMenu(function<void(MenuContext, Team)> callback, string title)
+Menu teamListMenu(function<void(MenuContext, Team)> callback, string title, string description)
 {
     vector<MenuOption> options = {};
 
@@ -133,7 +129,7 @@ Menu teamListMenu(function<void(MenuContext, Team)> callback, string title)
         });
     }
 
-    return Menu(options, title + " (Found " + to_string(options.size()) + " teams)");
+    return Menu(options, title + " (Found " + to_string(options.size()) + " teams)", description);
 }
 
 Menu managePlayersOfTeam(Team team)
@@ -152,7 +148,7 @@ Menu managePlayersOfTeam(Team team)
         });
     }
 
-    return Menu(options, "Manage the Players of " + team.getName() + " (Team) (Found " + to_string(options.size()) + " players)");
+    return Menu(options, "Showing the Players of " + team.getName() + " (Team) (Found " + to_string(options.size()) + " players)", "Select a player to manage them.");
 }
 
 Menu manageTeamPlayerMenu(Team team, Player player)
@@ -163,7 +159,7 @@ Menu manageTeamPlayerMenu(Team team, Player player)
 
     return Menu({
                     {
-                        "Manage Player",
+                        "Show Player",
                         [player](MenuContext context)
                         {
                             context.push([player]()
@@ -171,7 +167,7 @@ Menu manageTeamPlayerMenu(Team team, Player player)
                         },
                     },
                     {
-                        "Remove Player from the Team",
+                        "Remove from " + team.getName() + " (Team)",
                         [ID = player.getID()](MenuContext context)
                         {
                             TeamPlayer::removeTeamOrPlayerWithID(ID);
@@ -179,7 +175,7 @@ Menu manageTeamPlayerMenu(Team team, Player player)
                         },
                     },
                 },
-                "Managing " + player.getName() + " " + player.getSurname() + " (Player) from " + team.getName() + " (Team)");
+                "Managing " + player.getName() + " " + player.getSurname() + " (Player) from " + team.getName() + " (Team)", "Manage the player or remove them from the team.");
 }
 
 Menu manageTeamMenu(Team team)
@@ -197,7 +193,7 @@ Menu manageTeamMenu(Team team)
                         },
                     },
                     {
-                        "Manage Players",
+                        "Show Players",
                         [team](MenuContext context)
                         {
                             context.push([team]()
@@ -205,7 +201,7 @@ Menu manageTeamMenu(Team team)
                         },
                     },
                     {
-                        "Update Team",
+                        "Show Details",
                         [team](MenuContext context)
                         {
                             context.push([team]()
@@ -213,7 +209,7 @@ Menu manageTeamMenu(Team team)
                         },
                     },
                     {
-                        "Delete the Team",
+                        "Delete Team",
                         [team](MenuContext context)
                         {
                             team.deleteTeam();
@@ -221,7 +217,7 @@ Menu manageTeamMenu(Team team)
                         },
                     },
                 },
-                "Managing " + team.getName() + " (Team)");
+                "Showing " + team.getName() + " (Team)", "Manage or learn more about the team.");
 }
 
 Menu playerMenu()
@@ -238,18 +234,22 @@ Menu playerMenu()
                         },
                     },
                     {
-                        "Manage a Player",
+                        "Show Players",
                         [](MenuContext context)
                         {
                             context.push([]()
-                                         { return playersListMenu(); });
+                                         { return playersListMenu(
+                                               [](MenuContext context, Player player)
+                                               { context.push([player]()
+                                                              { return managePlayerMenu(player); }); },
+                                               "Showing Players", "You can manage, or learn more about a player by selecting them."); });
                         },
                     },
                 },
-                "Manage Players");
+                "Player Menu", "You can create a player, or manage an existing one by selecting them.\nTo see the list of all players, select the \"Show Players\" option.");
 }
 
-Menu playersListMenu(function<void(MenuContext, Player)> callback, string title)
+Menu playersListMenu(function<void(MenuContext, Player)> callback, string title, string description)
 {
     vector<MenuOption> options = {};
 
@@ -264,7 +264,7 @@ Menu playersListMenu(function<void(MenuContext, Player)> callback, string title)
         });
     }
 
-    return Menu(options, title + " (Found " + to_string(options.size()) + " players)");
+    return Menu(options, title + " (Found " + to_string(options.size()) + " players)", description);
 }
 
 Menu addPlayerMenu(Team team)
@@ -294,7 +294,7 @@ Menu addPlayerMenu(Team team)
         }
     }
 
-    return Menu(options, "Add a Player to " + team.getName() + " (Team) (Found " + to_string(options.size()) + " players)");
+    return Menu(options, "Add a Player to " + team.getName() + " (Team) (Found " + to_string(options.size()) + " players)", "Select a player to add to the team. A player can only be in one team at a time.");
 }
 
 Menu managePlayerMenu(Player player)
@@ -304,7 +304,7 @@ Menu managePlayerMenu(Player player)
 
     return Menu({
                     {
-                        "Update Player",
+                        "Show Details",
                         [player](MenuContext context)
                         {
                             context.push([player]()
@@ -320,14 +320,14 @@ Menu managePlayerMenu(Player player)
                         },
                     },
                 },
-                "Managing " + player.getName() + " " + player.getSurname() + " (Player)");
+                "Showing " + player.getName() + " " + player.getSurname() + " (Player)", "Manage or learn more about the player.");
 }
 
 Menu manageGameRecordsMenu()
 {
     return Menu({
                     {
-                        "Create a Game Record",
+                        "Create Game Record",
                         [](MenuContext context)
                         {
                             Match match = createMatch();
@@ -336,7 +336,7 @@ Menu manageGameRecordsMenu()
                         },
                     },
                     {
-                        "Manage a Game Record",
+                        "Show Game Records",
                         [](MenuContext context)
                         {
                             context.push(matchListMenu);
@@ -350,7 +350,7 @@ Menu manageGameRecordsMenu()
                         },
                     },
                 },
-                "Manage Game Records");
+                "Game Records Menu", "You can create a game record, or manage an existing one by selecting them.\nTo see the list of all game records, select the \"Show Game Records\" option.");
 }
 
 Menu showTeamStatsMenu()
@@ -396,14 +396,14 @@ Menu showTeamStatsMenu()
                         },
                     },
                     {
-                        "Show Stats Of Teams with the given constraints",
+                        "Show Stats",
                         [](MenuContext context)
                         {
                             context.push(statsOfTeamsMenu(constraint));
                         },
                     },
                 },
-                "Stats Of Teams");
+                "Show Stats Of Teams", "You can set a date constraint to show the stats of teams in a specific time period,\nor show the stats of all time by leaving the dates empty.\nTo show the stats with the current date constraint, select the \"Show Stats\" option.");
 }
 
 Menu statsOfTeamsMenu(DateConstraint constraint)
@@ -460,8 +460,14 @@ Menu matchListMenu()
 
     for (Match match : Match::getAllMatches())
     {
+        stringstream title("");
+
+        title << left;
+
+        title << setw(10) << Utils::dateToString(match.getDate()) << right << setw(15) << match.getWinner().getTeam().getName() << " vs " << left << setw(15) << match.getLoser().getTeam().getName() << setw(15) << "[" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]";
+
         options.push_back(MenuOption{
-            Utils::dateToString(match.getDate()) + " " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]",
+            title.str(),
             [match](MenuContext context)
             {
                 context.push([match]()
@@ -470,7 +476,7 @@ Menu matchListMenu()
         });
     }
 
-    return Menu(options, "Manage a Team (Found " + to_string(options.size()) + " teams)");
+    return Menu(options, "Showing Game Records (Found " + to_string(options.size()) + " records)", "You can manage, or learn more about a game record by selecting them.");
 }
 
 Menu manageMatchMenu(Match match)
@@ -480,7 +486,7 @@ Menu manageMatchMenu(Match match)
 
     return Menu({
                     {
-                        "Update Match",
+                        "Show Details",
                         [match](MenuContext context)
                         {
                             context.push([match]()
@@ -488,7 +494,7 @@ Menu manageMatchMenu(Match match)
                         },
                     },
                     {
-                        "Delete Match",
+                        "Delete Game Record",
                         [match](MenuContext context)
                         {
                             match.deleteMatch();
@@ -496,7 +502,7 @@ Menu manageMatchMenu(Match match)
                         },
                     },
                 },
-                match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]" + " (Match)");
+                "Showing " + Utils::dateToString(match.getDate()) + " " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]" + " (Game Record)", "Manage or learn more about the game record.");
 }
 
 // Functional units
@@ -526,7 +532,7 @@ Menu updateMatchMenu(Match match)
                         },
                     },
                     {
-                        "Team 1 Stats: " + match.getWinner().getTeam().getName() + " team, " + to_string(match.getWinner().getGoals()) + " goals",
+                        "Stats of Winner: " + match.getWinner().getTeam().getName() + " team, " + to_string(match.getWinner().getGoals()) + " goals",
                         [match](MenuContext context)
                         {
                             context.push(
@@ -537,7 +543,7 @@ Menu updateMatchMenu(Match match)
                         },
                     },
                     {
-                        "Team 2 Stats: " + match.getLoser().getTeam().getName() + " team, " + to_string(match.getLoser().getGoals()) + " goals",
+                        "Stats of Loser: " + match.getLoser().getTeam().getName() + " team, " + to_string(match.getLoser().getGoals()) + " goals",
                         [match](MenuContext context)
                         {
                             context.push(
@@ -548,7 +554,7 @@ Menu updateMatchMenu(Match match)
                         },
                     },
                 },
-                "Update " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]" + " (Match)");
+                "Showing the details of " + Utils::dateToString(match.getDate()) + " " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]" + " (Game Record)", "Update the details of the game record by selecting the related option.");
 }
 
 Menu updateStatsMenu(TeamStats stats)
@@ -585,7 +591,7 @@ Menu updateStatsMenu(TeamStats stats)
                         },
                     },
                 },
-                "Update the Stats of " + stats.getTeam().getName() + " Team");
+                "Showing the Stats of the " + stats.getTeam().getName() + " (Team)", "Update the details by selecting the related option.");
 }
 
 Menu updatePlayerMenu(Player player)
@@ -691,7 +697,7 @@ Menu updatePlayerMenu(Player player)
                         },
                     },
                 },
-                "Update " + player.getName() + " " + player.getSurname() + " (Player)");
+                "Showing the details of " + player.getName() + " " + player.getSurname() + " (Player)", "Update the details of the player by selecting the related option.");
 }
 
 Menu updateTeamMenu(Team team)
@@ -765,7 +771,7 @@ Menu updateTeamMenu(Team team)
                  }
 
                 },
-                "Update " + team.getName() + " (Team)");
+                "Showing the details of " + team.getName() + " (Team)", "Update the details of the team by selecting the related option.");
 }
 
 // Creation functions

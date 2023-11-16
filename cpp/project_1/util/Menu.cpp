@@ -108,7 +108,7 @@ void Menu::printDescription() const
 
     std::string line;
 
-    std::cout << "\x1b[36m";
+    std::cout << "\x1b[35m";
 
     while (getline(ss, line))
     {
