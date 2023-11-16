@@ -1,7 +1,6 @@
 #include <iostream>
 #include <functional>
 #include <vector>
-#include <ctime>
 #include <sstream>
 #include <iomanip>
 using namespace std;
@@ -43,9 +42,10 @@ Match createMatch();
 Menu updatePlayerMenu(Player);
 void updatePlayerName(Player);
 Menu updateTeamMenu(Team);
-Menu allTimeStatsOfTeamsMenu();
+Menu statsOfTeamsMenu(DateConstraint);
 Menu updateMatchMenu(Match);
 Menu updateStatsMenu(TeamStats);
+Menu showTeamStatsMenu();
 
 int main()
 {
@@ -316,27 +316,71 @@ Menu manageGameRecordsMenu()
                         },
                     },
                     {
-                        "All Time Stats Of Teams",
+                        "Show Stats Of Teams",
                         [](MenuContext context)
                         {
-                            context.push(allTimeStatsOfTeamsMenu());
+                            context.push(showTeamStatsMenu);
                         },
-                    },
-                    {
-                        "Stats Of Teams Until Given Week",
-                        [](MenuContext context) {},
-                    },
-                    {
-                        "Stats of Teams Weekly",
-                        [](MenuContext context) {},
                     },
                 },
                 "Manage Game Records");
 }
 
-Menu allTimeStatsOfTeamsMenu()
+Menu showTeamStatsMenu()
 {
-    vector<Team> teams = Team::getAllTeams();
+    static DateConstraint constraint;
+
+    return Menu({
+                    {
+                        "From: " + (constraint.from.has_value() ? Utils::dateToString(constraint.from.value()) : "Not Set"),
+                        [](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            string date;
+
+                            cout << "Enter the date (DD-MM-YYYY): ";
+                            cin >> date;
+
+                            constraint.from = Utils::stringToDate(date);
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                    {
+                        "To: " + (constraint.to.has_value() ? Utils::dateToString(constraint.to.value()) : "Not Set"),
+                        [](MenuContext context) mutable
+                        {
+                            Utils::clearScreen();
+
+                            string date;
+
+                            cout << "Enter the date (DD-MM-YYYY): ";
+                            cin >> date;
+
+                            constraint.to = Utils::stringToDate(date);
+
+                            cin.ignore();
+
+                            context.reload();
+                        },
+                    },
+                    {
+                        "Show Stats Of Teams with the given constraints",
+                        [](MenuContext context)
+                        {
+                            context.push(statsOfTeamsMenu(constraint));
+                        },
+                    },
+                },
+                "Stats Of Teams");
+}
+
+Menu statsOfTeamsMenu(DateConstraint constraint)
+{
+    int teams = 0;
 
     stringstream desc("");
     desc << left;
@@ -347,15 +391,39 @@ Menu allTimeStatsOfTeamsMenu()
          << "|" << endl
          << "|" << string(40, '-') << "|" << endl;
 
-    for (Team team : teams)
+    for (Team team : Team::getAllTeams())
     {
-        desc << "|" << setw(10) << team.getName() << setw(10) << to_string(team.getTotalGoals()) << setw(10) << to_string(team.getTotalWins()) << setw(10) << to_string(team.getTotalLosses()) << "|" << endl;
+        int goals = team.getTotalGoals(constraint);
+        int wins = team.getTotalWins(constraint);
+        int losses = team.getTotalLosses(constraint);
+
+        if (goals == 0 && wins == 0 && losses == 0)
+            continue;
+
+        teams++;
+
+        desc << "|" << setw(10) << team.getName() << setw(10) << to_string(goals) << setw(10) << to_string(wins) << setw(10) << to_string(losses) << "|" << endl;
     }
 
     desc << string(42, '-') << endl
          << endl;
 
-    return Menu({}, "All Time Stats Of Teams (Found " + to_string(teams.size()) + " teams)", desc.str(), false);
+    string title = "All Time";
+
+    if (constraint.from.has_value() && constraint.to.has_value())
+    {
+        title = "From " + Utils::dateToString(constraint.from.value()) + " To " + Utils::dateToString(constraint.to.value());
+    }
+    else if (constraint.from.has_value())
+    {
+        title = "From " + Utils::dateToString(constraint.from.value());
+    }
+    else if (constraint.to.has_value())
+    {
+        title = "Until " + Utils::dateToString(constraint.to.value());
+    }
+
+    return Menu({}, "Showing Stats Of Teams " + title + " (Found " + to_string(teams) + " teams)", desc.str(), false);
 }
 
 Menu matchListMenu()
@@ -420,7 +488,7 @@ Menu updateMatchMenu(Match match)
                             Utils::clearScreen();
 
                             string date;
-                            cout << "Enter the new date: ";
+                            cout << "Enter the new date (DD-MM-YYYY): ";
                             cin >> date;
                             match.setDate(Utils::stringToDate(date));
 
@@ -585,7 +653,7 @@ Menu updatePlayerMenu(Player player)
                             Utils::clearScreen();
 
                             string date;
-                            cout << "Enter the new date of birth: ";
+                            cout << "Enter the new date of birth (DD-MM-YYYY): ";
                             cin >> date;
                             player.setDate(Utils::stringToDate(date));
 
@@ -703,9 +771,8 @@ Player createPlayer()
 {
     Utils::clearScreen();
 
-    string name, surname, licenseID;
+    string name, surname, licenseID, dateOfBirth;
     int position, salary;
-    tm dateOfBirth;
 
     cout << "Enter the information of the player:" << endl;
 
@@ -724,24 +791,24 @@ Player createPlayer()
     cout << "Salary: ";
     cin >> salary;
 
-    cout << "Date of Birth: ";
-    cin >> dateOfBirth.tm_mday >> dateOfBirth.tm_mon >> dateOfBirth.tm_year;
+    cout << "Date of Birth (DD-MM-YYYY): ";
+    cin >> dateOfBirth;
 
     cin.ignore();
 
-    return Player::createPlayer(name, surname, licenseID, Player::numToPosition(position), salary, dateOfBirth);
+    return Player::createPlayer(name, surname, licenseID, Player::numToPosition(position), salary, Utils::stringToDate(dateOfBirth));
 }
 
 Match createMatch()
 {
     Utils::clearScreen();
 
-    tm date;
+    string date;
 
-    cout << "Enter the date of the match: ";
-    cin >> date.tm_mday >> date.tm_mon >> date.tm_year;
+    cout << "Enter the date of the match (DD-MM-YYYY): ";
+    cin >> date;
 
-    Match match = Match(date);
+    Match match = Match(Utils::stringToDate(date));
 
     cin.ignore();
 

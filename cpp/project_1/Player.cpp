@@ -23,7 +23,7 @@ Player::~Player() {}
 
 Player Player::createPlayer(std::string name, std::string surname, std::string licenseID, PlayingPosition position, int salary, tm dateOfBirth)
 {
-    Player player(std::to_string(rand()), name, surname, licenseID, position, salary, dateOfBirth);
+    Player player(Utils::getUUID(), name, surname, licenseID, position, salary, dateOfBirth);
 
     player.save();
 

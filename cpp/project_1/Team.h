@@ -5,11 +5,39 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <optional>
 
 #include "util/StorableUnit.h"
 
 class Match;
 class Player;
+
+struct DateConstraint
+{
+    std::optional<std::tm> from = std::nullopt;
+    std::optional<std::tm> to = std::nullopt;
+
+    bool isDateInConstraint(std::tm date) const
+    {
+        if (from.has_value())
+        {
+            if (date.tm_year < from.value().tm_year || (date.tm_year == from.value().tm_year && (date.tm_mon < from.value().tm_mon || (date.tm_mon == from.value().tm_mon && date.tm_mday < from.value().tm_mday))))
+            {
+                return false;
+            }
+        }
+
+        if (to.has_value())
+        {
+            if (date.tm_year > to.value().tm_year || (date.tm_year == to.value().tm_year && (date.tm_mon > to.value().tm_mon || (date.tm_mon == to.value().tm_mon && date.tm_mday > to.value().tm_mday))))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+};
 
 /// @brief Class representing a soccer team
 class Team : public StorableUnit
@@ -69,11 +97,11 @@ public:
 
     std::string getDirector() const;
 
-    int getTotalGoals() const;
+    int getTotalGoals(DateConstraint) const;
 
-    int getTotalWins() const;
+    int getTotalWins(DateConstraint) const;
 
-    int getTotalLosses() const;
+    int getTotalLosses(DateConstraint) const;
 
     void setName(std::string);
 

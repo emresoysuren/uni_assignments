@@ -4,18 +4,11 @@ std::tm Utils::stringToDate(std::string str)
 {
     std::tm date;
 
-    std::string word;
+    std::vector<std::string> dateParts = spiltString(str, '-');
 
-    std::stringstream ss(str);
-
-    getline(ss, word, '-');
-    date.tm_mday = std::stoi(word);
-
-    getline(ss, word, '-');
-    date.tm_mon = std::stoi(word);
-
-    getline(ss, word, '-');
-    date.tm_year = std::stoi(word);
+    date.tm_mday = std::stoi(dateParts[0]);
+    date.tm_mon = std::stoi(dateParts[1]);
+    date.tm_year = std::stoi(dateParts[2]);
 
     return date;
 }
@@ -47,4 +40,13 @@ void Utils::clearScreen()
     std::cout << "\x1b[2J";
     // Move the cursor to the top left
     std::cout << "\x1b[H";
+}
+
+std::string Utils::getUUID()
+{
+    std::string result;
+
+    result = std::to_string(rand());
+
+    return result;
 }

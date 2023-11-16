@@ -41,7 +41,7 @@ std::vector<Team> Team::getAllTeams()
 
 Team Team::createTeam(std::string name, std::string address, std::string phoneNumber, std::string director)
 {
-    Team team(std::to_string(rand()), name, address, phoneNumber, director);
+    Team team(Utils::getUUID(), name, address, phoneNumber, director);
 
     team.save();
 
@@ -68,12 +68,15 @@ std::string Team::getPath() const
     return FILE_PATH;
 }
 
-int Team::getTotalGoals() const
+int Team::getTotalGoals(DateConstraint constraint) const
 {
     int total = 0;
 
     for (Match match : TeamStats::getMatchesWithTeam(*this))
     {
+        if (!constraint.isDateInConstraint(match.getDate()))
+            continue;
+
         for (TeamStats stats : match.getStats())
         {
             if (stats.getTeam().getID() == teamID)
@@ -86,12 +89,15 @@ int Team::getTotalGoals() const
     return total;
 }
 
-int Team::getTotalWins() const
+int Team::getTotalWins(DateConstraint constraint) const
 {
     int total = 0;
 
     for (Match match : TeamStats::getMatchesWithTeam(*this))
     {
+        if (!constraint.isDateInConstraint(match.getDate()))
+            continue;
+
         if (match.getWinner().getTeam().getID() == teamID)
         {
             total++;
@@ -101,12 +107,15 @@ int Team::getTotalWins() const
     return total;
 }
 
-int Team::getTotalLosses() const
+int Team::getTotalLosses(DateConstraint constraint) const
 {
     int total = 0;
 
     for (Match match : TeamStats::getMatchesWithTeam(*this))
     {
+        if (!constraint.isDateInConstraint(match.getDate()))
+            continue;
+
         if (match.getLoser().getTeam().getID() == teamID)
         {
             total++;

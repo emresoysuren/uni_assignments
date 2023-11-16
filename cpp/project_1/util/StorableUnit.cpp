@@ -91,7 +91,8 @@ std::vector<std::string> StorableUnit::getStored(std::string path, std::string k
             return Utils::spiltString(line, ';');
         }
     }
-    throw "Couldn't find.";
+
+    throw std::invalid_argument("Key not found");
 }
 
 std::vector<std::string> StorableUnit::getStored() const
@@ -175,9 +176,9 @@ void StorableUnit::deleteOnAnyMatch(std::string path, std::string key)
     rename("temp.data", path.c_str());
 }
 
-std::vector<std::string> StorableUnit::findKeysContains(std::string path, std::string key)
+std::vector<std::vector<std::string>> StorableUnit::findKeysContains(std::string path, std::string key)
 {
-    std::vector<std::string> result;
+    std::vector<std::vector<std::string>> result;
 
     std::ifstream rfile(path);
 
@@ -191,7 +192,7 @@ std::vector<std::string> StorableUnit::findKeysContains(std::string path, std::s
         {
             if (word == key)
             {
-                result.push_back(words[0]);
+                result.push_back(words);
                 break;
             }
         }

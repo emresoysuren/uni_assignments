@@ -7,7 +7,7 @@ TeamStats::TeamStats(std::string statsID, Match match, Team team, int goals)
     : statsID(statsID), match(match), team(team), goals(goals) {}
 
 TeamStats::TeamStats(Match match, Team team, int goals)
-    : statsID(std::to_string(rand())), match(match), team(team), goals(goals) {}
+    : statsID(Utils::getUUID()), match(match), team(team), goals(goals) {}
 
 std::vector<std::string> TeamStats::getArgs() const
 {
@@ -46,9 +46,9 @@ std::vector<TeamStats> TeamStats::getTeamStatsWithMatch(Match match)
 
 void TeamStats::removeTeamMatchesWithTeamID(std::string teamID)
 {
-    for (std::string key : findKeysContains(FILE_PATH, teamID))
+    for (std::vector<std::string> args : findKeysContains(FILE_PATH, teamID))
     {
-        Match::idToMatch(key).deleteMatch();
+        Match::idToMatch(args[1]).deleteMatch();
     }
 }
 
@@ -56,9 +56,9 @@ std::vector<Match> TeamStats::getMatchesWithTeam(Team team)
 {
     std::vector<Match> matches;
 
-    for (std::string key : StorableUnit::findKeysContains(FILE_PATH, team.getID()))
+    for (std::vector<std::string> args : StorableUnit::findKeysContains(FILE_PATH, team.getID()))
     {
-        matches.push_back(Match::idToMatch(key));
+        matches.push_back(Match::idToMatch(args[1]));
     }
 
     return matches;

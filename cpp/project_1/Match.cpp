@@ -9,7 +9,7 @@ Match::Match(std::string ID, std::tm date)
     : matchID(ID), date(date) {}
 
 Match::Match(std::tm date)
-    : matchID(std::to_string(rand())), date(date) {}
+    : matchID(Utils::getUUID()), date(date) {}
 
 Match::~Match() {}
 
