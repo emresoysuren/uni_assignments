@@ -13,7 +13,6 @@
 #pragma once
 
 #include <string>
-using namespace std;
 
 #include "structs.h"
 
@@ -22,8 +21,8 @@ struct Student
 {
 public:
     int studentID;
-    string name;
-    string surname;
+    std::string name;
+    std::string surname;
     float midterm;
     float assignment[2];
     float quiz[2];
@@ -67,7 +66,7 @@ public:
     {
         // The names and surnames that will be used to create the random student
 
-        static const string names[30] = {
+        static const std::string names[30] = {
             "John",
             "Mary",
             "Robert",
@@ -100,7 +99,7 @@ public:
             "Sandra",
         };
 
-        static const string surnames[30] = {
+        static const std::string surnames[30] = {
             "Smith",
             "Johnson",
             "Williams",
@@ -189,7 +188,7 @@ private:
 
         // If the number grade couldn't find a matching letter grade, throw an exception
         // This can only happen if the given number grade is not between right constraints
-        throw;
+        throw std::invalid_argument("The given number grade is not between right constraints");
     }
 
     /// @brief Generates a random number between the given min and max values

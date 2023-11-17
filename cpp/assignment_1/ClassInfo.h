@@ -17,7 +17,6 @@
 #include <string>
 #include <iomanip>
 #include <vector>
-using namespace std;
 
 #include "structs.h"
 #include "Student.h"
@@ -27,7 +26,7 @@ struct ClassInfo
 {
 public:
     /// @brief A map that hold the distribution of the grades
-    map<string, int> gradeDistribution;
+    std::map<std::string, int> gradeDistribution;
 
     /// @brief Holds the count of the students
     int studentCount;
@@ -87,7 +86,7 @@ public:
         {
             float gradePercentage = (float)v / studentCount * 100;
 
-            printTable({}, {k, to_string(v), roundedString(gradePercentage) + "%"});
+            printTable({}, {k, std::to_string(v), roundedString(gradePercentage) + "%"});
         }
     }
 
@@ -107,15 +106,15 @@ public:
 
             GradeInfo yearGradeInfo = student.yearGrade(coefficents);
 
-            printTable({}, {to_string(student.studentID + 1), student.name + " " + student.surname, yearGradeInfo.letter + " (" + roundedString(yearGradeInfo.number) + ")", netGradeInfo.letter + " (" + roundedString(netGradeInfo.number) + ")"});
+            printTable({}, {std::to_string(student.studentID + 1), student.name + " " + student.surname, yearGradeInfo.letter + " (" + roundedString(yearGradeInfo.number) + ")", netGradeInfo.letter + " (" + roundedString(netGradeInfo.number) + ")"});
         }
     }
 
     /// @brief Prints a table that shows all the other information about the class
     void printInfo()
     {
-        printTable({"Class Info", "Student Count", "Year Grade Coefficent", "Min Grade", "Max Grade", "Average", "Normal Distribution"},
-                   {to_string(studentCount), roundedString(coefficents.yearGrade * 100) + "%", roundedString(minGrade), roundedString(maxGrade), roundedString(average), roundedString(normalDistribution)});
+        printTable({"Class Info", "Student Count", "Year G. Coefficent", "Min Grade", "Max Grade", "Average", "Normal Distribution"},
+                   {std::to_string(studentCount), roundedString(coefficents.yearGrade * 100) + "%", roundedString(minGrade), roundedString(maxGrade), roundedString(average), roundedString(normalDistribution)});
     }
 
 private:
@@ -148,21 +147,21 @@ private:
     /// @brief Rounds the given string to 2 decimal places and returns it as a string
     /// @param number The number that will be rounded
     /// @return Returns the rounded string
-    string roundedString(float number)
+    std::string roundedString(float number)
     {
         // Converts the given number to string
-        string numString = to_string(number);
+        std::string numString = std::to_string(number);
 
         // Returns the string by cutting it to 2 decimal places using substr
         return numString.substr(0, numString.find(".") + 3);
     }
 
     /// @brief Prints a table with the given columns and datas
-    void printTable(vector<string> columns, vector<string> datas = {}, int width = 20, bool useTitle = true)
+    void printTable(std::vector<std::string> columns, std::vector<std::string> datas = {}, int width = 20, bool useTitle = true)
     {
         if (columns.size() > 0)
         {
-            cout << endl;
+            std::cout << std::endl;
 
             // If the useTitle is true, use the first element of the columns as the title and add line around it
             if (useTitle)
@@ -171,11 +170,11 @@ private:
 
                 int leftSide = floor((rowWidth - columns[0].size()) / 2);
 
-                cout << setw(rowWidth) << string(leftSide - 2, '-') + "[ " + columns[0] + " ]" + string(rowWidth - columns[0].size() - leftSide - 2, '-') << endl;
+                std::cout << std::setw(rowWidth) << std::string(leftSide - 2, '-') + "[ " + columns[0] + " ]" + std::string(rowWidth - columns[0].size() - leftSide - 2, '-') << std::endl;
             }
 
             // Iterate over the columns and print them with the given width
-            for (string column : columns)
+            for (std::string column : columns)
             {
                 // Skip the first element of the columns if the useTitle is true
                 if (column == columns[0])
@@ -183,24 +182,24 @@ private:
                     continue;
                 }
 
-                cout << setw(width) << column;
+                std::cout << std::setw(width) << column;
             }
 
             // Print a line that seperates the columns and the datas
-            cout << endl
-                 << string(width * (columns.size() - 1), '-') << endl;
+            std::cout << std::endl
+                      << std::string(width * (columns.size() - 1), '-') << std::endl;
         }
 
         // If provided print the datas
         if (datas.size() > 0)
         {
             // Iterate over the datas and print them with the given width
-            for (string data : datas)
+            for (std::string data : datas)
             {
-                cout << setw(width) << data;
+                std::cout << std::setw(width) << data;
             }
 
-            cout << endl;
+            std::cout << std::endl;
         }
     }
 };

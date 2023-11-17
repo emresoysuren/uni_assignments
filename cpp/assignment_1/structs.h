@@ -13,17 +13,16 @@
 #pragma once
 
 #include <string>
-using namespace std;
 
-/// @brief A struct that hold the information of the grades
+/// @brief A struct that holds the information of the grades
 struct GradeInfo
 {
-    string letter;
+    std::string letter;
     float coefficent;
     float number;
 };
 
-/// @brief A struct that hold the information of the coefficents of the exams
+/// @brief A struct that holds the information of the coefficents of the exams
 struct Coefficents
 {
     float assignment;
