@@ -10,7 +10,7 @@ class MenuContext
 private:
     std::vector<std::function<Menu()>> context;
 
-    void startMenu(Menu menu) const;
+    void startMenu(Menu menu, bool useContext = true) const;
 
 public:
     MenuContext();
@@ -18,12 +18,12 @@ public:
 
     bool isRoot() const;
 
-    void push(Menu menu);
-    void push(std::function<Menu()> menu);
+    void push(Menu menu, bool useContext = true);
+    void push(std::function<Menu()> menu, bool useContext = true);
 
     void pop();
 
     void reload() const;
 
-    static void run(Menu menu);
+    static void run(Menu menu, bool useContext = true);
 };

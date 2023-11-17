@@ -46,6 +46,7 @@ Menu statsOfTeamsMenu(DateConstraint);
 Menu updateMatchMenu(Match);
 Menu updateStatsMenu(TeamStats);
 Menu showTeamStatsMenu();
+Menu getPositionMenu(function<void(MenuContext, PlayingPosition)> callback, string, string = "");
 
 int main()
 {
@@ -140,7 +141,7 @@ Menu managePlayersOfTeam(Team team)
     for (Player player : team.getPlayers())
     {
         options.push_back(MenuOption{
-            player.getName() + " " + player.getSurname(),
+            player.getName() + " " + player.getSurname() + " (" + Player::positionToString(player.getPosition()) + ")",
             [team, player](MenuContext context)
             {
                 context.push([team, player]()
@@ -165,6 +166,19 @@ Menu manageTeamPlayerMenu(Team team, Player player)
                         {
                             context.push([player]()
                                          { return managePlayerMenu(player); });
+                        },
+                    },
+                    {
+                        "Player Position: " + Player::positionToString(player.getPosition()),
+                        [player](MenuContext context) mutable
+                        {
+                            context.push(getPositionMenu(
+                                [player](MenuContext context, PlayingPosition pos) mutable
+                                {
+                                    player.setPosition(pos);
+                                    context.pop();
+                                },
+                                "Playing Positions", "Select the position of the player. This will change the position detail of the player."));
                         },
                     },
                     {
@@ -679,19 +693,16 @@ Menu updatePlayerMenu(Player player)
                         },
                     },
                     {
-                        "Position: " + to_string(player.getPosition()),
+                        "Position: " + Player::positionToString(player.getPosition()),
                         [player](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            int pos;
-                            cout << "Enter the new position: ";
-                            cin >> pos;
-                            player.setPosition(Player::numToPosition(pos));
-
-                            cin.ignore();
-
-                            context.reload();
+                            context.push(getPositionMenu(
+                                [player](MenuContext context, PlayingPosition pos) mutable
+                                {
+                                    player.setPosition(pos);
+                                    context.pop();
+                                },
+                                "Playing Positions", "Select the position of the player."));
                         },
                     },
                     {
@@ -859,7 +870,8 @@ Player createPlayer()
     Utils::clearScreen();
 
     string name, surname, licenseID, dateOfBirth;
-    int position, salary;
+    int salary;
+    PlayingPosition *position;
 
     cout << "Enter the information of the player:" << endl;
 
@@ -869,8 +881,17 @@ Player createPlayer()
     cout << "Surname: ";
     cin >> surname;
 
-    cout << "Position: ";
-    cin >> position;
+    cin.ignore();
+
+    MenuContext::run(
+        getPositionMenu(
+            [position](MenuContext context, PlayingPosition pos) mutable
+            {
+                *position = pos;
+                context.pop();
+            },
+            "Playing Positions", "Select the position of the player."),
+        false);
 
     cout << "License ID: ";
     cin >> licenseID;
@@ -883,7 +904,7 @@ Player createPlayer()
 
     cin.ignore();
 
-    return Player::createPlayer(name, surname, licenseID, Player::numToPosition(position), salary, Utils::stringToDate(dateOfBirth));
+    return Player::createPlayer(name, surname, licenseID, *position, salary, Utils::stringToDate(dateOfBirth));
 }
 
 Match createMatch()
@@ -908,12 +929,10 @@ Match createMatch()
     {
         int goals;
 
-        Utils::clearScreen();
-
-        teamListMenu([t](MenuContext context, Team team)
-                     { *t = team; },
-                     "Select the #" + to_string(i + 1) + " Team")
-            .start();
+        MenuContext::run(teamListMenu([t](MenuContext context, Team team)
+                                      { *t = team; },
+                                      "Select the #" + to_string(i + 1) + " Team"),
+                         false);
 
         Utils::clearScreen();
 
@@ -930,4 +949,30 @@ Match createMatch()
     match.create(stats[0], stats[1]);
 
     return match;
+}
+
+// Functional
+
+Menu getPositionMenu(function<void(MenuContext, PlayingPosition)> callback, string title, string description)
+{
+    return Menu(
+        {
+            {"Keeper", [callback](MenuContext context) mutable
+             {
+                 callback(context, PlayingPosition::keeper);
+             }},
+            {"Defender", [callback](MenuContext context) mutable
+             {
+                 callback(context, PlayingPosition::defender);
+             }},
+            {"Midfielder", [callback](MenuContext context) mutable
+             {
+                 callback(context, PlayingPosition::midfielder);
+             }},
+            {"Forward", [callback](MenuContext context) mutable
+             {
+                 callback(context, PlayingPosition::forward);
+             }},
+        },
+        title, description);
 }

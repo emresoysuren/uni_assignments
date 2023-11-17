@@ -60,6 +60,8 @@ public:
     /// @return Returns the PlayingPosition corresponding to the given number
     static PlayingPosition numToPosition(int position);
 
+    static std::string positionToString(int);
+
     static std::vector<Player> getAllPlayers();
 
     static Player idToPlayer(std::string playerID);

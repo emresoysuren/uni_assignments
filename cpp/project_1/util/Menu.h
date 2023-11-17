@@ -41,8 +41,6 @@ private:
 
     static int getKey();
 
-    void start(MenuContext context, bool useContext) const;
-
 public:
     bool loopOptions = true;
 
@@ -53,8 +51,5 @@ public:
 
     ~Menu();
 
-    /// @brief Start the menu with the given options
-    void start(MenuContext context) const;
-
-    void start() const;
+    void start(MenuContext context, bool useContext = true) const;
 };

@@ -238,16 +238,6 @@ void Menu::start(MenuContext context, bool useContext) const
     opt[selected].func.value()(context);
 }
 
-void Menu::start(MenuContext context) const
-{
-    start(context, true);
-}
-
-void Menu::start() const
-{
-    start(MenuContext(), false);
-}
-
 void Menu::resetConsole()
 {
     std::cout << "\x1b[u"

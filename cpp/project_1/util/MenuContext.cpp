@@ -1,30 +1,28 @@
 #include "MenuContext.h"
 #include "Menu.h"
+#include "Utils.h"
 
 MenuContext::MenuContext() {}
 MenuContext::~MenuContext() {}
 
-void MenuContext::startMenu(Menu menu) const
+void MenuContext::startMenu(Menu menu, bool useContext) const
 {
-    // Clear the screen
-    std::cout << "\x1b[2J";
-    // Move the cursor to the top left
-    std::cout << "\x1b[H";
+    Utils::clearScreen();
 
-    menu.start(*this);
+    menu.start(*this, useContext);
 }
 
-void MenuContext::push(Menu menu)
+void MenuContext::push(Menu menu, bool useContext)
 {
     context.push_back([menu]()
                       { return menu; });
-    startMenu(menu);
+    startMenu(menu, useContext);
 }
 
-void MenuContext::push(std::function<Menu()> menu)
+void MenuContext::push(std::function<Menu()> menu, bool useContext)
 {
     context.push_back(menu);
-    startMenu(menu());
+    startMenu(menu(), useContext);
 }
 
 bool MenuContext::isRoot() const
@@ -34,7 +32,7 @@ bool MenuContext::isRoot() const
 
 void MenuContext::pop()
 {
-    if (context.size() == 1)
+    if (isRoot())
     {
         return;
     }
@@ -48,8 +46,8 @@ void MenuContext::reload() const
     startMenu(context.back()());
 }
 
-void MenuContext::run(Menu menu)
+void MenuContext::run(Menu menu, bool useContext)
 {
     MenuContext context;
-    context.push(menu);
+    context.push(menu, useContext);
 }

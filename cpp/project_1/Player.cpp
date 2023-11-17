@@ -48,6 +48,18 @@ PlayingPosition Player::numToPosition(int position)
     return positions[position];
 }
 
+std::string Player::positionToString(int position)
+{
+    static std::map<int, std::string> positions = {
+        {PlayingPosition::keeper, "Keeper"},
+        {PlayingPosition::defender, "Defender"},
+        {PlayingPosition::midfielder, "Midfielder"},
+        {PlayingPosition::forward, "Forward"},
+    };
+
+    return positions[position];
+}
+
 std::vector<Player> Player::getAllPlayers()
 {
     std::vector<Player> players;
