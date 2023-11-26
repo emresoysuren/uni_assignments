@@ -4,7 +4,6 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include <cmath>
 using namespace std;
 
 #include "Match.h"
@@ -52,6 +51,8 @@ Menu showTeamStatsMenu();
 Menu getPositionMenu(function<void(MenuContext, PlayingPosition)>, string, string = "");
 Menu manageGoalsMenu(TeamStats);
 Menu goalListMenu(TeamStats);
+Menu manageGoalMenu(PlayerGoal);
+Menu updateGoalMenu(PlayerGoal);
 
 int main()
 {
@@ -574,10 +575,10 @@ Menu goalListMenu(TeamStats stats)
 
     description << "You can manage, or learn more about a game record by selecting them." << endl
                 << endl
-                << "+" + string(53, '-') + "+" << endl
-                << "|   " << setw(10) << "Time" << setw(15) << "Team" << setw(25) << "Player"
+                << "+" + string(50, '-') + "+" << endl
+                << "|   " << setw(7) << "Time" << setw(15) << "Team" << setw(25) << "Player"
                 << "|" << endl
-                << "+" + string(53, '-') + "+" << endl;
+                << "+" + string(50, '-') + "+" << endl;
 
     for (PlayerGoal goal : stats.getGoals())
     {
@@ -585,26 +586,83 @@ Menu goalListMenu(TeamStats stats)
 
         title << left;
 
-        string timeStr = to_string((int)floor(goal.getTime() / 60)) + ":" + ((goal.getTime() % 60) > 9 ? "" : "0") + to_string(goal.getTime() % 60);
-
-        title << setw(10) << timeStr << setw(15) << goal.getStats().getTeam().getName() << setw(25) << goal.getPlayer().getName() + " " + goal.getPlayer().getSurname();
+        title << setw(7) << Utils::secondsToString(goal.getTime()) << setw(15) << goal.getStats().getTeam().getName() << setw(25) << goal.getPlayer().getName() + " " + goal.getPlayer().getSurname();
 
         options.push_back(MenuOption{
             title.str(),
-            // [goal](MenuContext context)
-            // {
-            //     context.push([match]()
-            //                  { return manageMatchMenu(match); });
-            // },
+            [goal](MenuContext context)
+            {
+                context.push([goal]()
+                             { return manageGoalMenu(goal); });
+            },
         });
     }
 
     return Menu(options, "Showing Goals of " + stats.getTeam().getName() + " (Found " + to_string(options.size()) + " records)", description.str());
 }
 
+Menu manageGoalMenu(PlayerGoal goal)
+{
+    // In order the menu to be updated, we need to access the goal object from the file
+    goal = PlayerGoal::idToPlayerGoal(goal.getID());
+
+    return Menu({
+                    {
+                        "Show Details",
+                        [goal](MenuContext context)
+                        {
+                            context.push([goal]()
+                                         { return updateGoalMenu(goal); });
+                        },
+                    },
+                    {
+                        "Delete Goal",
+                        [goal](MenuContext context)
+                        {
+                            goal.deleteGoal();
+                            context.pop();
+                        },
+                    },
+                },
+                "Showing " + Utils::secondsToString(goal.getTime()) + " " + goal.getStats().getTeam().getName() + " (Team) " + goal.getPlayer().getName() + " " + goal.getPlayer().getSurname() + " (Player) Goal", "Manage or learn more about the goal.");
+}
+
 // Functional units
 
 // Update functions
+
+Menu updateGoalMenu(PlayerGoal goal)
+{
+    // In order the menu to be updated, we need to access the goal object from the file
+    goal = PlayerGoal::idToPlayerGoal(goal.getID());
+
+    return Menu({
+                    {
+                        "Time: " + Utils::secondsToString(goal.getTime()),
+                        [goal](MenuContext context) mutable
+                        {
+                            goal.setTime(stoi(Utils::getInput("Enter the new time as seconds: ")));
+                            context.reload();
+                        },
+                    },
+                    {
+                        "Player: " + goal.getPlayer().getName() + " " + goal.getPlayer().getSurname(),
+                        [goal](MenuContext context) mutable
+                        {
+                            context.push(managePlayersOfTeam(
+                                goal.getStats().getTeam(),
+                                [goal](MenuContext context, Player player) mutable
+                                {
+                                    goal.setPlayer(player);
+                                    context.pop();
+                                },
+                                "Showing Players",
+                                "Change the player of the goal by selecting a new one."));
+                        },
+                    },
+                },
+                "Showing the details of " + Utils::secondsToString(goal.getTime()) + " " + goal.getStats().getTeam().getName() + " (Team) " + goal.getPlayer().getName() + " " + goal.getPlayer().getSurname() + " (Player) Goal", "Update the details of the goal by selecting the related option.");
+}
 
 Menu updateMatchMenu(Match match)
 {

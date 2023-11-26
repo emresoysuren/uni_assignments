@@ -80,3 +80,15 @@ int PlayerGoal::getTime() const
 {
     return time;
 }
+
+void PlayerGoal::setTime(int time)
+{
+    this->time = time;
+    resave();
+}
+
+void PlayerGoal::setPlayer(Player player)
+{
+    playerID = player.getID();
+    resave();
+}

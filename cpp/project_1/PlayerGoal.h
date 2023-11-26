@@ -40,4 +40,7 @@ public:
     TeamStats getStats() const;
     Player getPlayer() const;
     int getTime() const;
+
+    void setTime(int time);
+    void setPlayer(Player player);
 };

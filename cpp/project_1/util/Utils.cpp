@@ -87,3 +87,16 @@ std::vector<std::string> Utils::getMultipleInputs(std::string mainTitle, std::ve
 
     return result;
 }
+
+std::string Utils::secondsToString(int seconds)
+{
+    std::stringstream ss("");
+
+    int minutes = floor(seconds / 60);
+
+    int secondsLeft = seconds % 60;
+
+    ss << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << secondsLeft;
+
+    return ss.str();
+}

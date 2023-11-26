@@ -1,6 +1,8 @@
 #pragma once
 
 #include <ctime>
+#include <cmath>
+#include <iomanip>
 #include <sstream>
 #include <iostream>
 #include <string>
@@ -20,4 +22,6 @@ public:
     static std::vector<std::string> getMultipleInputs(std::string mainTitle, std::vector<std::string> titles);
 
     static std::string getUUID();
+
+    static std::string secondsToString(int seconds);
 };
