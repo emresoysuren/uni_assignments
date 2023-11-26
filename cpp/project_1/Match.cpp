@@ -2,6 +2,7 @@
 #include "util/Utils.h"
 #include "Team.h"
 #include "TeamStats.h"
+#include "PlayerGoal.h"
 
 const std::string Match::FILE_PATH = "matches.data";
 
@@ -17,7 +18,7 @@ TeamStats Match::getWinner() const
 {
     std::vector<TeamStats> teams = getStats();
 
-    if (teams[0].getGoals() > teams[1].getGoals())
+    if (teams[0].getGoals().size() > teams[1].getGoals().size())
     {
         return teams[0];
     }
@@ -29,7 +30,7 @@ TeamStats Match::getLoser() const
 {
     std::vector<TeamStats> teams = getStats();
 
-    if (teams[0].getGoals() > teams[1].getGoals())
+    if (teams[0].getGoals().size() > teams[1].getGoals().size())
     {
         return teams[1];
     }
@@ -37,16 +38,23 @@ TeamStats Match::getLoser() const
     return teams[0];
 }
 
+bool Match::isDraw() const
+{
+    std::vector<TeamStats> teams = getStats();
+
+    return teams[0].getGoals().size() == teams[1].getGoals().size();
+}
+
 std::string Match::getID() const
 {
     return matchID;
 }
 
-void Match::create(TeamStats team1, TeamStats team2)
+void Match::create(std::vector<Team> teams)
 {
     save();
-    team1.save();
-    team2.save();
+    TeamStats(*this, teams[0]).save();
+    TeamStats(*this, teams[1]).save();
 }
 
 void Match::deleteMatch() const

@@ -28,12 +28,12 @@ void Menu::printLineAt(int index, std::vector<MenuOption> *opt, bool highlight) 
         if ((*opt)[index].func.has_value())
         {
             // Green color
-            std::cout << "\x1b[32m";
+            std::cout << "\x1b[92m";
         }
         else
         {
             // Red color
-            std::cout << "\x1b[31m";
+            std::cout << "\x1b[91m";
         }
 
         std::cout << numberedOption(index, opt, highlight);
@@ -44,12 +44,12 @@ void Menu::printLineAt(int index, std::vector<MenuOption> *opt, bool highlight) 
     if ((*opt)[index].func.has_value())
     {
         // Blue color
-        std::cout << "\x1b[34m";
+        std::cout << "\x1b[94m";
     }
     else
     {
         // Black color
-        std::cout << "\x1b[30m";
+        std::cout << "\x1b[90m";
     }
 
     std::cout << numberedOption(index, opt);
@@ -108,7 +108,7 @@ void Menu::printDescription() const
 
     std::string line;
 
-    std::cout << "\x1b[35m";
+    std::cout << "\x1b[95m";
 
     while (getline(ss, line))
     {
@@ -140,7 +140,7 @@ void Menu::start(MenuContext context, bool useContext) const
 
     std::cout << "\x1b[?25l";
 
-    std::cout << "\x1b[34m";
+    std::cout << "\x1b[94m";
 
     if (title != "")
     {

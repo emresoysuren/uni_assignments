@@ -81,7 +81,7 @@ int Team::getTotalGoals(DateConstraint constraint) const
         {
             if (stats.getTeam().getID() == teamID)
             {
-                total += stats.getGoals();
+                total += stats.getGoals().size();
             }
         }
     }
@@ -96,6 +96,9 @@ int Team::getTotalWins(DateConstraint constraint) const
     for (Match match : TeamStats::getMatchesWithTeam(*this))
     {
         if (!constraint.isDateInConstraint(match.getDate()))
+            continue;
+
+        if (match.isDraw())
             continue;
 
         if (match.getWinner().getTeam().getID() == teamID)
@@ -114,6 +117,9 @@ int Team::getTotalLosses(DateConstraint constraint) const
     for (Match match : TeamStats::getMatchesWithTeam(*this))
     {
         if (!constraint.isDateInConstraint(match.getDate()))
+            continue;
+
+        if (match.isDraw())
             continue;
 
         if (match.getLoser().getTeam().getID() == teamID)

@@ -5,8 +5,12 @@
 #include <vector>
 
 #include "util/StorableUnit.h"
+
 #include "Team.h"
+class Team;
+
 #include "Player.h"
+class Player;
 
 class TeamPlayer : public StorableUnit
 {

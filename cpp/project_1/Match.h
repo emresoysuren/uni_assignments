@@ -10,7 +10,6 @@
 
 #include "util/StorableUnit.h"
 
-class Utils;
 class Team;
 class TeamStats;
 
@@ -29,7 +28,7 @@ public:
     Match(std::tm date);
     ~Match();
 
-    void create(TeamStats team1, TeamStats team2);
+    void create(std::vector<Team>);
 
     std::vector<TeamStats> getStats() const;
 
@@ -48,4 +47,6 @@ public:
     static Match idToMatch(std::string);
 
     static std::vector<Match> getAllMatches();
+
+    bool isDraw() const;
 };

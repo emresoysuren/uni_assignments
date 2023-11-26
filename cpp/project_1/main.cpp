@@ -3,16 +3,18 @@
 #include <vector>
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 using namespace std;
 
+#include "Match.h"
 #include "Player.h"
 #include "Team.h"
 #include "TeamStats.h"
-#include "Match.h"
 #include "./util/Menu.h"
 #include "./util/MenuContext.h"
 #include "./util/Utils.h"
 #include "TeamPlayer.h"
+#include "PlayerGoal.h"
 
 // Define the description of the controls
 #ifdef _WIN32
@@ -30,7 +32,7 @@ Team createTeam();
 Player createPlayer();
 Menu addPlayerMenu(Team);
 Menu managePlayerMenu(Player);
-Menu managePlayersOfTeam(Team);
+Menu managePlayersOfTeam(Team, function<void(MenuContext, Player)>, string, string = "");
 Menu playerMenu();
 Menu playersListMenu(function<void(MenuContext, Player)>, string, string = "");
 Menu manageTeamPlayerMenu(Team, Player);
@@ -46,7 +48,9 @@ Menu statsOfTeamsMenu(DateConstraint);
 Menu updateMatchMenu(Match);
 Menu updateStatsMenu(TeamStats);
 Menu showTeamStatsMenu();
-Menu getPositionMenu(function<void(MenuContext, PlayingPosition)> callback, string, string = "");
+Menu getPositionMenu(function<void(MenuContext, PlayingPosition)>, string, string = "");
+Menu manageGoalsMenu(TeamStats);
+Menu goalListMenu(TeamStats);
 
 int main()
 {
@@ -134,7 +138,7 @@ Menu teamListMenu(function<void(MenuContext, Team)> callback, string title, stri
     return Menu(options, title + " (Found " + to_string(options.size()) + " teams)", description);
 }
 
-Menu managePlayersOfTeam(Team team)
+Menu managePlayersOfTeam(Team team, function<void(MenuContext, Player)> callback, string title, string description)
 {
     vector<MenuOption> options = {};
 
@@ -142,15 +146,14 @@ Menu managePlayersOfTeam(Team team)
     {
         options.push_back(MenuOption{
             player.getName() + " " + player.getSurname() + " (" + Player::positionToString(player.getPosition()) + ")",
-            [team, player](MenuContext context)
+            [callback, player](MenuContext context)
             {
-                context.push([team, player]()
-                             { return manageTeamPlayerMenu(team, player); });
+                callback(context, player);
             },
         });
     }
 
-    return Menu(options, "Showing the Players of " + team.getName() + " (Team) (Found " + to_string(options.size()) + " players)", "Select a player to manage them.");
+    return Menu(options, title + " (Found " + to_string(options.size()) + " players)", description);
 }
 
 Menu manageTeamPlayerMenu(Team team, Player player)
@@ -239,7 +242,11 @@ Menu manageTeamMenu(Team team)
                         [team](MenuContext context)
                         {
                             context.push([team]()
-                                         { return managePlayersOfTeam(team); });
+                                         { return managePlayersOfTeam(
+                                               team, [team](MenuContext context, Player player)
+                                               { context.push([team, player]()
+                                                              { return manageTeamPlayerMenu(team, player); }); },
+                                               "Showing the Players of " + team.getName() + " (Team)", "Select a player to manage."); });
                         },
                     },
                     {
@@ -506,7 +513,7 @@ Menu matchListMenu()
 
         title << left;
 
-        title << setw(10) << Utils::dateToString(match.getDate()) << right << setw(15) << match.getWinner().getTeam().getName() << " vs " << left << setw(15) << match.getLoser().getTeam().getName() << setw(15) << "[" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]";
+        title << setw(10) << Utils::dateToString(match.getDate()) << right << setw(15) << match.getWinner().getTeam().getName() << " vs " << left << setw(15) << match.getLoser().getTeam().getName() << setw(15) << "[" + to_string(match.getWinner().getGoals().size()) + ":" + to_string(match.getLoser().getGoals().size()) + "]";
 
         options.push_back(MenuOption{
             title.str(),
@@ -544,7 +551,80 @@ Menu manageMatchMenu(Match match)
                         },
                     },
                 },
-                "Showing " + Utils::dateToString(match.getDate()) + " " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]" + " (Game Record)", "Manage or learn more about the game record.");
+                "Showing " + Utils::dateToString(match.getDate()) + " " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals().size()) + ":" + to_string(match.getLoser().getGoals().size()) + "]" + " (Game Record)", "Manage or learn more about the game record.");
+}
+
+Menu manageGoalsMenu(TeamStats stats)
+{
+    return Menu({
+                    {
+                        "Add Goal",
+                        [stats](MenuContext context) mutable
+                        {
+                            context.push(managePlayersOfTeam(
+                                stats.getTeam(), [stats](MenuContext context, Player player)
+                                {
+                                    Utils::clearScreen();
+
+                                    int time;
+                                    cout << "Enter the time as seconds: ";
+                                    cin >> time;
+
+                                    cin.ignore();
+
+                                    stats.addGoal(player, time);
+                                    context.pop(); },
+                                "Showing the Players of " + stats.getTeam().getName() + " (Team)", "Select a player to add a goal to the team."));
+                        },
+                    },
+                    {
+                        "Show Goals (" + to_string(stats.getGoals().size()) + ")",
+                        [stats](MenuContext context)
+                        {
+                            context.push([stats]()
+                                         { return goalListMenu(stats); });
+                        },
+                    },
+                },
+                "Goals Menu of " + stats.getTeam().getName() + " (Team)", "You can add a goal to the team, or see the list of goals by selecting them.");
+}
+
+Menu goalListMenu(TeamStats stats)
+{
+    vector<MenuOption> options = {};
+
+    stringstream description("");
+
+    description << left;
+
+    description << "You can manage, or learn more about a game record by selecting them." << endl
+                << endl
+                << "+" + string(53, '-') + "+" << endl
+                << "|   " << setw(10) << "Time" << setw(15) << "Team" << setw(25) << "Player"
+                << "|" << endl
+                << "+" + string(53, '-') + "+" << endl;
+
+    for (PlayerGoal goal : stats.getGoals())
+    {
+        stringstream title("");
+
+        title << left;
+
+        string timeStr = to_string((int)floor(goal.getTime() / 60)) + ":" + ((goal.getTime() % 60) > 9 ? "" : "0") + to_string(goal.getTime() % 60);
+
+        title << setw(10) << timeStr << setw(15) << goal.getStats().getTeam().getName() << setw(25) << goal.getPlayer().getName() + " " + goal.getPlayer().getSurname();
+
+        options.push_back(MenuOption{
+            title.str(),
+            // [goal](MenuContext context)
+            // {
+            //     context.push([match]()
+            //                  { return manageMatchMenu(match); });
+            // },
+        });
+    }
+
+    return Menu(options, "Showing Goals of " + stats.getTeam().getName() + " (Found " + to_string(options.size()) + " records)", description.str());
 }
 
 // Functional units
@@ -574,7 +654,7 @@ Menu updateMatchMenu(Match match)
                         },
                     },
                     {
-                        "Stats of Winner: " + match.getWinner().getTeam().getName() + " team, " + to_string(match.getWinner().getGoals()) + " goals",
+                        "Stats of Winner: " + match.getWinner().getTeam().getName() + " team, " + to_string(match.getWinner().getGoals().size()) + " goals",
                         [match](MenuContext context)
                         {
                             context.push(
@@ -585,7 +665,7 @@ Menu updateMatchMenu(Match match)
                         },
                     },
                     {
-                        "Stats of Loser: " + match.getLoser().getTeam().getName() + " team, " + to_string(match.getLoser().getGoals()) + " goals",
+                        "Stats of Loser: " + match.getLoser().getTeam().getName() + " team, " + to_string(match.getLoser().getGoals().size()) + " goals",
                         [match](MenuContext context)
                         {
                             context.push(
@@ -596,7 +676,7 @@ Menu updateMatchMenu(Match match)
                         },
                     },
                 },
-                "Showing the details of " + Utils::dateToString(match.getDate()) + " " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals()) + ":" + to_string(match.getLoser().getGoals()) + "]" + " (Game Record)", "Update the details of the game record by selecting the related option.");
+                "Showing the details of " + Utils::dateToString(match.getDate()) + " " + match.getWinner().getTeam().getName() + " " + match.getLoser().getTeam().getName() + " [" + to_string(match.getWinner().getGoals().size()) + ":" + to_string(match.getLoser().getGoals().size()) + "]" + " (Game Record)", "Update the details of the game record by selecting the related option.");
 }
 
 Menu updateStatsMenu(TeamStats stats)
@@ -611,25 +691,17 @@ Menu updateStatsMenu(TeamStats stats)
                         {
                             context.push(teamListMenu([stats](MenuContext context, Team team) mutable
                                                       { 
-                                                        stats.setTeam(team);
+                                                        stats.changeTeam(team);
                                                         context.pop(); },
-                                                      "Select the new Team"));
+                                                      "Select the new Team", "This will delete all the goals of the team."));
                         },
                     },
                     {
-                        "Goals: " + to_string(stats.getGoals()),
+                        "Goals: " + to_string(stats.getGoals().size()),
                         [stats](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            int goals;
-                            cout << "Enter the new goal count: ";
-                            cin >> goals;
-                            stats.setGoals(goals);
-
-                            cin.ignore();
-
-                            context.reload();
+                            context.push([stats]()
+                                         { return manageGoalsMenu(stats); });
                         },
                     },
                 },
@@ -920,33 +992,22 @@ Match createMatch()
 
     cin.ignore();
 
-    vector<TeamStats> stats;
-    stats.reserve(2);
+    // Get the teams
 
-    Team *t = (Team *)calloc(1, sizeof(Team));
+    vector<Team> teams;
+    teams.reserve(2);
 
     for (int i = 0; i < 2; i++)
     {
-        int goals;
-
-        MenuContext::run(teamListMenu([t](MenuContext context, Team team)
-                                      { *t = team; },
+        MenuContext::run(teamListMenu([&teams](MenuContext context, Team team) mutable
+                                      { teams.push_back(team); },
                                       "Select the #" + to_string(i + 1) + " Team"),
                          false);
-
-        Utils::clearScreen();
-
-        cout << "Enter the goals of " << t->getName() << ": ";
-        cin >> goals;
-
-        stats.push_back(TeamStats(match, *t, goals));
-
-        cin.ignore();
     }
 
-    delete t;
+    // Create the match
 
-    match.create(stats[0], stats[1]);
+    match.create(teams);
 
     return match;
 }

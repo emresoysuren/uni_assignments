@@ -1,17 +1,20 @@
 #include "TeamStats.h"
+#include "Match.h"
+#include "PlayerGoal.h"
 #include "Team.h"
+#include "Player.h"
 
 const std::string TeamStats::FILE_PATH = "match_team_stats.data";
 
-TeamStats::TeamStats(std::string statsID, Match match, Team team, int goals)
+TeamStats::TeamStats(std::string statsID, Match match, Team team, std::vector<PlayerGoal> goals)
     : statsID(statsID), match(match), team(team), goals(goals) {}
 
-TeamStats::TeamStats(Match match, Team team, int goals)
-    : statsID(Utils::getUUID()), match(match), team(team), goals(goals) {}
+TeamStats::TeamStats(Match match, Team team)
+    : statsID(Utils::getUUID()), match(match), team(team) {}
 
 std::vector<std::string> TeamStats::getArgs() const
 {
-    return {statsID, match.getID(), team.getID(), std::to_string(goals)};
+    return {statsID, match.getID(), team.getID()};
 }
 
 std::string TeamStats::getPath() const
@@ -26,6 +29,7 @@ void TeamStats::save() const
 
 void TeamStats::deleteStats() const
 {
+    PlayerGoal::deleteGoalsWithStatsID(statsID);
     deleteStored();
 }
 
@@ -37,11 +41,20 @@ std::vector<TeamStats> TeamStats::getTeamStatsWithMatch(Match match)
     {
         if (args[1] == match.getID())
         {
-            stats.push_back(TeamStats(args[0], match, Team::idToTeam(args[2]), std::stoi(args[3])));
+            stats.push_back(fromArgs(args));
         }
     }
 
     return stats;
+}
+
+TeamStats TeamStats::fromArgs(std::vector<std::string> args)
+{
+    Match match = Match::idToMatch(args[1]);
+    Team team = Team::idToTeam(args[2]);
+    std::vector<PlayerGoal> goals = PlayerGoal::getGoalsWithStatsID(args[0]);
+
+    return TeamStats(args[0], match, team, goals);
 }
 
 void TeamStats::removeTeamMatchesWithTeamID(std::string teamID)
@@ -64,11 +77,6 @@ std::vector<Match> TeamStats::getMatchesWithTeam(Team team)
     return matches;
 }
 
-int TeamStats::getGoals() const
-{
-    return goals;
-}
-
 std::string TeamStats::getID() const
 {
     return statsID;
@@ -86,19 +94,29 @@ Match TeamStats::getMatch() const
 
 TeamStats TeamStats::idToTeamStats(std::string statsID)
 {
-    std::vector<std::string> stats = getStored(FILE_PATH, statsID);
+    std::vector<std::string> args = getStored(FILE_PATH, statsID);
 
-    return TeamStats(stats[0], Match::idToMatch(stats[1]), Team::idToTeam(stats[2]), std::stoi(stats[3]));
+    return fromArgs(args);
 }
 
-void TeamStats::setGoals(int newValue)
+void TeamStats::changeTeam(Team team)
 {
-    goals = newValue;
+    PlayerGoal::deleteGoalsWithStatsID(statsID);
+    this->team = team;
     resave();
 }
 
-void TeamStats::setTeam(Team newValue)
+std::vector<PlayerGoal> TeamStats::getGoals() const
 {
-    team = newValue;
-    resave();
+    return PlayerGoal::getGoalsWithStatsID(statsID);
+}
+
+void TeamStats::addGoal(Player player, int time) const
+{
+    PlayerGoal(statsID, player.getID(), time).save();
+}
+
+void TeamStats::removeGoal(std::string playerGoalID) const
+{
+    PlayerGoal::idToPlayerGoal(playerGoalID).deleteGoal();
 }

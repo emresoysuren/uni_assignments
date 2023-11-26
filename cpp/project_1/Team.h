@@ -83,8 +83,6 @@ public:
 
     std::vector<Player> getPlayers() const;
 
-    std::vector<Match> getMatches() const;
-
     // Getter and setters
 
     std::string getName() const;

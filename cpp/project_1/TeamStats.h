@@ -1,12 +1,20 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
+#include "util/StorableUnit.h"
+
+#include "PlayerGoal.h"
+class PlayerGoal;
+
 #include "Match.h"
 class Match;
 
 #include "Team.h"
 class Team;
 
-#include "util/StorableUnit.h"
+class Player;
 
 class TeamStats : public StorableUnit
 {
@@ -15,15 +23,17 @@ private:
     std::string statsID;
     Match match;
     Team team;
-    int goals;
+    std::vector<PlayerGoal> goals;
 
     virtual std::vector<std::string> getArgs() const;
     virtual std::string getPath() const;
 
-public:
-    TeamStats(std::string, Match, Team, int = 0);
+    static TeamStats fromArgs(std::vector<std::string>);
 
-    TeamStats(Match, Team, int = 0);
+public:
+    TeamStats(std::string, Match, Team, std::vector<PlayerGoal>);
+
+    TeamStats(Match, Team);
 
     void save() const;
 
@@ -37,15 +47,15 @@ public:
 
     static TeamStats idToTeamStats(std::string);
 
-    int getGoals() const;
-
     std::string getID() const;
 
     Team getTeam() const;
 
     Match getMatch() const;
 
-    void setGoals(int);
+    std::vector<PlayerGoal> getGoals() const;
+    void addGoal(Player player, int time) const;
+    void removeGoal(std::string playerGoalID) const;
 
-    void setTeam(Team);
+    void changeTeam(Team);
 };

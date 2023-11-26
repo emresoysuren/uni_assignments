@@ -1,4 +1,6 @@
 #include "TeamPlayer.h"
+#include "Team.h"
+#include "Player.h"
 
 const std::string TeamPlayer::FILE_PATH = "team_player.data";
 
