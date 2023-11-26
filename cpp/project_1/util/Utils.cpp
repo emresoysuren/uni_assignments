@@ -50,3 +50,40 @@ std::string Utils::getUUID()
 
     return result;
 }
+
+std::string Utils::getInput(std::string title)
+{
+    return getMultipleInputs({title})[0];
+}
+
+std::vector<std::string> Utils::getMultipleInputs(std::vector<std::string> titles)
+{
+    return getMultipleInputs("", titles);
+}
+
+std::vector<std::string> Utils::getMultipleInputs(std::string mainTitle, std::vector<std::string> titles)
+{
+    clearScreen();
+
+    if (mainTitle != "")
+    {
+        std::cout << mainTitle << std::endl;
+    }
+
+    std::vector<std::string> result;
+
+    for (std::string title : titles)
+    {
+        std::cout << title;
+
+        std::string input;
+
+        std::cin >> input;
+
+        result.push_back(input);
+    }
+
+    std::cin.ignore();
+
+    return result;
+}

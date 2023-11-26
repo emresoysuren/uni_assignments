@@ -1,6 +1,7 @@
 #include <iostream>
 #include <functional>
 #include <vector>
+#include <string>
 #include <sstream>
 #include <iomanip>
 #include <cmath>
@@ -412,17 +413,7 @@ Menu showTeamStatsMenu()
                         "From: " + (constraint.from.has_value() ? Utils::dateToString(constraint.from.value()) : "Not Set"),
                         [](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            string date;
-
-                            cout << "Enter the date (DD-MM-YYYY): ";
-                            cin >> date;
-
-                            constraint.from = Utils::stringToDate(date);
-
-                            cin.ignore();
-
+                            constraint.from = Utils::stringToDate(Utils::getInput("From (DD-MM-YYYY): "));
                             context.reload();
                         },
                     },
@@ -430,17 +421,7 @@ Menu showTeamStatsMenu()
                         "To: " + (constraint.to.has_value() ? Utils::dateToString(constraint.to.value()) : "Not Set"),
                         [](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            string date;
-
-                            cout << "Enter the date (DD-MM-YYYY): ";
-                            cin >> date;
-
-                            constraint.to = Utils::stringToDate(date);
-
-                            cin.ignore();
-
+                            constraint.to = Utils::stringToDate(Utils::getInput("To (DD-MM-YYYY): "));
                             context.reload();
                         },
                     },
@@ -562,18 +543,12 @@ Menu manageGoalsMenu(TeamStats stats)
                         [stats](MenuContext context) mutable
                         {
                             context.push(managePlayersOfTeam(
-                                stats.getTeam(), [stats](MenuContext context, Player player)
+                                stats.getTeam(),
+                                [stats](MenuContext context, Player player)
                                 {
-                                    Utils::clearScreen();
-
-                                    int time;
-                                    cout << "Enter the time as seconds: ";
-                                    cin >> time;
-
-                                    cin.ignore();
-
-                                    stats.addGoal(player, time);
-                                    context.pop(); },
+                                    stats.addGoal(player, stoi(Utils::getInput("Enter the time as seconds: ")));
+                                    context.pop();
+                                },
                                 "Showing the Players of " + stats.getTeam().getName() + " (Team)", "Select a player to add a goal to the team."));
                         },
                     },
@@ -641,14 +616,7 @@ Menu updateMatchMenu(Match match)
                         "Date: " + Utils::dateToString(match.getDate()),
                         [match](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            string date;
-                            cout << "Enter the new date (DD-MM-YYYY): ";
-                            cin >> date;
-                            match.setDate(Utils::stringToDate(date));
-
-                            cin.ignore();
+                            match.setDate(Utils::stringToDate(Utils::getInput("Enter the new date (DD-MM-YYYY): ")));
 
                             context.reload();
                         },
@@ -720,15 +688,7 @@ Menu updatePlayerMenu(Player player)
                         "Name: " + player.getName(),
                         [player](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            string name;
-                            cout << "Enter the new name: ";
-                            cin >> name;
-                            player.setName(name);
-
-                            cin.ignore();
-
+                            player.setName(Utils::getInput("Enter the new name: "));
                             context.reload();
                         },
                     },
@@ -736,15 +696,7 @@ Menu updatePlayerMenu(Player player)
                         "Surname: " + player.getSurname(),
                         [player](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            string surname;
-                            cout << "Enter the new surname: ";
-                            cin >> surname;
-                            player.setSurname(surname);
-
-                            cin.ignore();
-
+                            player.setSurname(Utils::getInput("Enter the new surname: "));
                             context.reload();
                         },
                     },
@@ -752,15 +704,7 @@ Menu updatePlayerMenu(Player player)
                         "License ID: " + player.getLicenseID(),
                         [player](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            string licenseID;
-                            cout << "Enter the new license ID: ";
-                            cin >> licenseID;
-                            player.setLicenseID(licenseID);
-
-                            cin.ignore();
-
+                            player.setLicenseID(Utils::getInput("Enter the new license ID: "));
                             context.reload();
                         },
                     },
@@ -781,15 +725,7 @@ Menu updatePlayerMenu(Player player)
                         "Salary: " + to_string(player.getSalary()),
                         [player](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            int salary;
-                            cout << "Enter the new salary: ";
-                            cin >> salary;
-                            player.setSalary(salary);
-
-                            cin.ignore();
-
+                            player.setSalary(stoi(Utils::getInput("Enter the new salary: ")));
                             context.reload();
                         },
                     },
@@ -797,15 +733,7 @@ Menu updatePlayerMenu(Player player)
                         "Date Of Birth: " + Utils::dateToString(player.getDate()),
                         [player](MenuContext context) mutable
                         {
-                            Utils::clearScreen();
-
-                            string date;
-                            cout << "Enter the new date of birth (DD-MM-YYYY): ";
-                            cin >> date;
-                            player.setDate(Utils::stringToDate(date));
-
-                            cin.ignore();
-
+                            player.setDate(Utils::stringToDate(Utils::getInput("Enter the new date of birth (DD-MM-YYYY): ")));
                             context.reload();
                         },
                     },
@@ -845,15 +773,7 @@ Menu updateTeamMenu(Team team)
                      "Name: " + team.getName(),
                      [team](MenuContext context) mutable
                      {
-                         Utils::clearScreen();
-
-                         string name;
-                         cout << "Enter the new name: ";
-                         cin >> name;
-                         team.setName(name);
-
-                         cin.ignore();
-
+                         team.setName(Utils::getInput("Enter the new name: "));
                          context.reload();
                      },
                  },
@@ -861,15 +781,7 @@ Menu updateTeamMenu(Team team)
                      "Address: " + team.getAddr(),
                      [team](MenuContext context) mutable
                      {
-                         Utils::clearScreen();
-
-                         string address;
-                         cout << "Enter the new address: ";
-                         cin >> address;
-                         team.setAddr(address);
-
-                         cin.ignore();
-
+                         team.setAddr(Utils::getInput("Enter the new address: "));
                          context.reload();
                      },
                  },
@@ -877,15 +789,7 @@ Menu updateTeamMenu(Team team)
                      "Phone Number: " + team.getPhone(),
                      [team](MenuContext context) mutable
                      {
-                         Utils::clearScreen();
-
-                         string phoneNumber;
-                         cout << "Enter the new phone number: ";
-                         cin >> phoneNumber;
-                         team.setPhone(phoneNumber);
-
-                         cin.ignore();
-
+                         team.setPhone(Utils::getInput("Enter the new phone number: "));
                          context.reload();
                      },
                  },
@@ -893,15 +797,7 @@ Menu updateTeamMenu(Team team)
                      "Director: " + team.getDirector(),
                      [team](MenuContext context) mutable
                      {
-                         Utils::clearScreen();
-
-                         string director;
-                         cout << "Enter the new director: ";
-                         cin >> director;
-                         team.setDirector(director);
-
-                         cin.ignore();
-
+                         team.setDirector(Utils::getInput("Enter the new director: "));
                          context.reload();
                      },
                  }
@@ -914,46 +810,15 @@ Menu updateTeamMenu(Team team)
 
 Team createTeam()
 {
-    Utils::clearScreen();
-
-    string name, address, phoneNumber, director;
-
-    cout << "Enter the information of the team:" << endl;
-
-    cout << "Name: ";
-    cin >> name;
-
-    cout << "Address: ";
-    cin >> address;
-
-    cout << "Phone Number: ";
-    cin >> phoneNumber;
-
-    cout << "Director: ";
-    cin >> director;
-
-    cin.ignore();
-
-    return Team::createTeam(name, address, phoneNumber, director);
+    vector<string> inputs = Utils::getMultipleInputs("Enter the information of the team:", {"Name: ", "Address: ", "Phone Number: ", "Director: "});
+    return Team::createTeam(inputs[0], inputs[1], inputs[2], inputs[3]);
 }
 
 Player createPlayer()
 {
-    Utils::clearScreen();
+    vector<string> inputs = Utils::getMultipleInputs("Enter the information of the player:", {"Name: ", "Surname: ", "License ID: ", "Salary: ", "Date of Birth (DD-MM-YYYY): "});
 
-    string name, surname, licenseID, dateOfBirth;
-    int salary;
     PlayingPosition *position;
-
-    cout << "Enter the information of the player:" << endl;
-
-    cout << "Name: ";
-    cin >> name;
-
-    cout << "Surname: ";
-    cin >> surname;
-
-    cin.ignore();
 
     MenuContext::run(
         getPositionMenu(
@@ -965,32 +830,12 @@ Player createPlayer()
             "Playing Positions", "Select the position of the player."),
         false);
 
-    cout << "License ID: ";
-    cin >> licenseID;
-
-    cout << "Salary: ";
-    cin >> salary;
-
-    cout << "Date of Birth (DD-MM-YYYY): ";
-    cin >> dateOfBirth;
-
-    cin.ignore();
-
-    return Player::createPlayer(name, surname, licenseID, *position, salary, Utils::stringToDate(dateOfBirth));
+    return Player::createPlayer(inputs[0], inputs[1], inputs[2], *position, stoi(inputs[3]), Utils::stringToDate(inputs[4]));
 }
 
 Match createMatch()
 {
-    Utils::clearScreen();
-
-    string date;
-
-    cout << "Enter the date of the match (DD-MM-YYYY): ";
-    cin >> date;
-
-    Match match = Match(Utils::stringToDate(date));
-
-    cin.ignore();
+    Match match = Match(Utils::stringToDate(Utils::getInput("Enter the date of the match (DD-MM-YYYY): ")));
 
     // Get the teams
 
