@@ -31,7 +31,7 @@ public:
 
     static PlayerGoal idToPlayerGoal(std::string playerGoalID);
     static std::vector<PlayerGoal> getGoalsWithStatsID(std::string statsID);
-    static void deleteGoalsWithStatsID(std::string statsID);
+    static void deleteGoalsWithID(std::string ID);
 
     void save() const;
     void deleteGoal() const;

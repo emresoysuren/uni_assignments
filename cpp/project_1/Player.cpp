@@ -3,6 +3,7 @@
 #include "Team.h"
 #include "Match.h"
 #include "TeamPlayer.h"
+#include "PlayerGoal.h"
 
 const std::string Player::FILE_PATH = "players.data";
 
@@ -23,7 +24,7 @@ Player::~Player() {}
 
 Player Player::createPlayer(std::string name, std::string surname, std::string licenseID, PlayingPosition position, int salary, tm dateOfBirth)
 {
-    Player player(Utils::getUUID(), name, surname, licenseID, position, salary, dateOfBirth);
+    Player player(generateUniquePrimaryKey(FILE_PATH), name, surname, licenseID, position, salary, dateOfBirth);
 
     player.save();
 
@@ -33,6 +34,7 @@ Player Player::createPlayer(std::string name, std::string surname, std::string l
 void Player::deletePlayer() const
 {
     TeamPlayer::removeTeamOrPlayerWithID(playerID);
+    PlayerGoal::deleteGoalsWithID(playerID);
     deleteStored();
 }
 

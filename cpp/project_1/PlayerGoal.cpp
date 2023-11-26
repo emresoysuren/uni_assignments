@@ -20,7 +20,7 @@ PlayerGoal::PlayerGoal(std::string playerGoalsID, std::string statsID, std::stri
     : playerGoalsID(playerGoalsID), statsID(statsID), playerID(playerID), time(time) {}
 
 PlayerGoal::PlayerGoal(std::string statsID, std::string playerID, int time)
-    : playerGoalsID(Utils::getUUID()), statsID(statsID), playerID(playerID), time(time) {}
+    : playerGoalsID(generateUniquePrimaryKey(FILE_PATH)), statsID(statsID), playerID(playerID), time(time) {}
 
 PlayerGoal::~PlayerGoal() {}
 
@@ -56,9 +56,9 @@ std::vector<PlayerGoal> PlayerGoal::getGoalsWithStatsID(std::string statsID)
     return result;
 }
 
-void PlayerGoal::deleteGoalsWithStatsID(std::string statsID)
+void PlayerGoal::deleteGoalsWithID(std::string ID)
 {
-    deleteOnAnyMatch(FILE_PATH, statsID);
+    deleteOnAnyMatch(FILE_PATH, ID);
 }
 
 std::string PlayerGoal::getID() const

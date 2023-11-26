@@ -42,7 +42,7 @@ void Utils::clearScreen()
     std::cout << "\x1b[H";
 }
 
-std::string Utils::getUUID()
+std::string Utils::generateRandomKey()
 {
     std::string result;
 

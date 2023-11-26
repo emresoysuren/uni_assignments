@@ -21,7 +21,7 @@ public:
     static std::vector<std::string> getMultipleInputs(std::vector<std::string> titles);
     static std::vector<std::string> getMultipleInputs(std::string mainTitle, std::vector<std::string> titles);
 
-    static std::string getUUID();
+    static std::string generateRandomKey();
 
     static std::string secondsToString(int seconds);
 };

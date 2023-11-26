@@ -41,7 +41,7 @@ std::vector<Team> Team::getAllTeams()
 
 Team Team::createTeam(std::string name, std::string address, std::string phoneNumber, std::string director)
 {
-    Team team(Utils::getUUID(), name, address, phoneNumber, director);
+    Team team(generateUniquePrimaryKey(FILE_PATH), name, address, phoneNumber, director);
 
     team.save();
 

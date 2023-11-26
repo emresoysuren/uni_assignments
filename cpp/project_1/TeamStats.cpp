@@ -10,7 +10,7 @@ TeamStats::TeamStats(std::string statsID, Match match, Team team, std::vector<Pl
     : statsID(statsID), match(match), team(team), goals(goals) {}
 
 TeamStats::TeamStats(Match match, Team team)
-    : statsID(Utils::getUUID()), match(match), team(team) {}
+    : statsID(generateUniquePrimaryKey(FILE_PATH)), match(match), team(team) {}
 
 std::vector<std::string> TeamStats::getArgs() const
 {
@@ -29,7 +29,7 @@ void TeamStats::save() const
 
 void TeamStats::deleteStats() const
 {
-    PlayerGoal::deleteGoalsWithStatsID(statsID);
+    PlayerGoal::deleteGoalsWithID(statsID);
     deleteStored();
 }
 
@@ -101,7 +101,7 @@ TeamStats TeamStats::idToTeamStats(std::string statsID)
 
 void TeamStats::changeTeam(Team team)
 {
-    PlayerGoal::deleteGoalsWithStatsID(statsID);
+    PlayerGoal::deleteGoalsWithID(statsID);
     this->team = team;
     resave();
 }

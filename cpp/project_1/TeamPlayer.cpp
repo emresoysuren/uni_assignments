@@ -26,7 +26,7 @@ void TeamPlayer::save() const
         return;
     }
 
-    StorableUnit::save();
+    StorableUnit::save(false);
 }
 
 std::vector<Player> TeamPlayer::getPlayersOfTeam(Team team)

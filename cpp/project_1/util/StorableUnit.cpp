@@ -1,15 +1,20 @@
 #include "StorableUnit.h"
 
-void StorableUnit::save() const
+void StorableUnit::save(bool uniquePrimary) const
 {
-    std::ofstream file(getPath(), std::ios::app);
+    if (uniquePrimary && !isKeyUnique(getPath(), getArgs()[0], true))
+    {
+        throw std::invalid_argument("Key is not unique");
+    };
+
+    std ::ofstream file(getPath(), std::ios::app);
 
     file << getFormatedArgs() << std::endl;
 
     file.close();
 }
 
-bool StorableUnit::isKeyUnique(std::string path, std::string key)
+bool StorableUnit::isKeyUnique(std::string path, std::string key, bool onlyPrimary)
 {
     std::ifstream file(path);
 
@@ -17,6 +22,16 @@ bool StorableUnit::isKeyUnique(std::string path, std::string key)
 
     while (getline(file, line))
     {
+        if (onlyPrimary)
+        {
+            if (line.substr(0, line.find(';')) == key)
+            {
+                return false;
+            }
+
+            continue;
+        }
+
         for (std::string word : Utils::spiltString(line, ';'))
         {
             if (word == key)
@@ -31,9 +46,27 @@ bool StorableUnit::isKeyUnique(std::string path, std::string key)
     return true;
 }
 
+bool StorableUnit::isKeyUnique(std::string path, std::string key)
+{
+    return isKeyUnique(path, key, false);
+}
+
 bool StorableUnit::isKeyUnique(std::string key) const
 {
     return isKeyUnique(getPath(), key);
+}
+
+std::string StorableUnit::generateUniquePrimaryKey(std::string path)
+{
+    std::string key;
+
+    do
+    {
+        key = Utils::generateRandomKey();
+
+    } while (!isKeyUnique(path, key, true));
+
+    return key;
 }
 
 void StorableUnit::resave() const

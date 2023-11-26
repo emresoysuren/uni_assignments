@@ -20,11 +20,14 @@ protected:
     static std::vector<std::string> getStored(std::string, std::string);
 
     void deleteStored() const;
-    void save() const;
+    void save(bool uniquePrimary = true) const;
     void resave() const;
+
+    static std::string generateUniquePrimaryKey(std::string);
 
     static std::vector<std::vector<std::string>> getAllStored(std::string);
 
+    static bool isKeyUnique(std::string, std::string, bool onlyPrimary);
     static bool isKeyUnique(std::string, std::string);
     bool isKeyUnique(std::string) const;
 

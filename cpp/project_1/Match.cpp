@@ -10,7 +10,7 @@ Match::Match(std::string ID, std::tm date)
     : matchID(ID), date(date) {}
 
 Match::Match(std::tm date)
-    : matchID(Utils::getUUID()), date(date) {}
+    : matchID(generateUniquePrimaryKey(FILE_PATH)), date(date) {}
 
 Match::~Match() {}
 
