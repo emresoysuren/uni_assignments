@@ -172,7 +172,6 @@ StatsInfo Player::getStats(DateConstraint constraint) const
 
     std::set<Match> matches;
 
-    // @TODO other stats are depends on goals, fix it
     for (PlayerGoal goal : PlayerGoal::getGoalsWithID(playerID))
     {
         Match match = goal.getStats().getMatch();
@@ -185,6 +184,9 @@ StatsInfo Player::getStats(DateConstraint constraint) const
 
     for (Match match : TeamStats::getMatchesWithTeam(teamOfPlayer.value()))
     {
+        if (!constraint.isDateInConstraint(match.getDate()))
+            continue;
+
         if (match.isDraw())
         {
             playerStats.draws++;

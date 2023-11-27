@@ -54,6 +54,7 @@ Menu manageGoalsMenu(TeamStats);
 Menu goalListMenu(TeamStats);
 Menu manageGoalMenu(PlayerGoal);
 Menu updateGoalMenu(PlayerGoal);
+string constraintTitle(DateConstraint);
 
 int main()
 {
@@ -440,7 +441,17 @@ Menu showTeamStatsMenu()
 
 Menu statsOfTeamsMenu(DateConstraint constraint)
 {
-    int teams = 0;
+    vector<StatsPair> statsPairs;
+
+    for (Team team : Team::getAllTeams())
+    {
+        StatsInfo teamStats = team.getStats(constraint);
+
+        if (teamStats.isAllZero())
+            continue;
+
+        statsPairs.push_back({team.getName(), teamStats});
+    }
 
     stringstream desc("");
     desc << left;
@@ -451,35 +462,15 @@ Menu statsOfTeamsMenu(DateConstraint constraint)
          << "|" << endl
          << "+" + string(50, '-') + "+" << endl;
 
-    for (Team team : Team::getAllTeams())
+    Utils::quicksort<StatsPair>(&statsPairs, StatsPair::isLess);
+
+    for (StatsPair pair : statsPairs)
     {
-        StatsInfo teamStats = team.getStats(constraint);
-
-        if (teamStats.isAllZero())
-            continue;
-
-        teams++;
-
-        desc << "|" << setw(10) << team.getName() << setw(10) << to_string(teamStats.goals) << setw(10) << to_string(teamStats.wins) << setw(10) << to_string(teamStats.draws) << setw(10) << to_string(teamStats.losses) << "|" << endl;
+        desc << "|" << setw(10) << pair.name << setw(10) << to_string(pair.stats.goals) << setw(10) << to_string(pair.stats.wins) << setw(10) << to_string(pair.stats.draws) << setw(10) << to_string(pair.stats.losses) << "|" << endl;
     }
 
     desc << "+" + string(50, '-') + "+" << endl
          << endl;
-
-    string title = "All Time";
-
-    if (constraint.from.has_value() && constraint.to.has_value())
-    {
-        title = "From " + Utils::dateToString(constraint.from.value()) + " To " + Utils::dateToString(constraint.to.value());
-    }
-    else if (constraint.from.has_value())
-    {
-        title = "From " + Utils::dateToString(constraint.from.value());
-    }
-    else if (constraint.to.has_value())
-    {
-        title = "Until " + Utils::dateToString(constraint.to.value());
-    }
 
     return Menu({
                     {
@@ -492,12 +483,22 @@ Menu statsOfTeamsMenu(DateConstraint constraint)
                         },
                     },
                 },
-                "Showing Stats Of Teams " + title + " (Found " + to_string(teams) + " teams)", desc.str(), false);
+                "Showing Stats Of Teams " + constraintTitle(constraint) + " (Found " + to_string(statsPairs.size()) + " teams)", desc.str(), false);
 }
 
 Menu statsOfPlayersMenu(DateConstraint constraint)
 {
-    int players = 0;
+    vector<StatsPair> statsPairs;
+
+    for (Player player : Player::getAllPlayers())
+    {
+        StatsInfo playerStats = player.getStats(constraint);
+
+        if (playerStats.isAllZero())
+            continue;
+
+        statsPairs.push_back({player.getName() + " " + player.getSurname(), playerStats});
+    }
 
     stringstream desc("");
     desc << left;
@@ -508,35 +509,15 @@ Menu statsOfPlayersMenu(DateConstraint constraint)
          << "|" << endl
          << "+" + string(65, '-') + "+" << endl;
 
-    for (Player player : Player::getAllPlayers())
+    Utils::quicksort<StatsPair>(&statsPairs, StatsPair::isLess);
+
+    for (StatsPair pair : statsPairs)
     {
-        StatsInfo playerStats = player.getStats(constraint);
-
-        if (playerStats.goals == 0 && playerStats.wins == 0 && playerStats.draws == 0 && playerStats.losses == 0)
-            continue;
-
-        players++;
-
-        desc << "|" << setw(25) << player.getName() + " " + player.getSurname() << setw(10) << to_string(playerStats.goals) << setw(10) << to_string(playerStats.wins) << setw(10) << to_string(playerStats.draws) << setw(10) << to_string(playerStats.losses) << "|" << endl;
+        desc << "|" << setw(25) << pair.name << setw(10) << to_string(pair.stats.goals) << setw(10) << to_string(pair.stats.wins) << setw(10) << to_string(pair.stats.draws) << setw(10) << to_string(pair.stats.losses) << "|" << endl;
     }
 
     desc << "+" + string(65, '-') + "+" << endl
          << endl;
-
-    string title = "All Time";
-
-    if (constraint.from.has_value() && constraint.to.has_value())
-    {
-        title = "From " + Utils::dateToString(constraint.from.value()) + " To " + Utils::dateToString(constraint.to.value());
-    }
-    else if (constraint.from.has_value())
-    {
-        title = "From " + Utils::dateToString(constraint.from.value());
-    }
-    else if (constraint.to.has_value())
-    {
-        title = "Until " + Utils::dateToString(constraint.to.value());
-    }
 
     return Menu({
                     {
@@ -549,14 +530,19 @@ Menu statsOfPlayersMenu(DateConstraint constraint)
                         },
                     },
                 },
-                "Showing Stats Of Players " + title + " (Found " + to_string(players) + " players)", desc.str(), false);
+                "Showing Stats Of Players " + constraintTitle(constraint) + " (Found " + to_string(statsPairs.size()) + " players)", desc.str(), false);
 }
 
 Menu matchListMenu()
 {
     vector<MenuOption> options = {};
 
-    for (Match match : Match::getAllMatches())
+    vector<Match> matches = Match::getAllMatches();
+
+    // Utils::quicksort(matches, [](Match a, Match b)
+    //                  { return a.getDate() < b.getDate(); });
+
+    for (Match match : matches)
     {
         stringstream title("");
 
@@ -642,18 +628,26 @@ Menu goalListMenu(TeamStats stats)
 
     description << "You can manage, or learn more about a game record by selecting them." << endl
                 << endl
-                << "+" + string(50, '-') + "+" << endl
-                << "|   " << setw(7) << "Time" << setw(15) << "Team" << setw(25) << "Player"
+                << "+" + string(58, '-') + "+" << endl
+                << "|   " << setw(15) << "Time" << setw(15) << "Team" << setw(25) << "Player"
                 << "|" << endl
-                << "+" + string(50, '-') + "+" << endl;
+                << "+" + string(58, '-') + "+" << endl;
 
-    for (PlayerGoal goal : stats.getGoals())
+    vector<PlayerGoal> goals = stats.getGoals();
+
+    Utils::quicksort<PlayerGoal>(&goals,
+                                 [](PlayerGoal a, PlayerGoal b)
+                                 {
+                                     return a.getTime() < b.getTime();
+                                 });
+
+    for (PlayerGoal goal : goals)
     {
         stringstream title("");
 
         title << left;
 
-        title << setw(7) << Utils::secondsToString(goal.getTime()) << setw(15) << goal.getStats().getTeam().getName() << setw(25) << goal.getPlayer().getName() + " " + goal.getPlayer().getSurname();
+        title << setw(15) << Utils::secondsToString(goal.getTime()) << setw(15) << goal.getStats().getTeam().getName() << setw(25) << goal.getPlayer().getName() + " " + goal.getPlayer().getSurname();
 
         options.push_back(MenuOption{
             title.str(),
@@ -1006,4 +1000,24 @@ Menu getPositionMenu(function<void(MenuContext, PlayingPosition)> callback, stri
              }},
         },
         title, description);
+}
+
+string constraintTitle(DateConstraint constraint)
+{
+    string title = "All Time";
+
+    if (constraint.from.has_value() && constraint.to.has_value())
+    {
+        title = "From " + Utils::dateToString(constraint.from.value()) + " To " + Utils::dateToString(constraint.to.value());
+    }
+    else if (constraint.from.has_value())
+    {
+        title = "From " + Utils::dateToString(constraint.from.value());
+    }
+    else if (constraint.to.has_value())
+    {
+        title = "Until " + Utils::dateToString(constraint.to.value());
+    }
+
+    return title;
 }

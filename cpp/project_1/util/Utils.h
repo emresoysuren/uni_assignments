@@ -7,10 +7,15 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <functional>
 
 /// @brief A class that provides some utility functions for the project
 class Utils
 {
+private:
+    template <typename T>
+    static void swap(T *arr, int index1, int index2);
+
 public:
     /// @brief Gets a date input from the user (clears the screen before getting input and validates the input).
     /// If the input is invalid, the user will be asked to enter a valid input.
@@ -50,4 +55,74 @@ public:
 
     /// @brief Converts a time in seconds to a string in the format of mm:ss
     static std::string secondsToString(int seconds);
+
+    template <typename T>
+    static void quicksort(T *arr, std::function<bool(T, T)> isLess, int min, int max);
+
+    template <typename T>
+    static void quicksort(std::vector<T> *vec, std::function<bool(T, T)> isLess);
 };
+
+/// Template implementations
+
+template <typename T>
+void Utils::quicksort(std::vector<T> *vec, std::function<bool(T, T)> isLess)
+{
+    // Create an array with the same size as the vector
+    T *arr = (T *)calloc(vec->size(), sizeof(T));
+
+    // Copy the vector to an array
+    for (int i = 0; i < vec->size(); i++)
+    {
+        arr[i] = (*vec)[i];
+    }
+
+    // Sort the array
+    quicksort(arr, isLess, 0, vec->size());
+
+    // Copy the sorted array to the vector
+    for (int i = 0; i < vec->size(); i++)
+    {
+        (*vec)[i] = arr[i];
+    }
+
+    // Free the array
+    delete arr;
+}
+
+template <typename T>
+void Utils::quicksort(T *arr, std::function<bool(T, T)> isLess, int min, int max)
+{
+    if ((max - min) <= 1)
+        return;
+
+    int pivotIndex = min;
+    swap(arr, max - 1, pivotIndex);
+    pivotIndex = max - 1;
+
+    int leftWall = min;
+
+    for (int i = min; i < max - 1; i++)
+    {
+        if (!isLess(arr[pivotIndex], arr[i]))
+        {
+            swap(arr, i, leftWall);
+            leftWall++;
+        }
+    }
+
+    swap(arr, pivotIndex, leftWall);
+    pivotIndex = leftWall;
+
+    // Recursively sort the two partitions
+    quicksort(arr, isLess, min, pivotIndex);
+    quicksort(arr, isLess, pivotIndex + 1, max);
+}
+
+template <typename T>
+void Utils::swap(T *arr, int index1, int index2)
+{
+    T temp = arr[index1];
+    arr[index1] = arr[index2];
+    arr[index2] = temp;
+}
