@@ -11,6 +11,7 @@
 #include <optional>
 
 #include "util/StorableUnit.h"
+#include "StatsInfo.h"
 
 class Utils;
 class Team;
@@ -23,12 +24,6 @@ enum PlayingPosition
     defender,
     midfielder,
     forward,
-};
-
-/// @brief A struct to represent the stats of a player to be shown in the player stats table
-struct PlayerStats
-{
-    int goals = 0, wins = 0, draws = 0, losses = 0;
 };
 
 /// @brief A class to represent a player
@@ -127,7 +122,7 @@ public:
     /// @brief Gets the stats of the player in the given date constraint
     /// @param constraint The date constraint to get the stats in
     /// @return The stats of the player in the given date constraint (goals, wins, draws, losses)
-    PlayerStats getStats(DateConstraint constraint) const;
+    StatsInfo getStats(DateConstraint constraint) const;
 
     /// @brief Sets the date of birth of the player
     void setDate(std::tm date);

@@ -68,67 +68,38 @@ std::string Team::getPath() const
     return FILE_PATH;
 }
 
-int Team::getTotalGoals(DateConstraint constraint) const
+StatsInfo Team::getStats(DateConstraint constraint) const
 {
-    int total = 0;
+    StatsInfo teamStats;
 
     for (Match match : TeamStats::getMatchesWithTeam(*this))
     {
         if (!constraint.isDateInConstraint(match.getDate()))
             continue;
+
+        if (match.isDraw())
+        {
+            teamStats.draws++;
+        }
+        else if (match.getWinner().getTeam().getID() == teamID)
+        {
+            teamStats.wins++;
+        }
+        else
+        {
+            teamStats.losses++;
+        }
 
         for (TeamStats stats : match.getStats())
         {
             if (stats.getTeam().getID() == teamID)
             {
-                total += stats.getGoals().size();
+                teamStats.goals += stats.getGoals().size();
             }
         }
     }
 
-    return total;
-}
-
-int Team::getTotalWins(DateConstraint constraint) const
-{
-    int total = 0;
-
-    for (Match match : TeamStats::getMatchesWithTeam(*this))
-    {
-        if (!constraint.isDateInConstraint(match.getDate()))
-            continue;
-
-        if (match.isDraw())
-            continue;
-
-        if (match.getWinner().getTeam().getID() == teamID)
-        {
-            total++;
-        }
-    }
-
-    return total;
-}
-
-int Team::getTotalLosses(DateConstraint constraint) const
-{
-    int total = 0;
-
-    for (Match match : TeamStats::getMatchesWithTeam(*this))
-    {
-        if (!constraint.isDateInConstraint(match.getDate()))
-            continue;
-
-        if (match.isDraw())
-            continue;
-
-        if (match.getLoser().getTeam().getID() == teamID)
-        {
-            total++;
-        }
-    }
-
-    return total;
+    return teamStats;
 }
 
 std::string Team::getName() const

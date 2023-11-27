@@ -12,6 +12,11 @@
 class Utils
 {
 public:
+    /// @brief Gets a date input from the user (clears the screen before getting input and validates the input).
+    /// If the input is invalid, the user will be asked to enter a valid input.
+    /// @param title The title of the input to be shown to the user to get input
+    static std::tm getDateInput(std::string title);
+
     /// @brief Converts a string to a date from the format of dd-mm-yyyy
     static std::tm stringToDate(std::string str);
 

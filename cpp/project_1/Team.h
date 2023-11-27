@@ -8,6 +8,7 @@
 #include <optional>
 
 #include "util/StorableUnit.h"
+#include "StatsInfo.h"
 
 class Match;
 class Player;
@@ -123,20 +124,10 @@ public:
     /// @brief Gets the director of the team
     std::string getDirector() const;
 
-    /// @brief Gets the total goals of the team
+    /// @brief Gets the stats of the team (wins, draws, losses, goals) in the given date constraint
     /// @param constraint The date constraint to apply
-    /// @return The total goals of the team
-    int getTotalGoals(DateConstraint constraint) const;
-
-    /// @brief Gets the total wins of the team
-    /// @param constraint The date constraint to apply
-    /// @return The total wins of the team
-    int getTotalWins(DateConstraint constraint) const;
-
-    /// @brief Gets the total losses of the team
-    /// @param constraint The date constraint to apply
-    /// @return The total losses of the team
-    int getTotalLosses(DateConstraint constraint) const;
+    /// @return The stats of the team in the given date constraint
+    StatsInfo getStats(DateConstraint constraint) const;
 
     /// @brief Sets the name of the team
     /// @param newValue The new name of the team

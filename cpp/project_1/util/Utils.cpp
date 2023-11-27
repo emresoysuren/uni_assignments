@@ -6,6 +6,11 @@ std::tm Utils::stringToDate(std::string str)
 
     std::vector<std::string> dateParts = spiltString(str, '-');
 
+    if (dateParts.size() != 3)
+    {
+        throw std::invalid_argument("Invalid date format");
+    }
+
     date.tm_mday = std::stoi(dateParts[0]);
     date.tm_mon = std::stoi(dateParts[1]);
     date.tm_year = std::stoi(dateParts[2]);
@@ -99,4 +104,16 @@ std::string Utils::secondsToString(int seconds)
     ss << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << secondsLeft;
 
     return ss.str();
+}
+
+std::tm Utils::getDateInput(std::string title)
+{
+    try
+    {
+        return Utils::stringToDate(Utils::getInput(title));
+    }
+    catch (const std::exception &_)
+    {
+        return getDateInput(title);
+    }
 }

@@ -160,9 +160,9 @@ void Player::setLicenseID(std::string licenseID)
     resave();
 }
 
-PlayerStats Player::getStats(DateConstraint constraint) const
+StatsInfo Player::getStats(DateConstraint constraint) const
 {
-    PlayerStats playerStats;
+    StatsInfo playerStats;
     std::optional<Team> teamOfPlayer = getTeam();
 
     if (!teamOfPlayer.has_value())

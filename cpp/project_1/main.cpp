@@ -415,7 +415,7 @@ Menu showTeamStatsMenu()
                         "From: " + (constraint.from.has_value() ? Utils::dateToString(constraint.from.value()) : "Not Set"),
                         [](MenuContext context) mutable
                         {
-                            constraint.from = Utils::stringToDate(Utils::getInput("From (DD-MM-YYYY): "));
+                            constraint.from = Utils::getDateInput("From (DD-MM-YYYY): ");
                             context.reload();
                         },
                     },
@@ -423,7 +423,7 @@ Menu showTeamStatsMenu()
                         "To: " + (constraint.to.has_value() ? Utils::dateToString(constraint.to.value()) : "Not Set"),
                         [](MenuContext context) mutable
                         {
-                            constraint.to = Utils::stringToDate(Utils::getInput("To (DD-MM-YYYY): "));
+                            constraint.to = Utils::getDateInput("To (DD-MM-YYYY): ");
                             context.reload();
                         },
                     },
@@ -446,26 +446,24 @@ Menu statsOfTeamsMenu(DateConstraint constraint)
     desc << left;
 
     desc << endl
-         << "+" + string(40, '-') + "+" << endl
-         << "|" << setw(10) << "Team" << setw(10) << "Goals" << setw(10) << "Wins" << setw(10) << "Losses"
+         << "+" + string(50, '-') + "+" << endl
+         << "|" << setw(10) << "Team" << setw(10) << "Goals" << setw(10) << "Wins" << setw(10) << "Draws" << setw(10) << "Losses"
          << "|" << endl
-         << "+" + string(40, '-') + "+" << endl;
+         << "+" + string(50, '-') + "+" << endl;
 
     for (Team team : Team::getAllTeams())
     {
-        int goals = team.getTotalGoals(constraint);
-        int wins = team.getTotalWins(constraint);
-        int losses = team.getTotalLosses(constraint);
+        StatsInfo teamStats = team.getStats(constraint);
 
-        if (goals == 0 && wins == 0 && losses == 0)
+        if (teamStats.isAllZero())
             continue;
 
         teams++;
 
-        desc << "|" << setw(10) << team.getName() << setw(10) << to_string(goals) << setw(10) << to_string(wins) << setw(10) << to_string(losses) << "|" << endl;
+        desc << "|" << setw(10) << team.getName() << setw(10) << to_string(teamStats.goals) << setw(10) << to_string(teamStats.wins) << setw(10) << to_string(teamStats.draws) << setw(10) << to_string(teamStats.losses) << "|" << endl;
     }
 
-    desc << "+" + string(40, '-') + "+" << endl
+    desc << "+" + string(50, '-') + "+" << endl
          << endl;
 
     string title = "All Time";
@@ -512,7 +510,7 @@ Menu statsOfPlayersMenu(DateConstraint constraint)
 
     for (Player player : Player::getAllPlayers())
     {
-        PlayerStats playerStats = player.getStats(constraint);
+        StatsInfo playerStats = player.getStats(constraint);
 
         if (playerStats.goals == 0 && playerStats.wins == 0 && playerStats.draws == 0 && playerStats.losses == 0)
             continue;
@@ -743,7 +741,7 @@ Menu updateMatchMenu(Match match)
                         "Date: " + Utils::dateToString(match.getDate()),
                         [match](MenuContext context) mutable
                         {
-                            match.setDate(Utils::stringToDate(Utils::getInput("Enter the new date (DD-MM-YYYY): ")));
+                            match.setDate(Utils::getDateInput("Enter the new date (DD-MM-YYYY): "));
 
                             context.reload();
                         },
@@ -860,7 +858,7 @@ Menu updatePlayerMenu(Player player)
                         "Date Of Birth: " + Utils::dateToString(player.getDate()),
                         [player](MenuContext context) mutable
                         {
-                            player.setDate(Utils::stringToDate(Utils::getInput("Enter the new date of birth (DD-MM-YYYY): ")));
+                            player.setDate(Utils::getDateInput("Enter the new date of birth (DD-MM-YYYY): "));
                             context.reload();
                         },
                     },
@@ -962,7 +960,7 @@ Player createPlayer()
 
 Match createMatch()
 {
-    Match match = Match(Utils::stringToDate(Utils::getInput("Enter the date of the match (DD-MM-YYYY): ")));
+    Match match = Match(Utils::getDateInput("Enter the date of the match (DD-MM-YYYY): "));
 
     // Get the teams
 
