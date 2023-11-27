@@ -13,6 +13,7 @@ all: ${DIR} .app
 # Utils
 clean:
 	${RM_RF} ${DIR}
+	${RM_RF} ${EXEC}
 
 # Directories
 ${DIR}:

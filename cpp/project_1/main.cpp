@@ -27,12 +27,12 @@ using namespace std;
 Menu mainMenu();
 Menu teamMenu();
 Menu manageTeamMenu(Team);
-Menu teamListMenu(function<void(MenuContext, Team)>, string, string = "");
+Menu teamListMenu(function<void(MenuContext, Team)>, string, string = "", vector<Team> = {});
 Team createTeam();
 Player createPlayer();
 Menu addPlayerMenu(Team);
 Menu managePlayerMenu(Player);
-Menu managePlayersOfTeam(Team, function<void(MenuContext, Player)>, string, string = "");
+Menu managePlayersOfTeam(Team, function<void(MenuContext, Player)>, string, string = "", vector<Player> = {});
 Menu playerMenu();
 Menu playersListMenu(function<void(MenuContext, Player)>, string, string = "");
 Menu manageTeamPlayerMenu(Team, Player);
@@ -49,7 +49,7 @@ Menu statsOfPlayersMenu(DateConstraint);
 Menu updateMatchMenu(Match);
 Menu updateStatsMenu(TeamStats);
 Menu showTeamStatsMenu();
-Menu getPositionMenu(function<void(MenuContext, PlayingPosition)>, string, string = "");
+Menu getPositionMenu(function<void(MenuContext, PlayingPosition)>, string, string = "", vector<PlayingPosition> = {});
 Menu manageGoalsMenu(TeamStats);
 Menu goalListMenu(TeamStats);
 Menu manageGoalMenu(PlayerGoal);
@@ -124,36 +124,56 @@ Menu teamMenu()
                 "Teams", "You can create a team, or manage an existing one by selecting them.\nTo see the list of all teams, select the \"Show Teams\" option.");
 }
 
-Menu teamListMenu(function<void(MenuContext, Team)> callback, string title, string description)
+Menu teamListMenu(function<void(MenuContext, Team)> callback, string title, string description, vector<Team> blockTeams)
 {
     vector<MenuOption> options = {};
 
     for (Team team : Team::getAllTeams())
     {
+        optional<function<void(MenuContext)>> func = [team, callback](MenuContext context)
+        {
+            callback(context, team);
+        };
+
+        for (Team bt : blockTeams)
+        {
+            if (team.getID() == bt.getID())
+            {
+                func = nullopt;
+                break;
+            }
+        }
+
         options.push_back(MenuOption{
             team.getName(),
-            [team, callback](MenuContext context)
-            {
-                callback(context, team);
-            },
+            func,
         });
     }
 
     return Menu(options, title + " (Found " + to_string(options.size()) + " teams)", description);
 }
 
-Menu managePlayersOfTeam(Team team, function<void(MenuContext, Player)> callback, string title, string description)
+Menu managePlayersOfTeam(Team team, function<void(MenuContext, Player)> callback, string title, string description, vector<Player> blockPlayers)
 {
     vector<MenuOption> options = {};
 
     for (Player player : team.getPlayers())
     {
+        optional<function<void(MenuContext)>> func = [callback, player](MenuContext context)
+        { callback(context, player); };
+
+        for (Player bp : blockPlayers)
+        {
+            if (player.getID() == bp.getID())
+            {
+                func = nullopt;
+                break;
+            }
+        }
+
         options.push_back(MenuOption{
             player.getName() + " " + player.getSurname() + " (" + Player::positionToString(player.getPosition()) + ")",
-            [callback, player](MenuContext context)
-            {
-                callback(context, player);
-            },
+            func,
         });
     }
 
@@ -185,7 +205,7 @@ Menu manageTeamPlayerMenu(Team team, Player player)
                                     player.setPosition(pos);
                                     context.pop();
                                 },
-                                "Playing Positions", "Select the position of the player. This will change the position detail of the player."));
+                                "Playing Positions", "Select the position of the player. This will change the position detail of the player.", {player.getPosition()}));
                         },
                     },
                     {
@@ -719,7 +739,7 @@ Menu updateGoalMenu(PlayerGoal goal)
                                     context.pop();
                                 },
                                 "Showing Players",
-                                "Change the player of the goal by selecting a new one."));
+                                "Change the player of the goal by selecting a new one.", {goal.getPlayer()}));
                         },
                     },
                 },
@@ -781,7 +801,7 @@ Menu updateStatsMenu(TeamStats stats)
                                                       { 
                                                         stats.changeTeam(team);
                                                         context.pop(); },
-                                                      "Select the new Team", "This will delete all the goals of the team."));
+                                                      "Select the new Team", "This will delete all the goals of the team.", {stats.getTeam()}));
                         },
                     },
                     {
@@ -838,7 +858,7 @@ Menu updatePlayerMenu(Player player)
                                     player.setPosition(pos);
                                     context.pop();
                                 },
-                                "Playing Positions", "Select the position of the player."));
+                                "Playing Positions", "Select the position of the player.", {player.getPosition()}));
                         },
                     },
                     {
@@ -979,28 +999,40 @@ Match createMatch()
 
 // Functional
 
-Menu getPositionMenu(function<void(MenuContext, PlayingPosition)> callback, string title, string description)
+Menu getPositionMenu(function<void(MenuContext, PlayingPosition)> callback, string title, string description, vector<PlayingPosition> blockPositions)
 {
-    return Menu(
+    vector<MenuOption> options = {};
+
+    map<PlayingPosition, string> positions = {
+        {PlayingPosition::keeper, "Keeper"},
+        {PlayingPosition::defender, "Defender"},
+        {PlayingPosition::midfielder, "Midfielder"},
+        {PlayingPosition::forward, "Forward"},
+    };
+
+    for (const auto &[key, value] : positions)
+    {
+        optional<function<void(MenuContext)>> func = [callback, key](MenuContext context)
         {
-            {"Keeper", [callback](MenuContext context) mutable
-             {
-                 callback(context, PlayingPosition::keeper);
-             }},
-            {"Defender", [callback](MenuContext context) mutable
-             {
-                 callback(context, PlayingPosition::defender);
-             }},
-            {"Midfielder", [callback](MenuContext context) mutable
-             {
-                 callback(context, PlayingPosition::midfielder);
-             }},
-            {"Forward", [callback](MenuContext context) mutable
-             {
-                 callback(context, PlayingPosition::forward);
-             }},
-        },
-        title, description);
+            callback(context, key);
+        };
+
+        for (PlayingPosition bp : blockPositions)
+        {
+            if (key == bp)
+            {
+                func = nullopt;
+                break;
+            }
+        }
+
+        options.push_back(MenuOption{
+            value,
+            func,
+        });
+    }
+
+    return Menu(options, title, description);
 }
 
 string constraintTitle(DateConstraint constraint)

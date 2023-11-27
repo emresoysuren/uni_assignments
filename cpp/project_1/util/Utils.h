@@ -13,6 +13,11 @@
 class Utils
 {
 private:
+    /// @brief Swaps two elements in an array
+    /// @tparam T The type of the elements in the array
+    /// @param arr The array to swap the elements in
+    /// @param index1 The index of the first element to swap
+    /// @param index2 The index of the second element to swap
     template <typename T>
     static void swap(T *arr, int index1, int index2);
 
@@ -56,11 +61,23 @@ public:
     /// @brief Converts a time in seconds to a string in the format of mm:ss
     static std::string secondsToString(int seconds);
 
+    /// @brief Checks if a date is before another date
+    /// @return Returns true if the first date is before the second date, false otherwise
     static bool isDateBefore(std::tm date1, std::tm date2);
 
+    /// @brief Sorts an array using the quicksort algorithm
+    /// @tparam T The type of the elements in the array
+    /// @param arr The array to sort
+    /// @param isLess A function that takes two elements of type T and returns true if the first element is less than the second element (it's used to compare the elements)
+    /// @param min The minimum index of the array to sort (inclusive)
+    /// @param max The maximum index of the array to sort (exclusive)
     template <typename T>
     static void quicksort(T *arr, std::function<bool(T, T)> isLess, int min, int max);
 
+    /// @brief Sorts a vector using the quicksort algorithm
+    /// @tparam T The type of the elements in the vector
+    /// @param vec The vector to sort
+    /// @param isLess A function that takes two elements of type T and returns true if the first element is less than the second element (it's used to compare the elements)
     template <typename T>
     static void quicksort(std::vector<T> *vec, std::function<bool(T, T)> isLess);
 };
