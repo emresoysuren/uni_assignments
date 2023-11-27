@@ -9,43 +9,10 @@
 
 #include "util/StorableUnit.h"
 #include "StatsInfo.h"
+#include "DateConstraint.h"
 
 class Match;
 class Player;
-
-/// @brief A struct that represents a date constraint.
-struct DateConstraint
-{
-    /// @brief The date from which the constraint starts
-    std::optional<std::tm> from = std::nullopt;
-
-    /// @brief The date to which the constraint ends
-    std::optional<std::tm> to = std::nullopt;
-
-    /// @brief Checks if the given date is in the constraint. If the from or to values are ommited, they will be ignored.
-    /// @param date The date to check
-    /// @return Whether the date is in the constraint or not
-    bool isDateInConstraint(std::tm date) const
-    {
-        if (from.has_value())
-        {
-            if (date.tm_year < from.value().tm_year || (date.tm_year == from.value().tm_year && (date.tm_mon < from.value().tm_mon || (date.tm_mon == from.value().tm_mon && date.tm_mday < from.value().tm_mday))))
-            {
-                return false;
-            }
-        }
-
-        if (to.has_value())
-        {
-            if (date.tm_year > to.value().tm_year || (date.tm_year == to.value().tm_year && (date.tm_mon > to.value().tm_mon || (date.tm_mon == to.value().tm_mon && date.tm_mday > to.value().tm_mday))))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-};
 
 /// @brief Class representing a soccer team
 class Team : public StorableUnit

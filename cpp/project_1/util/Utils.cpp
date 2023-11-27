@@ -117,3 +117,41 @@ std::tm Utils::getDateInput(std::string title)
         return getDateInput(title);
     }
 }
+
+bool Utils::isDateBefore(std::tm date1, std::tm date2)
+{
+    if (date1.tm_year < date2.tm_year)
+    {
+        return true;
+    }
+    else if (date1.tm_year > date2.tm_year)
+    {
+        return false;
+    }
+
+    // If the years are equal
+
+    if (date1.tm_mon < date2.tm_mon)
+    {
+        return true;
+    }
+    else if (date1.tm_mon > date2.tm_mon)
+    {
+        return false;
+    }
+
+    // If the months are equal
+
+    if (date1.tm_mday < date2.tm_mday)
+    {
+        return true;
+    }
+    else if (date1.tm_mday > date2.tm_mday)
+    {
+        return false;
+    }
+
+    // If the days are equal
+
+    return false;
+}

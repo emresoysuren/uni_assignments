@@ -56,6 +56,8 @@ public:
     /// @brief Converts a time in seconds to a string in the format of mm:ss
     static std::string secondsToString(int seconds);
 
+    static bool isDateBefore(std::tm date1, std::tm date2);
+
     template <typename T>
     static void quicksort(T *arr, std::function<bool(T, T)> isLess, int min, int max);
 

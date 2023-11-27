@@ -539,8 +539,9 @@ Menu matchListMenu()
 
     vector<Match> matches = Match::getAllMatches();
 
-    // Utils::quicksort(matches, [](Match a, Match b)
-    //                  { return a.getDate() < b.getDate(); });
+    Utils::quicksort<Match>(&matches,
+                            [](Match a, Match b)
+                            { return Utils::isDateBefore(a.getDate(), b.getDate()); });
 
     for (Match match : matches)
     {

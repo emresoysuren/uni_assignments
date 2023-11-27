@@ -12,10 +12,10 @@
 
 #include "util/StorableUnit.h"
 #include "StatsInfo.h"
+#include "DateConstraint.h"
 
 class Utils;
 class Team;
-class DateConstraint;
 
 /// @brief Enum to represent the position of a player playing in a team
 enum PlayingPosition
