@@ -16,7 +16,7 @@ using namespace std;
 #include "TeamPlayer.h"
 #include "PlayerGoal.h"
 
-// Define the description of the controls
+// Define the description of the controls based on the platform
 #ifdef _WIN32
 #define CONTROL_DESCRIPTION "Use the W and S keys to navigate between options,\nEnter to select an option and Backspace to go back."
 #else

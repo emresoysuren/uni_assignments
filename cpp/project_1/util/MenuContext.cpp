@@ -5,14 +5,14 @@
 MenuContext::MenuContext() {}
 MenuContext::~MenuContext() {}
 
-void MenuContext::startMenu(Menu menu, bool useContext) const
+void MenuContext::startMenu(Menu menu, bool usePopButton) const
 {
     Utils::clearScreen();
 
-    menu.start(*this, useContext);
+    menu.start(*this, usePopButton);
 }
 
-void MenuContext::push(Menu menu, bool useContext, bool replace)
+void MenuContext::push(Menu menu, bool usePopButton, bool replace)
 {
     if (replace)
     {
@@ -25,10 +25,10 @@ void MenuContext::push(Menu menu, bool useContext, bool replace)
                           { return menu; });
     }
 
-    startMenu(menu, useContext);
+    startMenu(menu, usePopButton);
 }
 
-void MenuContext::push(std::function<Menu()> menu, bool useContext, bool replace)
+void MenuContext::push(std::function<Menu()> menu, bool usePopButton, bool replace)
 {
     if (replace)
     {
@@ -39,7 +39,7 @@ void MenuContext::push(std::function<Menu()> menu, bool useContext, bool replace
         context.push_back(menu);
     }
 
-    startMenu(menu(), useContext);
+    startMenu(menu(), usePopButton);
 }
 
 bool MenuContext::isRoot() const
@@ -63,8 +63,8 @@ void MenuContext::reload() const
     startMenu(context.back()());
 }
 
-void MenuContext::run(Menu menu, bool useContext)
+void MenuContext::run(Menu menu, bool usePopButton)
 {
     MenuContext context;
-    context.push(menu, useContext);
+    context.push(menu, usePopButton);
 }

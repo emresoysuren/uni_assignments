@@ -121,11 +121,11 @@ Menu::Menu(std::vector<MenuOption> options, std::string title, std::string descr
 
 Menu::~Menu() {}
 
-void Menu::start(MenuContext context, bool useContext) const
+void Menu::start(MenuContext context, bool usePopButton) const
 {
     std::vector<MenuOption> opt = this->options;
 
-    if (useContext)
+    if (usePopButton)
     {
         opt.push_back({
             context.isRoot() ? "Exit" : "Back",
