@@ -6,6 +6,7 @@
 #include <sstream>
 #include <ctime>
 #include <vector>
+#include <set>
 #include <map>
 #include <optional>
 
@@ -13,6 +14,7 @@
 
 class Utils;
 class Team;
+class DateConstraint;
 
 /// @brief Enum to represent the position of a player playing in a team
 enum PlayingPosition
@@ -21,6 +23,11 @@ enum PlayingPosition
     defender,
     midfielder,
     forward,
+};
+
+struct PlayerStats
+{
+    int goals = 0, wins = 0, draws = 0, losses = 0;
 };
 
 /// @brief A class to represent a player
@@ -74,6 +81,7 @@ public:
     int getSalary() const;
     PlayingPosition getPosition() const;
     std::string getLicenseID() const;
+    PlayerStats getStats(DateConstraint constraint) const;
 
     void setDate(std::tm date);
     void setName(std::string name);

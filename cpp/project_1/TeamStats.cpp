@@ -52,7 +52,7 @@ TeamStats TeamStats::fromArgs(std::vector<std::string> args)
 {
     Match match = Match::idToMatch(args[1]);
     Team team = Team::idToTeam(args[2]);
-    std::vector<PlayerGoal> goals = PlayerGoal::getGoalsWithStatsID(args[0]);
+    std::vector<PlayerGoal> goals = PlayerGoal::getGoalsWithID(args[0]);
 
     return TeamStats(args[0], match, team, goals);
 }
@@ -108,7 +108,7 @@ void TeamStats::changeTeam(Team team)
 
 std::vector<PlayerGoal> TeamStats::getGoals() const
 {
-    return PlayerGoal::getGoalsWithStatsID(statsID);
+    return PlayerGoal::getGoalsWithID(statsID);
 }
 
 void TeamStats::addGoal(Player player, int time) const

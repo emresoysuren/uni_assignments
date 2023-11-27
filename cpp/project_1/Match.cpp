@@ -111,3 +111,8 @@ void Match::setDate(std::tm newValue)
     date = newValue;
     resave();
 }
+
+bool Match::operator<(const Match &other) const
+{
+    return matchID < other.matchID;
+}

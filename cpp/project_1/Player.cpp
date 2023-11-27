@@ -3,6 +3,7 @@
 #include "Team.h"
 #include "Match.h"
 #include "TeamPlayer.h"
+#include "TeamStats.h"
 #include "PlayerGoal.h"
 
 const std::string Player::FILE_PATH = "players.data";
@@ -157,4 +158,46 @@ void Player::setLicenseID(std::string licenseID)
 {
     this->licenseID = licenseID;
     resave();
+}
+
+PlayerStats Player::getStats(DateConstraint constraint) const
+{
+    PlayerStats playerStats;
+    std::optional<Team> teamOfPlayer = getTeam();
+
+    if (!teamOfPlayer.has_value())
+    {
+        return playerStats;
+    }
+
+    std::set<Match> matches;
+
+    // @TODO other stats are depends on goals, fix it
+    for (PlayerGoal goal : PlayerGoal::getGoalsWithID(playerID))
+    {
+        Match match = goal.getStats().getMatch();
+
+        if (!constraint.isDateInConstraint(match.getDate()))
+            continue;
+
+        playerStats.goals++;
+    }
+
+    for (Match match : TeamStats::getMatchesWithTeam(teamOfPlayer.value()))
+    {
+        if (match.isDraw())
+        {
+            playerStats.draws++;
+        }
+        else if (match.getWinner().getTeam().getID() == teamOfPlayer.value().getID())
+        {
+            playerStats.wins++;
+        }
+        else
+        {
+            playerStats.losses++;
+        }
+    }
+
+    return playerStats;
 }

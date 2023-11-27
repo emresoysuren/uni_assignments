@@ -44,11 +44,11 @@ void PlayerGoal::deleteGoal() const
     deleteStored();
 }
 
-std::vector<PlayerGoal> PlayerGoal::getGoalsWithStatsID(std::string statsID)
+std::vector<PlayerGoal> PlayerGoal::getGoalsWithID(std::string ID)
 {
     std::vector<PlayerGoal> result;
 
-    for (std::vector<std::string> args : StorableUnit::findKeysContains(FILE_PATH, statsID))
+    for (std::vector<std::string> args : StorableUnit::findKeysContains(FILE_PATH, ID))
     {
         result.push_back(fromArgs(args));
     }

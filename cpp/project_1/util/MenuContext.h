@@ -18,8 +18,8 @@ public:
 
     bool isRoot() const;
 
-    void push(Menu menu, bool useContext = true);
-    void push(std::function<Menu()> menu, bool useContext = true);
+    void push(Menu menu, bool useContext = true, bool replace = false);
+    void push(std::function<Menu()> menu, bool useContext = true, bool replace = false);
 
     void pop();
 

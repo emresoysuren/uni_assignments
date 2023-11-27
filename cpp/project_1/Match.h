@@ -49,4 +49,6 @@ public:
     static std::vector<Match> getAllMatches();
 
     bool isDraw() const;
+
+    bool operator<(const Match &other) const;
 };

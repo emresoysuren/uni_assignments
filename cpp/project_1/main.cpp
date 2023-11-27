@@ -45,6 +45,7 @@ Menu updatePlayerMenu(Player);
 void updatePlayerName(Player);
 Menu updateTeamMenu(Team);
 Menu statsOfTeamsMenu(DateConstraint);
+Menu statsOfPlayersMenu(DateConstraint);
 Menu updateMatchMenu(Match);
 Menu updateStatsMenu(TeamStats);
 Menu showTeamStatsMenu();
@@ -394,7 +395,7 @@ Menu manageGameRecordsMenu()
                         },
                     },
                     {
-                        "Show Stats Of Teams",
+                        "Show Stats",
                         [](MenuContext context)
                         {
                             context.push(showTeamStatsMenu);
@@ -482,7 +483,75 @@ Menu statsOfTeamsMenu(DateConstraint constraint)
         title = "Until " + Utils::dateToString(constraint.to.value());
     }
 
-    return Menu({}, "Showing Stats Of Teams " + title + " (Found " + to_string(teams) + " teams)", desc.str(), false);
+    return Menu({
+                    {
+                        "Show Stats Of Players",
+                        [constraint](MenuContext context)
+                        {
+                            context.push([constraint]()
+                                         { return statsOfPlayersMenu(constraint); },
+                                         true, true);
+                        },
+                    },
+                },
+                "Showing Stats Of Teams " + title + " (Found " + to_string(teams) + " teams)", desc.str(), false);
+}
+
+Menu statsOfPlayersMenu(DateConstraint constraint)
+{
+    int players = 0;
+
+    stringstream desc("");
+    desc << left;
+
+    desc << endl
+         << "+" + string(65, '-') + "+" << endl
+         << "|" << setw(25) << "Player" << setw(10) << "Goals" << setw(10) << "Wins" << setw(10) << "Draws" << setw(10) << "Losses"
+         << "|" << endl
+         << "+" + string(65, '-') + "+" << endl;
+
+    for (Player player : Player::getAllPlayers())
+    {
+        PlayerStats playerStats = player.getStats(constraint);
+
+        if (playerStats.goals == 0 && playerStats.wins == 0 && playerStats.draws == 0 && playerStats.losses == 0)
+            continue;
+
+        players++;
+
+        desc << "|" << setw(25) << player.getName() + " " + player.getSurname() << setw(10) << to_string(playerStats.goals) << setw(10) << to_string(playerStats.wins) << setw(10) << to_string(playerStats.draws) << setw(10) << to_string(playerStats.losses) << "|" << endl;
+    }
+
+    desc << "+" + string(65, '-') + "+" << endl
+         << endl;
+
+    string title = "All Time";
+
+    if (constraint.from.has_value() && constraint.to.has_value())
+    {
+        title = "From " + Utils::dateToString(constraint.from.value()) + " To " + Utils::dateToString(constraint.to.value());
+    }
+    else if (constraint.from.has_value())
+    {
+        title = "From " + Utils::dateToString(constraint.from.value());
+    }
+    else if (constraint.to.has_value())
+    {
+        title = "Until " + Utils::dateToString(constraint.to.value());
+    }
+
+    return Menu({
+                    {
+                        "Show Stats Of Teams",
+                        [constraint](MenuContext context)
+                        {
+                            context.push([constraint]()
+                                         { return statsOfTeamsMenu(constraint); },
+                                         true, true);
+                        },
+                    },
+                },
+                "Showing Stats Of Players " + title + " (Found " + to_string(players) + " players)", desc.str(), false);
 }
 
 Menu matchListMenu()
