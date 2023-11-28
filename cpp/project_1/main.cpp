@@ -621,7 +621,7 @@ Menu manageGoalsMenu(TeamStats stats)
                                 stats.getTeam(),
                                 [stats](MenuContext context, Player player)
                                 {
-                                    stats.addGoal(player, stoi(Utils::getInput("Enter the time as seconds: ")));
+                                    stats.addGoal(player, Utils::getIntInput("Enter the time in seconds: "));
                                     context.pop();
                                 },
                                 "Showing the Players of " + stats.getTeam().getName() + " (Team)", "Select a player to add a goal to the team."));
@@ -723,7 +723,7 @@ Menu updateGoalMenu(PlayerGoal goal)
                         "Time: " + Utils::secondsToString(goal.getTime()),
                         [goal](MenuContext context) mutable
                         {
-                            goal.setTime(stoi(Utils::getInput("Enter the new time as seconds: ")));
+                            goal.setTime(Utils::getIntInput("Enter the new time in seconds: "));
                             context.reload();
                         },
                     },
@@ -865,7 +865,7 @@ Menu updatePlayerMenu(Player player)
                         "Salary: " + to_string(player.getSalary()),
                         [player](MenuContext context) mutable
                         {
-                            player.setSalary(stoi(Utils::getInput("Enter the new salary: ")));
+                            player.setSalary(Utils::getIntInput("Enter the new salary: "));
                             context.reload();
                         },
                     },
@@ -956,21 +956,25 @@ Team createTeam()
 
 Player createPlayer()
 {
-    vector<string> inputs = Utils::getMultipleInputs("Enter the information of the player:", {"Name: ", "Surname: ", "License ID: ", "Salary: ", "Date of Birth (DD-MM-YYYY): "});
+    vector<string> inputs = Utils::getMultipleInputs("Enter the information of the player:", {"Name: ", "Surname: ", "License ID: "});
 
-    PlayingPosition *position;
+    int salary = Utils::getIntInput("Salary: ");
+
+    tm date = Utils::getDateInput("Date Of Birth (DD-MM-YYYY): ");
+
+    PlayingPosition position;
 
     MenuContext::run(
         getPositionMenu(
-            [position](MenuContext context, PlayingPosition pos) mutable
+            [&position](MenuContext context, PlayingPosition pos) mutable
             {
-                *position = pos;
+                position = pos;
                 context.pop();
             },
             "Playing Positions", "Select the position of the player."),
         false);
 
-    return Player::createPlayer(inputs[0], inputs[1], inputs[2], *position, stoi(inputs[3]), Utils::stringToDate(inputs[4]));
+    return Player::createPlayer(inputs[0], inputs[1], inputs[2], position, salary, date);
 }
 
 Match createMatch()

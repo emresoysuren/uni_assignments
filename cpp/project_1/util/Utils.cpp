@@ -15,6 +15,21 @@ std::tm Utils::stringToDate(std::string str)
     date.tm_mon = std::stoi(dateParts[1]);
     date.tm_year = std::stoi(dateParts[2]);
 
+    if (date.tm_mday < 1 || date.tm_mday > 31)
+    {
+        throw std::invalid_argument("Invalid day value in date");
+    }
+
+    if (date.tm_mon < 1 || date.tm_mon > 12)
+    {
+        throw std::invalid_argument("Invalid month value in date");
+    }
+
+    if (date.tm_year < 0)
+    {
+        throw std::invalid_argument("Invalid year value in date");
+    }
+
     return date;
 }
 
@@ -58,7 +73,15 @@ std::string Utils::generateRandomKey()
 
 std::string Utils::getInput(std::string title)
 {
-    return getMultipleInputs({title})[0];
+    clearScreen();
+    std::cout << title;
+
+    std::string input;
+    std::cin >> input;
+
+    cinIgnore();
+
+    return input;
 }
 
 std::vector<std::string> Utils::getMultipleInputs(std::vector<std::string> titles)
@@ -82,13 +105,12 @@ std::vector<std::string> Utils::getMultipleInputs(std::string mainTitle, std::ve
         std::cout << title;
 
         std::string input;
-
         std::cin >> input;
+
+        cinIgnore();
 
         result.push_back(input);
     }
-
-    std::cin.ignore();
 
     return result;
 }
@@ -104,6 +126,18 @@ std::string Utils::secondsToString(int seconds)
     ss << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << secondsLeft;
 
     return ss.str();
+}
+
+int Utils::getIntInput(std::string title)
+{
+    try
+    {
+        return stoi(Utils::getInput(title));
+    }
+    catch (const std::exception &_)
+    {
+        return getIntInput(title);
+    }
 }
 
 std::tm Utils::getDateInput(std::string title)
@@ -154,4 +188,10 @@ bool Utils::isDateBefore(std::tm date1, std::tm date2)
     // If the days are equal
 
     return false;
+}
+
+void Utils::cinIgnore()
+{
+    std::cin.clear();
+    std::cin.ignore(INT_MAX, '\n');
 }

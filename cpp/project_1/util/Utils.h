@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <climits>
 #include <vector>
 #include <functional>
 
@@ -21,6 +22,9 @@ private:
     template <typename T>
     static void swap(T *arr, int index1, int index2);
 
+    /// @brief Clears and ingores the cin buffer
+    static void cinIgnore();
+
 public:
     /// @brief Gets a date input from the user (clears the screen before getting input and validates the input).
     /// If the input is invalid, the user will be asked to enter a valid input.
@@ -33,14 +37,21 @@ public:
     /// @brief Converts a date to a string in the format of dd-mm-yyyy
     static std::string dateToString(std::tm date);
 
+    /// @brief Gets a int input from the user (clears the screen before getting input and validates the input).
+    /// If the input is invalid, the user will be asked to enter a valid input.
+    /// @param title The title of the input to be shown to the user to get input
+    /// @return Returns the int input
+    static int getIntInput(std::string title);
+
     /// @brief Splits a string into a vector of strings using the given delimiter
     static std::vector<std::string> spiltString(std::string str, char delimiter);
 
     /// @brief Clears the screen
     static void clearScreen();
 
-    /// @brief Gets an input from the user (clears the screen before getting input)
+    /// @brief Gets an input from the user (clears the screen before getting input).
     /// @param title The title of the input to be shown to the user to get input
+    /// @return Returns the string input
     static std::string getInput(std::string title);
 
     /// @brief Gets multiple inputs from the user (clears the screen before getting input)
